@@ -1,0 +1,26 @@
+pluginManagement {
+    repositories {
+        mavenCentral()
+        maven { url 'https://repo.spring.io/release' }
+        // resolve last due to intermittent jcenter issues
+        gradlePluginPortal()
+    }
+}
+
+plugins {
+    id 'com.gradle.enterprise' version '3.11.1'
+    id 'io.spring.ge.conventions' version '0.0.11'
+}
+
+rootProject.name = 'micrometer-samples'
+
+buildCache {
+    remote(HttpBuildCache) {
+        url = 'https://ge.micrometer.io/cache/'
+    }
+}
+gradleEnterprise {
+    server = 'https://ge.micrometer.io'
+}
+
+include 'micrometer-samples-boot3'
