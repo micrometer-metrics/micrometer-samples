@@ -32,7 +32,8 @@ subprojects {
     apply plugin: 'io.spring.javaformat'
     apply plugin: 'com.diffplug.spotless'
     apply plugin: 'com.github.hierynomus.license'
-    apply plugin: 'io.spring.nohttp'
+    // TODO: apply this but ignore docker conf since it contains http:// urls
+//    apply plugin: 'io.spring.nohttp'
     apply plugin: 'org.gradle.test-retry'
 
     java {
