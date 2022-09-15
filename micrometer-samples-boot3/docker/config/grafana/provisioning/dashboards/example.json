@@ -65,6 +65,7 @@
               "mode": "off"
             }
           },
+          "decimals": 2,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -78,7 +79,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "gr/s"
         },
         "overrides": []
       },
@@ -108,13 +110,118 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum by (greeting_name)(rate(greeting_seconds_count[1m]))",
+          "expr": "sum(rate(greeting_seconds_count[1m])) by (greeting_name)",
           "legendFormat": "{{greeting_name}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Greetings by name",
+      "title": "Greetings by Name",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "gr/s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "sum((rate(greeting_greeted_total[1m])))",
+          "legendFormat": "greeted",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "sum((rate(greeting_failed_total[1m])))",
+          "hide": false,
+          "legendFormat": "failed",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Greetings by Outcome",
       "type": "timeseries"
     },
     {
@@ -173,12 +280,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 0
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 8
       },
-      "id": 7,
+      "id": 11,
       "options": {
         "legend": {
           "calcs": [],
@@ -198,8 +305,8 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum((rate(greeting_greeted_total[1m])))",
-          "legendFormat": "greeted",
+          "expr": "histogram_quantile(.9, sum(rate(greeting_seconds_bucket[1m])) by (le))",
+          "legendFormat": "TP95",
           "range": true,
           "refId": "A"
         },
@@ -209,19 +316,83 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "exemplar": true,
-          "expr": "sum((rate(greeting_failed_total[1m])))",
+          "exemplar": false,
+          "expr": "max(greeting_seconds_max)",
           "hide": false,
-          "legendFormat": "failed",
+          "legendFormat": "max",
           "range": true,
           "refId": "B"
         }
       ],
-      "title": "Greeted",
+      "title": "Greetings Latency Quantiles",
       "type": "timeseries"
+    },
+    {
+      "cards": {},
+      "color": {
+        "cardColor": "#b4ff00",
+        "colorScale": "sqrt",
+        "colorScheme": "interpolateSpectral",
+        "exponent": 0.5,
+        "mode": "spectrum"
+      },
+      "dataFormat": "tsbuckets",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      },
+      "heatmap": {},
+      "hideZeroBuckets": true,
+      "highlightCards": true,
+      "id": 9,
+      "legend": {
+        "show": true
+      },
+      "links": [],
+      "maxDataPoints": 30,
+      "reverseYBuckets": false,
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "sum(increase(greeting_seconds_bucket[$__interval])) by (le)",
+          "format": "heatmap",
+          "interval": "",
+          "legendFormat": "{{le}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Greetings Latency Histogram",
+      "tooltip": {
+        "show": true,
+        "showHistogram": true
+      },
+      "tooltipDecimals": 0,
+      "type": "heatmap",
+      "xAxis": {
+        "show": true
+      },
+      "yAxis": {
+        "decimals": 2,
+        "format": "s",
+        "logBase": 1,
+        "show": true
+      },
+      "yBucketBound": "auto"
     }
   ],
-  "refresh": false,
+  "refresh": "5s",
   "schemaVersion": 36,
   "style": "dark",
   "tags": [],
@@ -229,7 +400,7 @@
     "list": []
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
