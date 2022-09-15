@@ -74,8 +74,8 @@ class SampleController {
     private <T> Supplier<T> slowDown(Supplier<T> supplier) {
         return () -> {
             try {
-                if (Math.random() < 0.1) { // larger latency, less frequent
-                    Thread.sleep(500);
+                if (Math.random() < 0.02) { // huge latency, less frequent
+                    Thread.sleep(1_000);
                 }
                 Thread.sleep(((int) (Math.random() * 100)) + 100); // +base latency
             }
