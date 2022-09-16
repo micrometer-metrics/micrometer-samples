@@ -14,6 +14,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven { url 'https://repo.spring.io/milestone' }
     maven { url 'https://repo.spring.io/snapshot' }
@@ -32,6 +33,7 @@ dependencies {
 
     implementation 'io.micrometer:micrometer-registry-prometheus'
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+    implementation 'io.micrometer:micrometer-tracing:1.0.0-SNAPSHOT'
     implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
