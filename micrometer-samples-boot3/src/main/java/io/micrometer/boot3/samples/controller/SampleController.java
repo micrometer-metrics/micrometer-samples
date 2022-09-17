@@ -21,7 +21,6 @@ import java.util.function.Supplier;
 
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
-import io.micrometer.tracing.Tracer;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,11 +32,8 @@ class SampleController {
 
     private final ObservationRegistry registry;
 
-    private final Tracer tracer;
-
-    SampleController(ObservationRegistry registry, Tracer tracer) {
+    SampleController(ObservationRegistry registry) {
         this.registry = registry;
-        this.tracer = tracer;
     }
 
     @GetMapping("/")
