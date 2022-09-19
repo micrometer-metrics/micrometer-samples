@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: openfeign
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0

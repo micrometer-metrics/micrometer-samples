@@ -23,4 +23,4 @@ gradleEnterprise {
     server = 'https://ge.micrometer.io'
 }
 
-include 'micrometer-samples-boot3', 'micrometer-samples-boot3-database'
+include 'micrometer-samples-boot3', 'micrometer-samples-boot3-database', "openfeign", "mvc"

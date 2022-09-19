@@ -1,0 +1,11 @@
+server:
+  port: 7100
+
+spring:
+  application:
+    name: mvc
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
