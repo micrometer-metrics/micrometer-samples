@@ -3,12 +3,14 @@ services:
     zipkin:
         container_name: zipkin
         image: openzipkin/zipkin
+        extra_hosts: ['host.docker.internal:host-gateway']
         restart: always
         ports:
             - 9411:9411
     prometheus:
         image: prom/prometheus
         container_name: prometheus
+        extra_hosts: ['host.docker.internal:host-gateway']
         restart: always
         command:
             - --enable-feature=exemplar-storage
@@ -20,6 +22,7 @@ services:
     grafana:
         image: grafana/grafana
         container_name: grafana
+        extra_hosts: ['host.docker.internal:host-gateway']
         restart: always
         volumes:
             - ./docker/config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
