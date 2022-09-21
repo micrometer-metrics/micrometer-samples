@@ -29,10 +29,12 @@ public class OpenFeignApplication implements CommandLineRunner {
     public void run(String... args) throws Exception {
         this.openFeignService.call();
     }
+
 }
 
 @Service
 class OpenFeignService {
+
     private static final Logger log = LoggerFactory.getLogger(OpenFeignService.class);
 
     private final ProducerClient producerClient;
@@ -54,10 +56,13 @@ class OpenFeignService {
             span.end();
         }
     }
+
 }
 
 @FeignClient(url = "${url:http://localhost:7100}", name = "producer")
 interface ProducerClient {
+
     @GetMapping
     String callProducer();
+
 }

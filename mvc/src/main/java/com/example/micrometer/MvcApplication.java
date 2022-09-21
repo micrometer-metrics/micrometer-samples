@@ -20,10 +20,12 @@ public class MvcApplication {
     public static void main(String... args) {
         new SpringApplication(MvcApplication.class).run(args);
     }
+
 }
 
 @RestController
 class MvcController {
+
     private static final Logger log = LoggerFactory.getLogger(MvcController.class);
 
     private final Tracer tracer;
@@ -33,18 +35,19 @@ class MvcController {
     }
 
     // TODO: Uncomment this once Mvc gets instrumented in Framework
-//    @GetMapping("/")
-//    public String span() {
-//        String traceId = this.tracer.currentSpan().context().traceId();
-//        log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", traceId);
-//        return traceId;
-//    }
+    // @GetMapping("/")
+    // public String span() {
+    // String traceId = this.tracer.currentSpan().context().traceId();
+    // log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", traceId);
+    // return traceId;
+    // }
 
     @GetMapping("/")
-    public String span(@RequestHeader Map<String,String> headers) {
+    public String span(@RequestHeader Map<String, String> headers) {
         String traceId = headers.get("traceparent");
         Assert.notNull(traceId, "traceparent must not be null");
         log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", traceId.split("-")[1]);
         return traceId;
     }
+
 }
