@@ -17,8 +17,6 @@ package io.micrometer.boot3.samples.db;
 
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
