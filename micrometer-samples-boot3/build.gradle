@@ -33,8 +33,10 @@ dependencies {
 
     implementation 'io.micrometer:micrometer-registry-prometheus'
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+    implementation 'io.micrometer:micrometer-observation:1.10.0-SNAPSHOT'
     implementation 'io.micrometer:micrometer-tracing:1.0.0-SNAPSHOT'
     implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+    implementation 'io.micrometer:micrometer-observation-spring-boot-autoconfigure:0.1.0-SNAPSHOT'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
