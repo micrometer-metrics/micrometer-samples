@@ -15,33 +15,14 @@
  */
 package io.micrometer.boot3.samples;
 
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.config.MeterFilter;
-import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class PrometheusAndZipkinWithBraveSample {
 
     public static void main(String[] args) {
         SpringApplication.run(PrometheusAndZipkinWithBraveSample.class, args);
-    }
-
-    @Bean
-    MeterFilter meterFilter() {
-        return new MeterFilter() {
-            @Override
-            public DistributionStatisticConfig configure(Meter.Id id, DistributionStatisticConfig config) {
-                if (id.getName().equals("greeting")) {
-                    return DistributionStatisticConfig.builder().percentilesHistogram(true).build().merge(config);
-                }
-                else {
-                    return config;
-                }
-            }
-        };
     }
 
 }
