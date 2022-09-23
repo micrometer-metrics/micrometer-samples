@@ -32,8 +32,7 @@ subprojects {
     apply plugin: 'io.spring.javaformat'
     apply plugin: 'com.diffplug.spotless'
     apply plugin: 'com.github.hierynomus.license'
-    // TODO: apply this but ignore docker conf since it contains http:// urls
-//    apply plugin: 'io.spring.nohttp'
+    apply plugin: 'io.spring.nohttp'
     apply plugin: 'org.gradle.test-retry'
 
     java {
@@ -144,6 +143,10 @@ subprojects {
         ext.year = Calendar.getInstance().get(Calendar.YEAR)
         skipExistingHeaders = true
         exclude '**/*.json' // comments not supported
+    }
+
+    nohttp {
+        source.exclude '**/docker/**/*.yml'
     }
 
     spotless {
