@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micrometer.boot3.samples.controller;
+package io.micrometer.boot3.samples;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,9 +30,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 class SampleController {
 
-    private static final Logger log = LoggerFactory.getLogger(SampleController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SampleController.class);
 
-    private final List<String> PEOPLE = Arrays.asList("suzy", "mike");
+    private static final List<String> PEOPLE = Arrays.asList("suzy", "mike");
 
     private final ObservationRegistry registry;
 
@@ -74,6 +74,7 @@ class SampleController {
     private <T> Supplier<T> slowDown(Supplier<T> supplier) {
         return () -> {
             try {
+                LOGGER.info("Fetching the data");
                 if (Math.random() < 0.02) { // huge latency, less frequent
                     Thread.sleep(1_000);
                 }
@@ -82,7 +83,7 @@ class SampleController {
             catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            log.info("Fetching the data");
+
             return supplier.get();
         };
     }

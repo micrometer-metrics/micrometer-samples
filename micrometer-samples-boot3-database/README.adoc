@@ -1,3 +1,0 @@
-# IMPORTANT
-
-Run the `docker-compose.sh` script to properly setup `prometheus.yml`.

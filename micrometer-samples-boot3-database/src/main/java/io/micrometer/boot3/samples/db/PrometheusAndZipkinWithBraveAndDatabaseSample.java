@@ -15,12 +15,8 @@
  */
 package io.micrometer.boot3.samples.db;
 
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.config.MeterFilter;
-import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class PrometheusAndZipkinWithBraveAndDatabaseSample {
@@ -29,21 +25,6 @@ public class PrometheusAndZipkinWithBraveAndDatabaseSample {
         new SpringApplicationBuilder(PrometheusAndZipkinWithBraveAndDatabaseSample.class)
                 // TODO: Until we remove tracing from Boot
                 .properties("spring.main.allow-bean-definition-overriding=true").build().run(args);
-    }
-
-    @Bean
-    MeterFilter meterFilter() {
-        return new MeterFilter() {
-            @Override
-            public DistributionStatisticConfig configure(Meter.Id id, DistributionStatisticConfig config) {
-                if (id.getName().equals("greeting")) {
-                    return DistributionStatisticConfig.builder().percentilesHistogram(true).build().merge(config);
-                }
-                else {
-                    return config;
-                }
-            }
-        };
     }
 
 }
