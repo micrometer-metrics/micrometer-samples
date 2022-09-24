@@ -17,6 +17,7 @@ package io.micrometer.boot3.samples;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import io.micrometer.observation.Observation;
@@ -46,14 +47,14 @@ class SampleController {
     }
 
     @GetMapping("/greet/{name}")
-    String greet(@PathVariable String name) {
+    Map<String, String> greet(@PathVariable String name) {
         Observation observation = Observation.createNotStarted("greeting", registry).start();
         try (Observation.Scope scope = observation.openScope()) {
             if (PEOPLE.contains(name)) {
                 // only 2 names are valid (low cardinality)
                 observation.lowCardinalityKeyValue("greeting.name", name);
                 observation.event(Observation.Event.of("greeted"));
-                return fetchDataSlowly(() -> String.format("Hello %s!", name));
+                return fetchDataSlowly(() -> Map.of("greeted", name));
             }
             else {
                 observation.lowCardinalityKeyValue("greeting.name", "N/A");
@@ -74,7 +75,7 @@ class SampleController {
     private <T> Supplier<T> slowDown(Supplier<T> supplier) {
         return () -> {
             try {
-                LOGGER.info("Fetching the data");
+                LOGGER.info("<ACCEPTANCE_TEST> Fetching the data");
                 if (Math.random() < 0.02) { // huge latency, less frequent
                     Thread.sleep(1_000);
                 }
