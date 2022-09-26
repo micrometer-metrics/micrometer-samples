@@ -45,7 +45,11 @@ dependencies {
     runtimeOnly 'org.flywaydb:flyway-core'
     runtimeOnly 'com.h2database:h2'
 
+    testImplementation platform('org.testcontainers:testcontainers-bom:1.+')
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.rest-assured:rest-assured'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.awaitility:awaitility'
 }
 
 bootJar {
