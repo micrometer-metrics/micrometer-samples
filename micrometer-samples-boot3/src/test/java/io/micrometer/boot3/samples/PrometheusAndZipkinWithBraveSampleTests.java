@@ -40,6 +40,8 @@ import static io.prometheus.client.exporter.common.TextFormat.CONTENT_TYPE_OPENM
 import static io.restassured.RestAssured.*;
 import static io.restassured.http.ContentType.JSON;
 import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.springframework.boot.test.context.SpringBootTest.UseMainMethod.ALWAYS;
@@ -146,11 +148,14 @@ class PrometheusAndZipkinWithBraveSampleTests {
                 .statusCode(200)
                 .contentType(JSON)
                 .body("size()", equalTo(1))
-                .body("[0].traceId", equalTo(traceId))
-                .body("[0].name", equalTo("greeting"))
-                .body("[0].localEndpoint.serviceName", equalTo("boot3-sample"))
-                .body("[0].annotations[0].value", equalTo("greeted"))
-                .body("[0].tags['greeting.name']", equalTo("suzy"));
+                .rootPath("[0]")
+                    .body("traceId", equalTo(traceId))
+                    .body("id", equalTo(traceId))
+                    .body("parentId", is(nullValue()))
+                    .body("name", equalTo("greeting"))
+                    .body("localEndpoint.serviceName", equalTo("boot3-sample"))
+                    .body("annotations[0].value", equalTo("greeted"))
+                    .body("tags['greeting.name']", equalTo("suzy"));
         // @formatter:on
     }
 
