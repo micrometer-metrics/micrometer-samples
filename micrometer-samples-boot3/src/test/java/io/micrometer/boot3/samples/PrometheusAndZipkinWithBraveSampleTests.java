@@ -49,7 +49,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @AutoConfigureObservability
 @ExtendWith(OutputCaptureExtension.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT, useMainMethod = ALWAYS)
-class PrometheusAndZipkinWithBraveSampleTest {
+class PrometheusAndZipkinWithBraveSampleTests {
 
     private static final Pattern TRACE_PATTERN = Pattern
             .compile("^.+INFO \\[(.+),(\\p{XDigit}+),(\\p{XDigit}+)\\] .+ <ACCEPTANCE_TEST>.+$");
@@ -141,17 +141,16 @@ class PrometheusAndZipkinWithBraveSampleTest {
                 .port(zipkin.getFirstMappedPort())
                 .accept(JSON)
         .when()
-                .get("/zipkin/api/v2/traces")
+                .get("/zipkin/api/v2/trace/" + traceId)
         .then()
                 .statusCode(200)
                 .contentType(JSON)
                 .body("size()", equalTo(1))
-                .body("[0].size()", equalTo(1))
-                .body("[0][0].traceId", equalTo(traceId))
-                .body("[0][0].name", equalTo("greeting"))
-                .body("[0][0].localEndpoint.serviceName", equalTo("boot3-sample"))
-                .body("[0][0].annotations[0].value", equalTo("greeted"))
-                .body("[0][0].tags['greeting.name']", equalTo("suzy"));
+                .body("[0].traceId", equalTo(traceId))
+                .body("[0].name", equalTo("greeting"))
+                .body("[0].localEndpoint.serviceName", equalTo("boot3-sample"))
+                .body("[0].annotations[0].value", equalTo("greeted"))
+                .body("[0].tags['greeting.name']", equalTo("suzy"));
         // @formatter:on
     }
 
