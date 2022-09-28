@@ -55,12 +55,7 @@ workflows:
   version: 2
   build_prs:
     jobs:
-      - build:
-          filters:
-            branches:
-              only:
-                - main
-                - /\d+\.\d+\.x/
+      - build
   nightly:
     triggers:
       - schedule:
