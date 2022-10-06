@@ -161,7 +161,7 @@ class PrometheusAndZipkinWithBraveAndDatabaseSampleTests {
                     .body("id", not(equalTo(traceId)))
                     .body("parentId", not(equalTo(traceId)))
                     .body("kind", equalTo("CLIENT"))
-                    .body("remoteEndpoint.serviceName", equalTo("datasource"))
+                    .body("remoteEndpoint.serviceName", equalTo("testdb"))
                     .body("tags['jdbc.query[0]']", equalTo("SELECT name FROM emp where name=?"));
         // @formatter:on
     }
