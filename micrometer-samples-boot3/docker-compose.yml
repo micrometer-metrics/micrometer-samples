@@ -24,6 +24,10 @@ services:
         container_name: grafana
         extra_hosts: ['host.docker.internal:host-gateway']
         restart: always
+        environment:
+            - GF_AUTH_ANONYMOUS_ENABLED=true
+            - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+            - GF_AUTH_DISABLE_LOGIN_FORM=true
         volumes:
             - ./docker/config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
             - ./docker/config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
@@ -31,4 +35,4 @@ services:
             - 3000:3000
 # Zipkin: http://localhost:9411/zipkin/
 # Prometheus: http://localhost:9090/
-# Grafana: http://localhost:3000/ (admin:admin)
+# Grafana: http://localhost:3000/

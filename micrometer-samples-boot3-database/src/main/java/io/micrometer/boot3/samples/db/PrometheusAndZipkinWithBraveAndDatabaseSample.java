@@ -15,16 +15,14 @@
  */
 package io.micrometer.boot3.samples.db;
 
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 
 @SpringBootApplication
 public class PrometheusAndZipkinWithBraveAndDatabaseSample {
 
     public static void main(String[] args) {
-        new SpringApplicationBuilder(PrometheusAndZipkinWithBraveAndDatabaseSample.class)
-                // TODO: Until we remove tracing from Boot
-                .properties("spring.main.allow-bean-definition-overriding=true").build().run(args);
+        SpringApplication.run(PrometheusAndZipkinWithBraveAndDatabaseSample.class, args);
     }
 
 }

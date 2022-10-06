@@ -39,7 +39,7 @@ dependencies {
     implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
     implementation 'io.micrometer:micrometer-observation-spring-boot-autoconfigure:0.1.0-SNAPSHOT'
 
-    implementation 'net.ttddyy.observation:datasource-micrometer-spring-boot:0.0.1-SNAPSHOT'
+    implementation 'net.ttddyy.observation:datasource-micrometer-spring-boot:1.0.0-SNAPSHOT'
 
     runtimeOnly 'org.flywaydb:flyway-core'
     runtimeOnly 'com.h2database:h2'
