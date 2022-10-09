@@ -44,13 +44,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.springframework.boot.test.context.SpringBootTest.UseMainMethod.ALWAYS;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @Testcontainers
 @AutoConfigureObservability
 @ExtendWith(OutputCaptureExtension.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT, useMainMethod = ALWAYS)
+@SpringBootTest(webEnvironment = RANDOM_PORT)
 class PrometheusAndZipkinWithBraveSampleTests {
 
     private static final Pattern TRACE_PATTERN = Pattern
@@ -76,19 +75,19 @@ class PrometheusAndZipkinWithBraveSampleTests {
     void verifyLogsMetricsTraces(CapturedOutput output) {
         // @formatter:off
         verifyIfGreetingApiWorks();
-        String traceId = await()
+        TraceInfo traceInfo = await()
                 .atMost(Duration.ofMillis(200))
                 .pollDelay(Duration.ofMillis(10))
                 .pollInterval(Duration.ofMillis(100))
-                .until(() -> getTraceIdFromLogs(output), Optional::isPresent)
+                .until(() -> getTraceInfoFromLogs(output), Optional::isPresent)
                 .orElseThrow();
 
-        verifyIfPrometheusEndpointWorks(traceId);
+        verifyIfPrometheusEndpointWorks(traceInfo);
         await()
-                .atMost(Duration.ofSeconds(3))
+                .atMost(Duration.ofSeconds(5))
                 .pollDelay(Duration.ofMillis(100))
                 .pollInterval(Duration.ofMillis(500))
-                .untilAsserted(() -> verifyIfTraceIsInZipkin(traceId));
+                .untilAsserted(() -> verifyIfTraceIsInZipkin(traceInfo));
         // @formatter:on
     }
 
@@ -105,18 +104,18 @@ class PrometheusAndZipkinWithBraveSampleTests {
         // @formatter:on
     }
 
-    private Optional<String> getTraceIdFromLogs(CharSequence output) {
+    private Optional<TraceInfo> getTraceInfoFromLogs(CharSequence output) {
         // @formatter:off
         return output.toString().lines()
                 .filter(line -> line.contains("<ACCEPTANCE_TEST>"))
                 .map(TRACE_PATTERN::matcher)
                 .flatMap(Matcher::results)
-                .map(matchResult -> matchResult.group(2))
+                .map(matchResult -> new TraceInfo(matchResult.group(2), matchResult.group(3)))
                 .findFirst();
         // @formatter:on
     }
 
-    private void verifyIfPrometheusEndpointWorks(String traceId) {
+    private void verifyIfPrometheusEndpointWorks(TraceInfo traceInfo) {
         // @formatter:off
         given()
                 .port(port)
@@ -131,32 +130,34 @@ class PrometheusAndZipkinWithBraveSampleTests {
                         containsString("greeting_seconds_bucket"), // histogram
                         containsString("greeting_active_seconds_active_count"), // active summary
                         containsString("greeting_active_seconds_bucket"), // active histogram
-                        containsString(String.format("trace_id=\"%s\"", traceId)), // exemplar
-                        containsString("span_id") // exemplar
+                        containsString(String.format("{span_id=\"%s\",trace_id=\"%s\"}", traceInfo.spanId, traceInfo.traceId)) // exemplar
                 );
         // @formatter:on
     }
 
-    private void verifyIfTraceIsInZipkin(String traceId) {
+    private void verifyIfTraceIsInZipkin(TraceInfo traceInfo) {
         // @formatter:off
         given()
                 .port(zipkin.getFirstMappedPort())
                 .accept(JSON)
         .when()
-                .get("/zipkin/api/v2/trace/" + traceId)
+                .get("/zipkin/api/v2/trace/" + traceInfo.traceId)
         .then()
                 .statusCode(200)
                 .contentType(JSON)
                 .body("size()", equalTo(1))
                 .rootPath("[0]")
-                    .body("traceId", equalTo(traceId))
-                    .body("id", equalTo(traceId))
+                    .body("traceId", equalTo(traceInfo.traceId))
+                    .body("id", equalTo(traceInfo.spanId))
                     .body("parentId", is(nullValue()))
                     .body("name", equalTo("greeting"))
                     .body("localEndpoint.serviceName", equalTo("boot3-sample"))
                     .body("annotations[0].value", equalTo("greeted"))
                     .body("tags['greeting.name']", equalTo("suzy"));
         // @formatter:on
+    }
+
+    private record TraceInfo(String traceId, String spanId) {
     }
 
 }
