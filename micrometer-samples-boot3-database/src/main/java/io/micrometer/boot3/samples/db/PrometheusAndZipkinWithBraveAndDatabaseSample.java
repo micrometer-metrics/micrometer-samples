@@ -15,14 +15,32 @@
  */
 package io.micrometer.boot3.samples.db;
 
+import io.micrometer.observation.ObservationRegistry;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.observation.HttpRequestsObservationFilter;
+
+import static jakarta.servlet.DispatcherType.*;
+import static org.springframework.core.Ordered.LOWEST_PRECEDENCE;
 
 @SpringBootApplication
 public class PrometheusAndZipkinWithBraveAndDatabaseSample {
 
     public static void main(String[] args) {
         SpringApplication.run(PrometheusAndZipkinWithBraveAndDatabaseSample.class, args);
+    }
+
+    // TODO: remove after Boot auto-configuration is added
+    @Bean
+    FilterRegistrationBean<HttpRequestsObservationFilter> traceWebFilter(ObservationRegistry observationRegistry) {
+        var filterRegistrationBean = new FilterRegistrationBean<>(
+                new HttpRequestsObservationFilter(observationRegistry));
+        filterRegistrationBean.setDispatcherTypes(ASYNC, ERROR, FORWARD, INCLUDE, REQUEST);
+        filterRegistrationBean.setOrder(LOWEST_PRECEDENCE);
+
+        return filterRegistrationBean;
     }
 
 }

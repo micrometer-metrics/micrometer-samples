@@ -40,10 +40,8 @@ import static io.prometheus.client.exporter.common.TextFormat.CONTENT_TYPE_OPENM
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.StringContains.containsString;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @Testcontainers
@@ -145,15 +143,28 @@ class PrometheusAndZipkinWithBraveSampleTests {
         .then()
                 .statusCode(200)
                 .contentType(JSON)
-                .body("size()", equalTo(1))
-                .rootPath("[0]")
+                .body("size()", equalTo(2))
+                .body("findAll { it.name == 'greeting' }.size()", equalTo(1))
+                .body("findAll { it.name == 'http get' }.size()", equalTo(1))
+                .rootPath("find { it.name == 'greeting' }")
                     .body("traceId", equalTo(traceInfo.traceId))
                     .body("id", equalTo(traceInfo.spanId))
-                    .body("parentId", is(nullValue()))
-                    .body("name", equalTo("greeting"))
+                    .body("parentId", not(nullValue()))
                     .body("localEndpoint.serviceName", equalTo("boot3-sample"))
                     .body("annotations[0].value", equalTo("greeted"))
-                    .body("tags['greeting.name']", equalTo("suzy"));
+                    .body("tags['greeting.name']", equalTo("suzy"))
+                .detachRootPath("")
+                .rootPath("find { it.name == 'http get' }")
+                    .body("traceId", equalTo(traceInfo.traceId))
+                    .body("id", not(nullValue()))
+                    .body("parentId", is(nullValue()))
+                    .body("kind", equalTo("SERVER"))
+                    .body("localEndpoint.serviceName", equalTo("boot3-sample"))
+                    .body("tags['method']", equalTo("GET"))
+                    .body("tags['http.url']", equalTo("/greet/suzy"))
+                    .body("tags['outcome']", equalTo("SUCCESS"))
+                    .body("tags['status']", equalTo("200"))
+                    .body("tags['uri']", equalTo("/greet/{name}"));
         // @formatter:on
     }
 
