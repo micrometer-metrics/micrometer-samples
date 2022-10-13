@@ -23,34 +23,4 @@ gradleEnterprise {
     server = 'https://ge.micrometer.io'
 }
 
-include "acceptance-tests"
-include "baggage-producer"
-include "baggage-consumer"
-include "batch"
-include "cassandra"
-include "cassandra-reactive"
-include "circuitbreaker"
-include "circuitbreaker-reactive"
-include "config-server"
-include "data"
-include "data-reactive"
-include "gateway"
-include "integration"
-include "kafka-producer"
-include "kafka-consumer"
-include 'micrometer-samples-boot3'
-include 'micrometer-samples-boot3-database'
-include 'mongodb-reactive'
-include "mvc"
-include "openfeign"
-include "resttemplate"
-include "rsocket-client"
-include "rsocket-server"
-include "security"
-include "stream-producer"
-include "stream-consumer"
-include "task"
-include "vault-resttemplate"
-include "vault-webclient"
-include "webclient"
-include "webflux"
+include 'micrometer-samples-boot3', 'micrometer-samples-boot3-database', "openfeign", "mvc"

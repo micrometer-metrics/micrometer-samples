@@ -15,40 +15,23 @@
  */
 package com.example.micrometer;
 
-import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.Tracer;
-import jakarta.servlet.DispatcherType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.Ordered;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.observation.HttpRequestsObservationFilter;
 
-import java.util.Collections;
+import java.util.Map;
 
 @SpringBootApplication
 public class MvcApplication {
 
     public static void main(String... args) {
         new SpringApplication(MvcApplication.class).run(args);
-    }
-
-    // You must set this manually until this is registered in Boot
-    @Bean
-    FilterRegistrationBean observationWebFilter(ObservationRegistry observationRegistry) {
-        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean(
-                new HttpRequestsObservationFilter(observationRegistry));
-        filterRegistrationBean.setDispatcherTypes(DispatcherType.ASYNC, DispatcherType.ERROR, DispatcherType.FORWARD,
-                DispatcherType.INCLUDE, DispatcherType.REQUEST);
-        filterRegistrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        // We provide a list of URLs that we want to create observations for
-        filterRegistrationBean.setUrlPatterns(Collections.singletonList("/"));
-        return filterRegistrationBean;
     }
 
 }
@@ -64,10 +47,19 @@ class MvcController {
         this.tracer = tracer;
     }
 
+    // TODO: Uncomment this once Mvc gets instrumented in Framework
+    // @GetMapping("/")
+    // public String span() {
+    // String traceId = this.tracer.currentSpan().context().traceId();
+    // log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", traceId);
+    // return traceId;
+    // }
+
     @GetMapping("/")
-    public String span() {
-        String traceId = this.tracer.currentSpan().context().traceId();
-        log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", traceId);
+    public String span(@RequestHeader Map<String, String> headers) {
+        String traceId = headers.get("traceparent");
+        Assert.notNull(traceId, "traceparent must not be null");
+        log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", traceId.split("-")[1]);
         return traceId;
     }
 

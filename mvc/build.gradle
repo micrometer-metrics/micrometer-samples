@@ -5,8 +5,8 @@ buildscript {
 		gradlePluginPortal()
 	}
 	dependencies {
-		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
-		classpath 'io.spring.gradle:dependency-management-plugin:1.0.14.RELEASE'
+		classpath 'org.springframework.boot:spring-boot-gradle-plugin:3.0.0-SNAPSHOT'
+		classpath 'io.spring.gradle:dependency-management-plugin:1.0.13.RELEASE'
 	}
 }
 
@@ -19,20 +19,31 @@ repositories {
 	maven { url 'https://repo.spring.io/snapshot' }
 }
 
+configurations {
+	implementation {
+		// see gh-1599; pause detection is not configured so this dependency can be excluded
+		exclude module: 'LatencyUtils'
+	}
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-	implementation "io.micrometer:micrometer-tracing-bridge-${project.hasProperty("brave") ? "brave" : "otel" }"
-	// Default is OTel + Zipkin. You can opt in via "wavefront" to Wavefront and "brave" for Brave
-	if (project.hasProperty("wavefront")) {
-		implementation "io.micrometer:micrometer-tracing-reporter-wavefront"
-	}
-	if (project.hasProperty("brave")) {
-		implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
-	} else {
-		implementation "io.opentelemetry:opentelemetry-exporter-zipkin"
-	}
+	implementation 'io.micrometer:micrometer-observation-spring-boot-autoconfigure:0.1.0-SNAPSHOT'
+
+	implementation 'io.micrometer:micrometer-registry-prometheus'
+	implementation 'io.micrometer:micrometer-tracing-bridge-brave' // TODO: Make it parametrized to check OTel too
+	implementation 'io.micrometer:micrometer-tracing:1.0.0-SNAPSHOT'
+	implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+bootJar {
+	enabled = false
+}
+
+resolveMainClassName {
+	enabled = false
 }
