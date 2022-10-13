@@ -162,7 +162,7 @@ class PrometheusAndZipkinWithBraveAndDatabaseSampleTests {
                     .body("parentId", not(nullValue()))
                     .body("kind", equalTo("CLIENT"))
                     .body("remoteEndpoint.serviceName", equalTo("testdb"))
-                    .body("tags['jdbc.query[0]']", equalTo("SELECT name FROM emp where name=?"))
+                    .body("tags['jdbc.query[0]']", equalTo("SELECT count(name) FROM emp where name=?"))
                 .detachRootPath("")
                 .rootPath("find { it.name == 'http get' }")
                     .body("traceId", equalTo(traceInfo.traceId))

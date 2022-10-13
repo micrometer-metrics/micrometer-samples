@@ -50,7 +50,7 @@ class SampleController {
     Map<String, String> greet(@PathVariable String name) {
         Observation observation = Observation.createNotStarted("greeting", registry).start();
         try (Observation.Scope scope = observation.openScope()) {
-            if (PEOPLE.contains(name)) {
+            if (foundByName(name)) {
                 // only 2 names are valid (low cardinality)
                 observation.lowCardinalityKeyValue("greeting.name", name);
                 observation.event(Observation.Event.of("greeted"));
@@ -70,6 +70,10 @@ class SampleController {
         finally {
             observation.stop();
         }
+    }
+
+    private boolean foundByName(String name) {
+        return PEOPLE.contains(name);
     }
 
     private <T> Supplier<T> slowDown(Supplier<T> supplier) {
