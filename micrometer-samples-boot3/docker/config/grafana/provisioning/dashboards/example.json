@@ -305,7 +305,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "histogram_quantile(.9, sum(rate(greeting_seconds_bucket[1m])) by (le))",
+          "expr": "histogram_quantile(.95, sum(rate(greeting_seconds_bucket[1m])) by (le))",
           "legendFormat": "TP95",
           "range": true,
           "refId": "A"
