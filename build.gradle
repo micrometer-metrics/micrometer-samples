@@ -24,6 +24,7 @@ description = 'Micrometer Samples'
 
 allprojects {
     group = 'io.micrometer'
+    version = '0.1.0-SNAPSHOT'
 
     afterEvaluate { project -> println "I'm configuring $project.name with version $project.version" }
 }
