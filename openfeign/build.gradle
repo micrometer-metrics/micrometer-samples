@@ -39,11 +39,9 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 	implementation 'io.github.openfeign:feign-micrometer'
 
-	implementation 'io.micrometer:micrometer-observation-spring-boot-autoconfigure:0.1.0-SNAPSHOT'
-
 	implementation 'io.micrometer:micrometer-registry-prometheus'
 	implementation 'io.micrometer:micrometer-tracing-bridge-brave' // TODO: Make it parametrized to check OTel too
-	implementation 'io.micrometer:micrometer-tracing:1.0.0-SNAPSHOT'
+	implementation 'io.micrometer:micrometer-tracing'
 	implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
