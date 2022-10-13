@@ -49,11 +49,3 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.awaitility:awaitility'
 }
-
-bootJar {
-    enabled = false
-}
-
-resolveMainClassName {
-    enabled = false
-}
