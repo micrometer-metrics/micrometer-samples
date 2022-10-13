@@ -16,3 +16,9 @@ bin/
 .vscode
 .DS_Store
 .java-version
+
+target/
+.mvn/
+mvnw
+mvnw.cmd
+pom.xml

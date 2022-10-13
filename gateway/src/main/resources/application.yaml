@@ -1,0 +1,9 @@
+server:
+  port: 7111
+
+spring:
+  application:
+    name: gateway
+
+# For tests
+logging.level.org.springframework.cloud.sleuth: DEBUG

@@ -8,6 +8,20 @@
 
 Sample apps to demo [Micrometer](https://github.com/micrometer-metrics/micrometer) features.
 
+## Building
+
+First run `./scripts/build_all_projects_locally.sh` to clone and install locally all the projects that will be then used by the samples (that's only required if we need to use branches that are not yet released).
+
+To run the acceptance tests just call
+
+```bash
+$ ./gradlew build pTML -x test && ./gradlew acceptanceTest
+```
+
+## Running
+
+You can run each of the samples individually.
+
 ## Join the discussion
 
 Join the [Micrometer Slack](https://slack.micrometer.io) to share your questions, concerns, and feature requests.

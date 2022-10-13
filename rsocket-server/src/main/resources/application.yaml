@@ -1,0 +1,20 @@
+server:
+  port: 7112
+
+spring:
+  application:
+    name: rsocket-server
+  rsocket:
+    server:
+      mapping-path: "/rsocket"
+      transport: websocket
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+logging.pattern.level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+# For tests
+logging.level.org.springframework.cloud.sleuth: DEBUG

@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: baggage-producer
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    baggage:
+      remote-fields:
+        - mybaggae
+        - myremotefield
+
+logging.pattern.level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
