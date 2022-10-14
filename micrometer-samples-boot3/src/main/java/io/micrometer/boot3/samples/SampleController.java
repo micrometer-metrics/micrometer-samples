@@ -65,7 +65,7 @@ class SampleController {
         }
         catch (Exception exception) {
             observation.error(exception);
-            throw exception;
+            return Map.of();
         }
         finally {
             observation.stop();

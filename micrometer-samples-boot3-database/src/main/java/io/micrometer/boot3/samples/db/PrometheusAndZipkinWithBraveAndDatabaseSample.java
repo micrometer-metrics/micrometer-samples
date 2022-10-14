@@ -15,7 +15,11 @@
  */
 package io.micrometer.boot3.samples.db;
 
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationHandler;
 import io.micrometer.observation.ObservationRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -41,6 +45,23 @@ public class PrometheusAndZipkinWithBraveAndDatabaseSample {
         filterRegistrationBean.setOrder(LOWEST_PRECEDENCE);
 
         return filterRegistrationBean;
+    }
+
+    @Bean
+    ObservationHandler<Observation.Context> errorHandler() {
+        return new ObservationHandler<Observation.Context>() {
+            private static final Logger LOGGER = LoggerFactory.getLogger("errorHandler");
+
+            @Override
+            public void onError(Observation.Context context) {
+                LOGGER.error("Ooops!", context.getError());
+            }
+
+            @Override
+            public boolean supportsContext(Observation.Context context) {
+                return true;
+            }
+        };
     }
 
 }
