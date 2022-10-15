@@ -7,11 +7,13 @@ buildscript {
     dependencies {
         classpath 'org.springframework.boot:spring-boot-gradle-plugin:3.0.0-SNAPSHOT'
         classpath 'io.spring.gradle:dependency-management-plugin:1.0.14.RELEASE'
+        classpath 'org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.9.14'
     }
 }
 
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'org.graalvm.buildtools.native'
 
 repositories {
     mavenCentral()
@@ -42,3 +44,15 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.awaitility:awaitility'
 }
+
+graalvmNative {
+    binaries {
+        main {
+            javaLauncher = javaToolchains.launcherFor {
+                languageVersion = JavaLanguageVersion.of(17)
+                vendor = JvmVendorSpec.matching('GraalVM Community')
+            }
+        }
+    }
+}
+

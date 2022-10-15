@@ -20,16 +20,21 @@ import io.micrometer.observation.ObservationHandler;
 import io.micrometer.observation.ObservationRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aot.hint.RuntimeHints;
+import org.springframework.aot.hint.RuntimeHintsRegistrar;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ImportRuntimeHints;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.observation.HttpRequestsObservationFilter;
 
 import static jakarta.servlet.DispatcherType.*;
 import static org.springframework.core.Ordered.LOWEST_PRECEDENCE;
 
 @SpringBootApplication
+@ImportRuntimeHints(PrometheusAndZipkinWithBraveAndDatabaseSample.ResourceHints.class)
 public class PrometheusAndZipkinWithBraveAndDatabaseSample {
 
     public static void main(String[] args) {
@@ -62,6 +67,16 @@ public class PrometheusAndZipkinWithBraveAndDatabaseSample {
                 return true;
             }
         };
+    }
+
+    static class ResourceHints implements RuntimeHintsRegistrar {
+
+        @Override
+        public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+            hints.resources().registerResource(new ClassPathResource("itest-data.sql"));
+            hints.resources().registerResource(new ClassPathResource("itest-schema.sql"));
+        }
+
     }
 
 }
