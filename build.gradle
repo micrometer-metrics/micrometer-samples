@@ -140,6 +140,19 @@ subprojects {
     }
 
     plugins.withId('org.graalvm.buildtools.native') {
+        graalvmNative {
+            binaries {
+                main {
+                    javaLauncher = javaToolchains.launcherFor {
+                        languageVersion = JavaLanguageVersion.of(17)
+                        vendor = JvmVendorSpec.matching('GraalVM Community')
+                    }
+                }
+            }
+        }
+
+//        check.dependsOn('nativeTest')
+
         tasks.withType(io.spring.javaformat.gradle.tasks.CheckFormat) {
             if (it.name in [ 'checkFormatAot', 'checkFormatAotTest' ]) {
                 exclude '*'
