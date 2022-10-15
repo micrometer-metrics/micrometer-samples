@@ -139,6 +139,19 @@ subprojects {
         source.exclude '**/docker/**/*.yml'
     }
 
+    plugins.withId('org.graalvm.buildtools.native') {
+        tasks.withType(io.spring.javaformat.gradle.tasks.CheckFormat) {
+            if (it.name in [ 'checkFormatAot', 'checkFormatAotTest' ]) {
+                exclude '*'
+            }
+        }
+
+        checkstyle {
+            checkstyleAot.enabled = false
+            checkstyleAotTest.enabled = false
+        }
+    }
+
     dependencyLocking {
         lockAllConfigurations()
     }
