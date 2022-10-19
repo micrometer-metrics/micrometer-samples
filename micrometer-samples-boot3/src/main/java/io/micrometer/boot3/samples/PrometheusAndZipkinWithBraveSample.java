@@ -24,7 +24,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.observation.HttpRequestsObservationFilter;
+import org.springframework.web.filter.ServerHttpObservationFilter;
 
 import static jakarta.servlet.DispatcherType.*;
 import static org.springframework.core.Ordered.LOWEST_PRECEDENCE;
@@ -38,9 +38,8 @@ public class PrometheusAndZipkinWithBraveSample {
 
     // TODO: remove after Boot auto-configuration is added
     @Bean
-    FilterRegistrationBean<HttpRequestsObservationFilter> traceWebFilter(ObservationRegistry observationRegistry) {
-        var filterRegistrationBean = new FilterRegistrationBean<>(
-                new HttpRequestsObservationFilter(observationRegistry));
+    FilterRegistrationBean<ServerHttpObservationFilter> traceWebFilter(ObservationRegistry observationRegistry) {
+        var filterRegistrationBean = new FilterRegistrationBean<>(new ServerHttpObservationFilter(observationRegistry));
         filterRegistrationBean.setDispatcherTypes(ASYNC, ERROR, FORWARD, INCLUDE, REQUEST);
         filterRegistrationBean.setOrder(LOWEST_PRECEDENCE);
 
