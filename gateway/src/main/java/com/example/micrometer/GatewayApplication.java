@@ -1,5 +1,6 @@
 package com.example.micrometer;
 
+import io.micrometer.observation.Observation;
 import io.micrometer.tracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
 import org.springframework.core.env.Environment;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,10 +30,13 @@ public class GatewayApplication implements CommandLineRunner {
             @Value("${url:http://localhost:7100}") String url) {
         return builder.routes().route("mvc_route",
                 route -> route.path("/mvc/**").filters(f -> f.stripPrefix(1).filter((exchange, chain) -> {
-                    String traceId = tracer.currentSpan().context().traceId();
-                    log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", traceId);
+                    Observation gatewayObservation = exchange.getRequiredAttribute("gateway.observation");
+                    gatewayObservation.scoped(() -> {
+                        String traceId = tracer.currentSpan().context().traceId();
+                        log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", traceId);
+                    });
                     return chain.filter(exchange);
-                })).uri(url)).build();
+                }, Ordered.LOWEST_PRECEDENCE)).uri(url)).build();
     }
 
     @Autowired
