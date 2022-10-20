@@ -17,33 +17,17 @@ package io.micrometer.boot3.samples.db;
 
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationHandler;
-import io.micrometer.observation.ObservationRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.filter.ServerHttpObservationFilter;
-
-import static jakarta.servlet.DispatcherType.*;
-import static org.springframework.core.Ordered.LOWEST_PRECEDENCE;
 
 @SpringBootApplication
 public class PrometheusAndZipkinWithBraveAndDatabaseSample {
 
     public static void main(String[] args) {
         SpringApplication.run(PrometheusAndZipkinWithBraveAndDatabaseSample.class, args);
-    }
-
-    // TODO: remove after Boot auto-configuration is added
-    @Bean
-    FilterRegistrationBean<ServerHttpObservationFilter> traceWebFilter(ObservationRegistry observationRegistry) {
-        var filterRegistrationBean = new FilterRegistrationBean<>(new ServerHttpObservationFilter(observationRegistry));
-        filterRegistrationBean.setDispatcherTypes(ASYNC, ERROR, FORWARD, INCLUDE, REQUEST);
-        filterRegistrationBean.setOrder(LOWEST_PRECEDENCE);
-
-        return filterRegistrationBean;
     }
 
     @Bean
