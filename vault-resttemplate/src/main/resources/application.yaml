@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: vault-resttemplate
+  cloud:
+    vault:
+      scheme: http
+      token: vault-plaintext-root-token
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+logging.pattern.level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

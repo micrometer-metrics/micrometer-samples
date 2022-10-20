@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: stream-consumer
+
+spring.cloud:
+  function:
+    definition: channel
+  stream:
+    bindings.channel-in-0.destination: channeldestination
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+logging.pattern.level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

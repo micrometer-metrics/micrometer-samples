@@ -1,0 +1,6 @@
+server:
+  port: 7111
+
+spring:
+  application:
+    name: gateway
