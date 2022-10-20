@@ -21,6 +21,7 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-integration'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.integration:spring-integration-file'
 
 	implementation "io.micrometer:micrometer-tracing-bridge-${project.hasProperty("brave") ? "brave" : "otel" }"

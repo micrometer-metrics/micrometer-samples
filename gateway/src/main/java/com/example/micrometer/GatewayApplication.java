@@ -11,6 +11,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.Environment;
@@ -30,7 +31,7 @@ public class GatewayApplication implements CommandLineRunner {
             @Value("${url:http://localhost:7100}") String url) {
         return builder.routes().route("mvc_route",
                 route -> route.path("/mvc/**").filters(f -> f.stripPrefix(1).filter((exchange, chain) -> {
-                    Observation gatewayObservation = exchange.getRequiredAttribute("gateway.observation");
+                    Observation gatewayObservation = exchange.getRequiredAttribute(ServerWebExchangeUtils.GATEWAY_OBSERVATION_ATTR);
                     gatewayObservation.scoped(() -> {
                         String traceId = tracer.currentSpan().context().traceId();
                         log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", traceId);
