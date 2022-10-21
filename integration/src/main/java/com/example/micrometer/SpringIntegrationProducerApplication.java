@@ -48,13 +48,13 @@ class Runner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        Observation.createNotStarted("spring.integration", observationRegistry)
-                .observe(() -> {
-                    String trace = tracer.currentSpan().context().traceId();
-                    log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", trace);
-                    this.fileGateway.placeOrder(trace);
-                });
+        Observation.createNotStarted("spring.integration", observationRegistry).observe(() -> {
+            String trace = tracer.currentSpan().context().traceId();
+            log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", trace);
+            this.fileGateway.placeOrder(trace);
+        });
     }
+
 }
 
 @MessagingGateway

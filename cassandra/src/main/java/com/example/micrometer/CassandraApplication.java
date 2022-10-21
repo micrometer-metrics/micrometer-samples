@@ -23,20 +23,21 @@ public class CassandraApplication {
     }
 
     @Bean
-    public CommandLineRunner demo(BasicUserRepository basicUserRepository, Tracer tracer, ObservationRegistry observationRegistry) {
+    public CommandLineRunner demo(BasicUserRepository basicUserRepository, Tracer tracer,
+            ObservationRegistry observationRegistry) {
         return (args) -> {
-            Observation.createNotStarted("cassandra-app", observationRegistry)
-                    .observe(() -> {
-                        try {
-                            log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", tracer.currentSpan().context().traceId());
-                            User save = basicUserRepository.save(new User("foo", "bar", "baz", 1L));
-                            User userByIdIn = basicUserRepository.findUserByIdIn(save.getId());
-                            basicUserRepository.findUserByIdIn(123123L);
-                        }
-                        catch (DataAccessException e) {
-                            log.info("Expected to throw an exception so that we see if rollback works", e);
-                        }
-                    });
+            Observation.createNotStarted("cassandra-app", observationRegistry).observe(() -> {
+                try {
+                    log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer",
+                            tracer.currentSpan().context().traceId());
+                    User save = basicUserRepository.save(new User("foo", "bar", "baz", 1L));
+                    User userByIdIn = basicUserRepository.findUserByIdIn(save.getId());
+                    basicUserRepository.findUserByIdIn(123123L);
+                }
+                catch (DataAccessException e) {
+                    log.info("Expected to throw an exception so that we see if rollback works", e);
+                }
+            });
         };
     }
 

@@ -9,16 +9,18 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.client.observation.DefaultClientRequestObservationConvention;
 
 /**
- * In this class we'll add all the manual configuration required for
- * Observability to work.
+ * In this class we'll add all the manual configuration required for Observability to
+ * work.
  */
 @Configuration(proxyBeanMethods = false)
 public class ManualConfiguration {
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    org.springframework.vault.client.RestTemplateCustomizer traceVaultRestTemplateCustomizer(ObservationRegistry observationRegistry) {
-        return restTemplate -> new ObservationRestTemplateCustomizer(observationRegistry, new DefaultClientRequestObservationConvention()).customize(restTemplate);
+    org.springframework.vault.client.RestTemplateCustomizer traceVaultRestTemplateCustomizer(
+            ObservationRegistry observationRegistry) {
+        return restTemplate -> new ObservationRestTemplateCustomizer(observationRegistry,
+                new DefaultClientRequestObservationConvention()).customize(restTemplate);
     }
 
 }

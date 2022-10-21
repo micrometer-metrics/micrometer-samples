@@ -29,6 +29,7 @@ public class MvcApplication {
     public static void main(String... args) {
         new SpringApplication(MvcApplication.class).run(args);
     }
+
 }
 
 @RestController

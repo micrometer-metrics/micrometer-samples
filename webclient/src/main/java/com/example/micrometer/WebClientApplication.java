@@ -70,10 +70,10 @@ class WebClientService {
     Mono<String> call() {
         Observation observation = Observation.start("client", observationRegistry);
         return Mono.just(observation).flatMap(span -> {
-            observation.scoped(() -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", this.tracer.currentSpan().context().traceId()));
+            observation.scoped(() -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
+                    this.tracer.currentSpan().context().traceId()));
             return this.webClient.get().retrieve().bodyToMono(String.class);
-        })
-                .doFinally(signalType -> observation.stop())
+        }).doFinally(signalType -> observation.stop())
                 .contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation));
     }
 

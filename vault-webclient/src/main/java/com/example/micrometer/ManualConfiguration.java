@@ -9,8 +9,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.web.reactive.function.client.DefaultClientRequestObservationConvention;
 
 /**
- * In this class we'll add all the manual configuration required for
- * Observability to work.
+ * In this class we'll add all the manual configuration required for Observability to
+ * work.
  */
 @Configuration(proxyBeanMethods = false)
 public class ManualConfiguration {
@@ -19,7 +19,8 @@ public class ManualConfiguration {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     org.springframework.vault.client.WebClientCustomizer traceVaultWebClientCustomizer(
             ObservationRegistry observationRegistry) {
-        return webClientBuilder -> new ObservationWebClientCustomizer(observationRegistry, new DefaultClientRequestObservationConvention()).customize(webClientBuilder);
+        return webClientBuilder -> new ObservationWebClientCustomizer(observationRegistry,
+                new DefaultClientRequestObservationConvention()).customize(webClientBuilder);
     }
 
 }

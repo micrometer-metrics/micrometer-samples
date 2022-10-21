@@ -51,22 +51,22 @@ class KafkaProducerService {
 
     private final ObservationRegistry observationRegistry;
 
-    KafkaProducerService(KafkaTemplate<String, String> kafkaTemplate, Tracer tracer, ObservationRegistry observationRegistry) {
+    KafkaProducerService(KafkaTemplate<String, String> kafkaTemplate, Tracer tracer,
+            ObservationRegistry observationRegistry) {
         this.kafkaTemplate = kafkaTemplate;
         this.tracer = tracer;
         this.observationRegistry = observationRegistry;
     }
 
     void call() throws Exception {
-        Observation.createNotStarted("kafka-producer", this.observationRegistry)
-                .observeChecked(() -> {
-                    log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", this.tracer.currentSpan().context().traceId());
-                    CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send("mytopic", "hello");
-                    return future.handle((result, throwable) -> {
-                        log.info("Result <{}>, throwable <{}>", result, throwable);
-                        return CompletableFuture.completedFuture(result);
-                    });
-                }).get();
+        Observation.createNotStarted("kafka-producer", this.observationRegistry).observeChecked(() -> {
+            log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", this.tracer.currentSpan().context().traceId());
+            CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send("mytopic", "hello");
+            return future.handle((result, throwable) -> {
+                log.info("Result <{}>, throwable <{}>", result, throwable);
+                return CompletableFuture.completedFuture(result);
+            });
+        }).get();
     }
 
 }

@@ -11,15 +11,17 @@ import org.springframework.data.mongodb.observability.MongoObservationCommandLis
 import org.springframework.data.mongodb.observability.MongoTracingObservationHandler;
 
 /**
- * In this class we'll add all the manual configuration required for
- * Observability to work.
+ * In this class we'll add all the manual configuration required for Observability to
+ * work.
  */
 @Configuration(proxyBeanMethods = false)
 public class ManualConfiguration {
+
     // You must set this manually until this is registered in Boot
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    MongoClientSettingsBuilderCustomizer observationMongoClientSettingsBuilderCustomizer(ObservationRegistry observationRegistry) {
+    MongoClientSettingsBuilderCustomizer observationMongoClientSettingsBuilderCustomizer(
+            ObservationRegistry observationRegistry) {
         return clientSettingsBuilder -> clientSettingsBuilder
                 .addCommandListener(new MongoObservationCommandListener(observationRegistry));
     }

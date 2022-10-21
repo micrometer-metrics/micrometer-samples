@@ -48,8 +48,7 @@ class StreamBridgeService {
     }
 
     void call() {
-        Observation.createNotStarted("stream.producer", observationRegistry)
-                .observe(() -> {
+        Observation.createNotStarted("stream.producer", observationRegistry).observe(() -> {
             log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", this.tracer.currentSpan().context().traceId());
             this.streamBridge.send("channel-out-0", "HELLO");
         });

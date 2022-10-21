@@ -1,6 +1,5 @@
 package com.example.micrometer;
 
-import io.micrometer.observation.ObservationRegistry;
 import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
 import org.springframework.cloud.stream.config.ListenerContainerCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -9,8 +8,8 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
 /**
- * In this class we'll add all the manual configuration required for
- * Observability to work.
+ * In this class we'll add all the manual configuration required for Observability to
+ * work.
  */
 @Configuration(proxyBeanMethods = false)
 public class ManualConfiguration {

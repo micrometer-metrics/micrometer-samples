@@ -30,16 +30,17 @@ public class ReactiveMongoApplication {
     }
 
     @Bean
-    public CommandLineRunner demo(com.example.micrometer.BasicUserRepository basicUserRepository, ObservationRegistry observationRegistry, Tracer tracer) {
+    public CommandLineRunner demo(com.example.micrometer.BasicUserRepository basicUserRepository,
+            ObservationRegistry observationRegistry, Tracer tracer) {
         return (args) -> {
             Observation observation = Observation.start("mongo-reactive-app", observationRegistry);
             Mono.just(observation).flatMap(obs -> {
-                        obs.scoped(() -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", tracer.currentSpan().context().traceId()));
-                        long time = System.currentTimeMillis();
-                        return basicUserRepository.save(new User("foo" + time, "bar", "baz", null))
-                                .flatMap(user -> basicUserRepository.findUserByUsername("foo" + time));
-                    })
-                    .contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation))
+                obs.scoped(() -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
+                        tracer.currentSpan().context().traceId()));
+                long time = System.currentTimeMillis();
+                return basicUserRepository.save(new User("foo" + time, "bar", "baz", null))
+                        .flatMap(user -> basicUserRepository.findUserByUsername("foo" + time));
+            }).contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation))
                     .doFinally(signalType -> observation.stop()).block(Duration.ofMinutes(1));
             log.info("Done!");
         };
@@ -83,8 +84,9 @@ class TestMongoClientSettingsBuilderCustomizer implements MongoClientSettingsBui
                     return;
                 }
                 parent.scoped(() -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer",
-                            tracer.currentSpan().context().traceId()));
+                        tracer.currentSpan().context().traceId()));
             }
         });
     }
+
 }

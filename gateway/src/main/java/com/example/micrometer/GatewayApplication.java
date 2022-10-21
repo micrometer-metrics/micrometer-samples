@@ -31,7 +31,8 @@ public class GatewayApplication implements CommandLineRunner {
             @Value("${url:http://localhost:7100}") String url) {
         return builder.routes().route("mvc_route",
                 route -> route.path("/mvc/**").filters(f -> f.stripPrefix(1).filter((exchange, chain) -> {
-                    Observation gatewayObservation = exchange.getRequiredAttribute(ServerWebExchangeUtils.GATEWAY_OBSERVATION_ATTR);
+                    Observation gatewayObservation = exchange
+                            .getRequiredAttribute(ServerWebExchangeUtils.GATEWAY_OBSERVATION_ATTR);
                     gatewayObservation.scoped(() -> {
                         String traceId = tracer.currentSpan().context().traceId();
                         log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", traceId);

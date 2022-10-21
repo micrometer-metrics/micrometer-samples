@@ -8,8 +8,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.integration.amqp.outbound.AmqpOutboundEndpoint;
 
 /**
- * In this class we'll add all the manual configuration required for
- * Observability to work.
+ * In this class we'll add all the manual configuration required for Observability to
+ * work.
  */
 @Configuration(proxyBeanMethods = false)
 public class ManualConfiguration {

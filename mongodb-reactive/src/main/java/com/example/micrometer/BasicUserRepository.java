@@ -17,7 +17,6 @@ package com.example.micrometer;
 
 import reactor.core.publisher.Mono;
 
-import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 
 /**

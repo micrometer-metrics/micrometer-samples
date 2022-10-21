@@ -52,7 +52,8 @@ class Config {
     @Bean
     WebClientCustomizer testWebClientCustomizer(Tracer tracer) {
         return webClientBuilder -> webClientBuilder.filter((request, next) -> Mono.deferContextual(contextView -> {
-            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView, ObservationThreadLocalAccessor.KEY)) {
+            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+                    ObservationThreadLocalAccessor.KEY)) {
                 log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", tracer.currentSpan().context().traceId());
             }
             return next.exchange(request);
@@ -72,7 +73,8 @@ class WebClientService {
 
     private final ObservationRegistry observationRegistry;
 
-    WebClientService(ReactiveVaultTemplate reactiveVaultTemplate, Tracer tracer, ObservationRegistry observationRegistry) {
+    WebClientService(ReactiveVaultTemplate reactiveVaultTemplate, Tracer tracer,
+            ObservationRegistry observationRegistry) {
         this.reactiveVaultTemplate = reactiveVaultTemplate;
         this.tracer = tracer;
         this.observationRegistry = observationRegistry;
@@ -81,9 +83,10 @@ class WebClientService {
     Mono<VaultResponse> call() {
         Observation observation = Observation.start("client", observationRegistry);
         return Mono.just(observation).flatMap(span -> {
-                    observation.scoped(() -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", this.tracer.currentSpan().context().traceId()));
-                    return this.reactiveVaultTemplate.read("/secrets/foo");
-                }).doFinally(signalType -> observation.stop())
+            observation.scoped(() -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
+                    this.tracer.currentSpan().context().traceId()));
+            return this.reactiveVaultTemplate.read("/secrets/foo");
+        }).doFinally(signalType -> observation.stop())
                 .contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation));
     }
 
