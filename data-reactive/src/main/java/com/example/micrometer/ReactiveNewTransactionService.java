@@ -1,5 +1,6 @@
 package com.example.micrometer;
 
+import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +19,14 @@ public class ReactiveNewTransactionService {
 
     private final Tracer tracer;
 
+    private final ObservationRegistry observationRegistry;
+
     public ReactiveNewTransactionService(ReactiveCustomerRepository repository,
-            ReactiveContinuedTransactionService reactiveContinuedTransactionService, Tracer tracer) {
+            ReactiveContinuedTransactionService reactiveContinuedTransactionService, Tracer tracer, ObservationRegistry observationRegistry) {
         this.repository = repository;
         this.reactiveContinuedTransactionService = reactiveContinuedTransactionService;
         this.tracer = tracer;
+        this.observationRegistry = observationRegistry;
     }
 
     @Transactional

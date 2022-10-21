@@ -29,6 +29,7 @@ public class SpringIntegrationProducerApplication {
 
 }
 
+// TODO: This doesn't test anything because consumer and producer are ran in the same thread
 @Component
 class Runner implements CommandLineRunner {
 
