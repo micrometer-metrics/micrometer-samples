@@ -6,7 +6,9 @@ spring.cloud:
   function:
     definition: channel
   stream:
-    bindings.channel-in-0.destination: channeldestination
+    bindings.channel-in-0:
+      destination: channeldestination
+      group: channelgroup
 
 management:
   tracing:

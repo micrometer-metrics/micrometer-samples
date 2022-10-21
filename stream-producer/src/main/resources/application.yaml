@@ -4,7 +4,9 @@ spring:
 
 spring.cloud.stream:
   source: channel
-  bindings.channel-out-0.destination: channeldestination
+  bindings.channel-out-0:
+    destination: channeldestination
+    group: channelgroup
 
 management:
   tracing:
