@@ -1,6 +1,5 @@
 package com.example.micrometer;
 
-import io.micrometer.tracing.Tracer;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,14 +13,9 @@ public class NewTransactionService {
     private final CustomerRepository repository;
 
     private final ContinuedTransactionService continuedTransactionService;
-
-    private final Tracer tracer;
-
-    public NewTransactionService(CustomerRepository repository, ContinuedTransactionService continuedTransactionService,
-            Tracer tracer) {
+    public NewTransactionService(CustomerRepository repository, ContinuedTransactionService continuedTransactionService) {
         this.repository = repository;
         this.continuedTransactionService = continuedTransactionService;
-        this.tracer = tracer;
     }
 
     @Transactional

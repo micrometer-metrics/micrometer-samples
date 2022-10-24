@@ -1,5 +1,8 @@
 package com.example.micrometer;
 
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -21,10 +24,15 @@ public class ReactiveDataApplication {
     }
 
     @Bean
-    public CommandLineRunner demo(ReactiveNewTransactionService reactiveNewTransactionService) {
+    public CommandLineRunner demo(ReactiveNewTransactionService reactiveNewTransactionService, ObservationRegistry observationRegistry) {
         return (args) -> {
             try {
-                reactiveNewTransactionService.newTransaction().block(Duration.ofSeconds(50));
+                Observation observation = Observation.start("reactive-data", observationRegistry);
+                reactiveNewTransactionService
+                        .newTransaction()
+                        .contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation))
+                        .doFinally(signalType -> observation.stop())
+                        .block(Duration.ofSeconds(50));
             }
             catch (DataAccessException e) {
                 log.info("Expected to throw an exception so that we see if rollback works", e);

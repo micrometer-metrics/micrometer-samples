@@ -40,9 +40,8 @@ public class ReactiveMongoApplication {
                 long time = System.currentTimeMillis();
                 return basicUserRepository.save(new User("foo" + time, "bar", "baz", null))
                         .flatMap(user -> basicUserRepository.findUserByUsername("foo" + time));
-            }).contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation)
-                            .put(Observation.class, observation)) // TODO: Spring Data MongoDB is the only one requiring to put <Observation.class> as a key
-                    .doFinally(signalType -> observation.stop()).block(Duration.ofMinutes(1));
+            }).contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation))
+            .doFinally(signalType -> observation.stop()).block(Duration.ofMinutes(1));
             log.info("Done!");
         };
     }

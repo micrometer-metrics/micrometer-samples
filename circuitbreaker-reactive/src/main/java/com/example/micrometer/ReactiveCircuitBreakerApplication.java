@@ -1,6 +1,9 @@
 package com.example.micrometer;
 
-import io.micrometer.tracing.SpanAndScope;
+import io.micrometer.context.ContextSnapshot;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
 import io.micrometer.tracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +15,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.client.circuitbreaker.ReactiveCircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import reactor.util.context.ContextView;
 
 import java.time.Duration;
 
@@ -41,28 +45,37 @@ class CircuitService {
 
     private final Tracer tracer;
 
-    CircuitService(ReactiveCircuitBreakerFactory factory, Tracer tracer) {
+    private final ObservationRegistry observationRegistry;
+
+    CircuitService(ReactiveCircuitBreakerFactory factory, Tracer tracer, ObservationRegistry observationRegistry) {
         this.factory = factory;
         this.tracer = tracer;
+        this.observationRegistry = observationRegistry;
     }
 
     Mono<String> call() {
+        Observation observation = Observation.start("reactive-circuit-breaker", observationRegistry);
         // You don't need this in your code unless you want to create new spans manually
-        return Mono.just(this.tracer.nextSpan().name("reactive-circuit-breaker")).flatMap(span -> {
+        return Mono.deferContextual(contextView -> {
             // You don't need this in your code unless you want to create new spans
             // manually
-            Tracer.SpanInScope spanInScope = this.tracer.withSpan(span.start());
-            SpanAndScope spanAndScope = new SpanAndScope(span, spanInScope);
-            return this.factory.create("circuit").run(Mono.defer(() -> {
-                log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
-                        this.tracer.currentSpan().context().traceId());
-                return Mono.error(new IllegalStateException("BOOM"));
-            }), throwable -> {
-                log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer",
-                        this.tracer.currentSpan().context().traceId());
-                return Mono.just("fallback");
-            }).doFinally(signalType -> spanAndScope.close());
-        });
+                return this.factory.create("circuit").run(Mono.defer(() -> {
+                    scoped(contextView, () -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
+                            this.tracer.currentSpan().context().traceId()));
+                    return Mono.error(new IllegalStateException("BOOM"));
+                }), throwable -> {
+                    scoped(contextView, () -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer",
+                            this.tracer.currentSpan().context().traceId()));
+                    return Mono.just("fallback");
+                });
+            }).contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation))
+            .doFinally(signalType -> observation.stop());
+    }
+
+    private void scoped(ContextView contextView, Runnable runnable) {
+        try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView, ObservationThreadLocalAccessor.KEY)) {
+            runnable.run();
+        }
     }
 
 }

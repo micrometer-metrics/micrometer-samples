@@ -2,7 +2,7 @@ spring:
   application:
     name: cassandra-reactive
 
-spring.data.cassandra:
+spring.cassandra:
   keyspace-name: example
   schema-action: recreate
   local-datacenter: datacenter1

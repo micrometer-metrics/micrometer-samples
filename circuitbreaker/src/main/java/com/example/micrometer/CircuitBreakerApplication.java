@@ -1,6 +1,7 @@
 package com.example.micrometer;
 
-import io.micrometer.tracing.Span;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 @SpringBootApplication
 public class CircuitBreakerApplication implements CommandLineRunner {
+
+    private static final Logger log = LoggerFactory.getLogger(CircuitBreakerApplication.class);
 
     public static void main(String... args) {
         new SpringApplicationBuilder(CircuitBreakerApplication.class).web(WebApplicationType.NONE).run(args);
@@ -38,27 +41,25 @@ class CircuitService {
 
     private final Tracer tracer;
 
-    CircuitService(CircuitBreakerFactory factory, Tracer tracer) {
+    private final ObservationRegistry observationRegistry;
+
+    CircuitService(CircuitBreakerFactory factory, Tracer tracer, ObservationRegistry observationRegistry) {
         this.factory = factory;
         this.tracer = tracer;
+        this.observationRegistry = observationRegistry;
     }
 
     String call() {
-        Span span = this.tracer.nextSpan();
-        try (Tracer.SpanInScope ws = this.tracer.withSpan(span.start())) {
-            return this.factory.create("circuit").run(() -> {
-                log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
-                        this.tracer.currentSpan().context().traceId());
-                throw new IllegalStateException("BOOM");
-            }, throwable -> {
-                log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer",
-                        this.tracer.currentSpan().context().traceId());
-                return "fallback";
-            });
-        }
-        finally {
-            span.end();
-        }
+        return Observation.createNotStarted("circuitbreaker", observationRegistry)
+                .observe(() -> this.factory.create("circuit").run(() -> {
+                    log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
+                            this.tracer.currentSpan().context().traceId());
+                    throw new IllegalStateException("BOOM");
+                }, throwable -> {
+                    log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer",
+                            this.tracer.currentSpan().context().traceId());
+                    return "fallback";
+                }));
     }
 
 }

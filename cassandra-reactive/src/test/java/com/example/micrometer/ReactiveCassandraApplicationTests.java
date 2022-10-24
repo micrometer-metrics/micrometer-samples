@@ -22,7 +22,7 @@ class ReactiveCassandraApplicationTests {
 
     @DynamicPropertySource
     static void setup(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.cassandra.contact-points",
+        registry.add("spring.cassandra.contact-points",
                 () -> cassandra.getContainerIpAddress() + ":" + cassandra.getFirstMappedPort());
         Cluster cluster = cassandra.getCluster();
         try (Session session = cluster.connect()) {

@@ -1,13 +1,14 @@
 package com.example.micrometer;
 
-import io.micrometer.tracing.Span;
-import io.micrometer.tracing.Tracer;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.config.server.EnableConfigServer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,9 +37,10 @@ public class ConfigServerApplication implements CommandLineRunner {
 @Configuration
 class Config {
 
+    // You must register RestTemplate as a bean!
     @Bean
-    RestTemplate restTemplate() {
-        return new RestTemplate();
+    RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder.build();
     }
 
 }
@@ -52,24 +54,21 @@ class WebClientService {
 
     private final RestTemplate restTemplate;
 
-    private final Tracer tracer;
+    private final ObservationRegistry observationRegistry;
 
-    WebClientService(Environment environment, RestTemplate restTemplate, Tracer tracer) {
+    WebClientService(Environment environment, RestTemplate restTemplate, ObservationRegistry observationRegistry) {
         this.environment = environment;
         this.restTemplate = restTemplate;
-        this.tracer = tracer;
+        this.observationRegistry = observationRegistry;
     }
 
     void call() {
-        Span hello = this.tracer.nextSpan().name("hello");
-        try (Tracer.SpanInScope spanInScope = this.tracer.withSpan(hello.start())) {
-            int port = environment.getProperty("server.port", Integer.class, 8888);
-            log.info("Got back the following response from config server \n{}",
-                    this.restTemplate.getForObject("http://localhost:" + port + "/main-application.yml", String.class));
-        }
-        finally {
-            hello.end();
-        }
+        Observation.createNotStarted("hello", observationRegistry)
+                .observe(() -> {
+                    int port = environment.getProperty("server.port", Integer.class, 8888);
+                    log.info("Got back the following response from config server \n{}",
+                            this.restTemplate.getForObject("http://localhost:" + port + "/main-application.yml", String.class));
+                });
 
     }
 

@@ -26,6 +26,7 @@ ext {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+	implementation 'org.springframework.data:spring-data-cassandra:4.0.0-SNAPSHOT'  // TODO: Remove
 	implementation 'org.springframework.boot:spring-boot-starter-data-cassandra-reactive'
 
 	implementation "io.micrometer:micrometer-tracing-bridge-${project.hasProperty("brave") ? "brave" : "otel" }"
