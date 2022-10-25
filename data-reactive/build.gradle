@@ -27,7 +27,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'io.r2dbc:r2dbc-h2'
-	implementation 'io.r2dbc:r2dbc-proxy'
+	implementation 'io.r2dbc:r2dbc-proxy:1.0.1.BUILD-SNAPSHOT'
+
+	implementation "io.micrometer:micrometer-observation:1.10.0-SNAPSHOT" // TODO: Remove me
+	implementation "io.micrometer:micrometer-tracing:1.0.0-SNAPSHOT" // TODO: Remove me
 
 	implementation "io.micrometer:micrometer-tracing-bridge-${project.hasProperty("brave") ? "brave" : "otel" }"
 	// Default is OTel + Zipkin. You can opt in via "wavefront" to Wavefront and "brave" for Brave

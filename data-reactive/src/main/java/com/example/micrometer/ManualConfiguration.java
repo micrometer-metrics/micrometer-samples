@@ -7,9 +7,8 @@ import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccess
 import io.micrometer.observation.docs.ObservationDocumentation;
 import io.micrometer.observation.transport.Kind;
 import io.micrometer.observation.transport.SenderContext;
-import io.micrometer.tracing.Tracer;
-import io.micrometer.tracing.handler.DefaultTracingObservationHandler;
 import io.r2dbc.proxy.ProxyConnectionFactory;
+import io.r2dbc.proxy.callback.DelegatingContextView;
 import io.r2dbc.proxy.callback.ProxyConfig;
 import io.r2dbc.proxy.core.MethodExecutionInfo;
 import io.r2dbc.proxy.core.QueryExecutionInfo;
@@ -23,21 +22,21 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcProperties;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.util.StringUtils;
+import org.springframework.context.event.ContextRefreshedEvent;
+import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
-import java.net.URI;
 import java.util.function.Function;
 
 @Configuration(proxyBeanMethods = false)
 class ManualConfiguration {
 
     @Bean
-    ObservationProxyExecutionListener observationProxyExecutionListener(ObservationRegistry observationRegistry, ConnectionFactory connectionFactory, R2dbcProperties r2dbcProperties) {
-        return new ObservationProxyExecutionListener(observationRegistry, connectionFactory, r2dbcProperties);
+    LazyObservationProxyExecutionListener lazyObservationProxyExecutionListener(BeanFactory beanFactory) {
+        return new LazyObservationProxyExecutionListener(beanFactory);
     }
 
     @Bean
@@ -45,33 +44,6 @@ class ManualConfiguration {
         return new ObservationConnectionFactoryBeanPostProcessor(beanFactory);
     }
 
-    @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE + 5)
-    R2DbcTracingHandler r2DbcTracingHandler(Tracer tracer) {
-        return new R2DbcTracingHandler(tracer);
-    }
-}
-
-/**
- * Sender Context for R2DBC.
- */
-class R2DbcContext extends SenderContext {
-
-    private URI uri;
-
-    public R2DbcContext(String name) {
-        super((carrier, key, value) -> {
-        }, Kind.CLIENT);
-        setRemoteServiceName(name);
-    }
-
-    URI getUri() {
-        return uri;
-    }
-
-    void setUri(URI host) {
-        this.uri = host;
-    }
 }
 
 /**
@@ -98,7 +70,7 @@ class ObservationProxyExecutionListener implements ProxyExecutionListener {
         if (observationRegistry.isNoop()) {
             return;
         }
-        Observation parentObservation = executionInfo.getValueStore().getOrDefault(ObservationThreadLocalAccessor.KEY,  observationRegistry.getCurrentObservation()); // TODO: Won't work until https://github.com/r2dbc/r2dbc-proxy/pull/121 gets merged
+        Observation parentObservation = executionInfo.getValueStore().getOrDefault(ContextView.class, new DelegatingContextView(Context.empty())).getOrDefault(ObservationThreadLocalAccessor.KEY,  observationRegistry.getCurrentObservation()); // TODO: Won't work until https://github.com/r2dbc/r2dbc-proxy/pull/121 gets merged
         if (parentObservation == null) {
             if (log.isDebugEnabled()) {
                 log.debug("Parent observation not present, won't do any instrumentation");
@@ -117,24 +89,14 @@ class ObservationProxyExecutionListener implements ProxyExecutionListener {
     Observation clientObservation(Observation parentObservation, QueryExecutionInfo executionInfo, String name) {
         String url = r2dbcProperties.getUrl();
         // @formatter:off
-        R2DbcContext context = new R2DbcContext(name);
+        SenderContext<?> context = new SenderContext<>((carrier, key, value) -> { }, Kind.CLIENT);
+        context.setRemoteServiceName(name);
+        context.setRemoteServiceAddress(url);
         Observation observation = R2DbcObservationDocumentation.R2DBC_QUERY_OBSERVATION.observation(observationRegistry, () -> context)
                 .parentObservation(parentObservation)
                 .lowCardinalityKeyValue(R2DbcObservationDocumentation.LowCardinalityKeys.CONNECTION.withValue(name))
                 .lowCardinalityKeyValue(R2DbcObservationDocumentation.LowCardinalityKeys.THREAD.withValue(executionInfo.getThreadName()));
         // @formatter:on
-
-        if (StringUtils.hasText(url)) {
-            try {
-                URI uri = URI.create(url);
-                context.setUri(uri);
-            }
-            catch (Exception e) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Failed to parse the url [" + url + "]. Won't set this value as a tag");
-                }
-            }
-        }
         return observation.start();
     }
 
@@ -175,31 +137,6 @@ class ObservationProxyExecutionListener implements ProxyExecutionListener {
 }
 
 /**
- * Dedicated Tracing Handler for R2DBC.
- */
-class R2DbcTracingHandler extends DefaultTracingObservationHandler {
-
-    R2DbcTracingHandler(Tracer tracer) {
-        super(tracer);
-    }
-
-    @Override
-    public void onStart(Observation.Context context) {
-        super.onStart(context);
-        R2DbcContext r2DbcContext = (R2DbcContext) context;
-        if (r2DbcContext.getUri() != null) {
-            getTracingContext(context).getSpan().remoteIpAndPort(r2DbcContext.getUri().getHost(), r2DbcContext.getUri().getPort());
-        }
-    }
-
-    @Override
-    public boolean supportsContext(Observation.Context context) {
-        return context instanceof R2DbcContext;
-    }
-
-}
-
-/**
  * BPP wrapping connection factories.
  */
 class ObservationConnectionFactoryBeanPostProcessor implements BeanPostProcessor {
@@ -228,49 +165,58 @@ class ObservationConnectionFactoryBeanPostProcessor implements BeanPostProcessor
 /**
  * Since we don't want to eagerly read beans - we will create a lazy proxy.
  */
-class LazyObservationProxyExecutionListener implements ProxyExecutionListener {
+class LazyObservationProxyExecutionListener implements ProxyExecutionListener, ApplicationListener<ContextRefreshedEvent> {
 
     private ObservationProxyExecutionListener delegate;
 
     private final BeanFactory beanFactory;
 
-    private final ConnectionFactory connectionFactory;
-
-    LazyObservationProxyExecutionListener(BeanFactory beanFactory, ConnectionFactory connectionFactory) {
+    LazyObservationProxyExecutionListener(BeanFactory beanFactory) {
         this.beanFactory = beanFactory;
-        this.connectionFactory = connectionFactory;
     }
 
     @Override
     public void beforeMethod(MethodExecutionInfo executionInfo) {
-        delegate().beforeMethod(executionInfo);
+        if (this.delegate == null) {
+            return;
+        }
+        this.delegate.beforeMethod(executionInfo);
     }
 
     @Override
     public void afterMethod(MethodExecutionInfo executionInfo) {
-        delegate().afterMethod(executionInfo);
+        if (this.delegate == null) {
+            return;
+        }
+        this.delegate.afterMethod(executionInfo);
     }
 
     @Override
     public void beforeQuery(QueryExecutionInfo execInfo) {
-        delegate().beforeQuery(execInfo);
+        if (this.delegate == null) {
+            return;
+        }
+        this.delegate.beforeQuery(execInfo);
     }
 
     @Override
     public void afterQuery(QueryExecutionInfo execInfo) {
-        delegate().afterQuery(execInfo);
+        if (this.delegate == null) {
+            return;
+        }
+        this.delegate.afterQuery(execInfo);
     }
 
     @Override
     public void eachQueryResult(QueryExecutionInfo execInfo) {
-        delegate().eachQueryResult(execInfo);
-    }
-
-    private ProxyExecutionListener delegate() {
         if (this.delegate == null) {
-            this.delegate = new ObservationProxyExecutionListener(this.beanFactory.getBean(ObservationRegistry.class), this.connectionFactory, this.beanFactory.getBean(R2dbcProperties.class));
+            return;
         }
-        return this.delegate;
+        this.delegate.eachQueryResult(execInfo);
+    }
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        this.delegate = new ObservationProxyExecutionListener(this.beanFactory.getBean(ObservationRegistry.class), this.beanFactory.getBean(ConnectionFactory.class), this.beanFactory.getBean(R2dbcProperties.class));
     }
 }
 
@@ -291,7 +237,7 @@ class ObservationProxyConnectionFactoryWrapper implements Function<ConnectionFac
     public ConnectionFactory apply(ConnectionFactory connectionFactory) {
         ProxyConnectionFactory.Builder builder = ProxyConnectionFactory.builder(connectionFactory);
         proxyConfig().ifAvailable(builder::proxyConfig);
-        builder.listener(new LazyObservationProxyExecutionListener(this.beanFactory, connectionFactory));
+        builder.listener(this.beanFactory.getBean(LazyObservationProxyExecutionListener.class));
         return builder.build();
     }
 

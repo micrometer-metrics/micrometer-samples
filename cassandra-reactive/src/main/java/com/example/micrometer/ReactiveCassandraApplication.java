@@ -1,6 +1,8 @@
 package com.example.micrometer;
 
-import io.micrometer.tracing.Span;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
 import io.micrometer.tracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,14 +25,18 @@ public class ReactiveCassandraApplication {
     }
 
     @Bean
-    public CommandLineRunner demo(BasicUserRepository basicUserRepository, Tracer tracer) {
+    public CommandLineRunner demo(BasicUserRepository basicUserRepository, ObservationRegistry observationRegistry, Tracer tracer) {
         return (args) -> {
-            Span nextSpan = tracer.nextSpan().name("cassandra-reactive-app");
-            Mono.just(nextSpan).doOnNext(span -> tracer.withSpan(span.start())).flatMap(span -> {
-                log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", tracer.currentSpan().context().traceId());
+            Observation observation = Observation.start("cassandra-reactive-app", observationRegistry);
+            Mono.just(observation)
+                    .flatMap(span -> {
+                        observation.scoped(() -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", tracer.currentSpan().context().traceId()));
                 return basicUserRepository.save(new User("foo", "bar", "baz", 1L))
                         .flatMap(user -> basicUserRepository.findUserByIdIn(user.getId()));
-            }).doFinally(signalType -> nextSpan.end()).block(Duration.ofMinutes(1));
+            })
+                    .doFinally(signalType -> observation.stop())
+                    .contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation))
+                    .block(Duration.ofMinutes(1));
         };
     }
 

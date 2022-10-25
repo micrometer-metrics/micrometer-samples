@@ -33,6 +33,8 @@ dependencies {
 	// Default is OTel + Zipkin. You can opt in via "wavefront" to Wavefront and "brave" for Brave
 	if (project.hasProperty("wavefront")) {
 		implementation "io.micrometer:micrometer-tracing-reporter-wavefront"
+	} else {
+		implementation 'io.zipkin.reporter2:zipkin-sender-urlconnection' // we need a way to send spans to Zipkin
 	}
 	if (project.hasProperty("brave")) {
 		implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
