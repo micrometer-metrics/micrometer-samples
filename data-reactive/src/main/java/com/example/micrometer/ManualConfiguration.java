@@ -18,6 +18,7 @@ import io.r2dbc.proxy.listener.ProxyExecutionListener;
 import io.r2dbc.spi.ConnectionFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import reactor.util.context.ContextView;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -98,7 +99,8 @@ class ObservationProxyExecutionListener implements ProxyExecutionListener {
         if (observationRegistry.isNoop()) {
             return;
         }
-        Observation parentObservation = executionInfo.getValueStore().getOrDefault(ObservationThreadLocalAccessor.KEY,  observationRegistry.getCurrentObservation()); // TODO: Won't work until https://github.com/r2dbc/r2dbc-proxy/pull/121 gets merged
+        ContextView contextView = executionInfo.getValueStore().get(ContextView.class, ContextView.class);
+        Observation parentObservation = contextView.getOrDefault(ObservationThreadLocalAccessor.KEY, observationRegistry.getCurrentObservation());
         if (parentObservation == null) {
             if (log.isDebugEnabled()) {
                 log.debug("Parent observation not present, won't do any instrumentation");
@@ -111,7 +113,7 @@ class ObservationProxyExecutionListener implements ProxyExecutionListener {
             log.debug("Created a new child observation before query [" + observation + "]");
         }
         tagQueries(executionInfo, observation);
-        executionInfo.getValueStore().put(ObservationThreadLocalAccessor.KEY, observation);
+        executionInfo.getValueStore().put(Observation.class, observation);
     }
 
     Observation clientObservation(Observation parentObservation, QueryExecutionInfo executionInfo, String name) {
@@ -148,7 +150,7 @@ class ObservationProxyExecutionListener implements ProxyExecutionListener {
 
     @Override
     public void afterQuery(QueryExecutionInfo executionInfo) {
-        Observation observation = executionInfo.getValueStore().get(ObservationThreadLocalAccessor.KEY, Observation.class);
+        Observation observation = executionInfo.getValueStore().get(Observation.class, Observation.class);
         if (observation != null) {
             if (log.isDebugEnabled()) {
                 log.debug("Continued the child observation in after query [" + observation + "]");
@@ -163,7 +165,7 @@ class ObservationProxyExecutionListener implements ProxyExecutionListener {
 
     @Override
     public void eachQueryResult(QueryExecutionInfo executionInfo) {
-        Observation observation = executionInfo.getValueStore().get(ObservationThreadLocalAccessor.KEY, Observation.class);
+        Observation observation = executionInfo.getValueStore().get(Observation.class, Observation.class);
         if (observation != null) {
             if (log.isDebugEnabled()) {
                 log.debug("Marking after query result for observation [" + observation + "]");
