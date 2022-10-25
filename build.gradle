@@ -1,28 +1,17 @@
 buildscript {
-    dependencyLocking {
-        lockAllConfigurations()
-    }
-
     repositories {
         mavenCentral()
         gradlePluginPortal()
     }
     dependencies {
-        // TODO: this plugin brings in org.springframework:spring-core:3.1.3.RELEASE and org.springframework:spring-asm:3.1.3.RELEASE
-        // Because of this, it fails Boot's mainClass lookup mechanism, we need to find a better way to guard license headers
-        // classpath ('gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1')
-        classpath 'io.spring.nohttp:nohttp-gradle:0.0.10'
-        classpath 'org.gradle:test-retry-gradle-plugin:1.4.1'
         classpath 'io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.35'
     }
-
-    configurations.classpath.resolutionStrategy.cacheDynamicVersionsFor 0, 'minutes'
 }
 
 description = 'Micrometer Samples'
 
 allprojects {
-    group = 'io.micrometer'
+    group = 'com.example.micrometersamples'
     version = '0.1.0-SNAPSHOT'
 
     afterEvaluate { project -> println "I'm configuring $project.name with version $project.version" }
@@ -32,9 +21,7 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'checkstyle'
     apply plugin: 'io.spring.javaformat'
-    // apply plugin: 'com.github.hierynomus.license'
-    apply plugin: 'io.spring.nohttp'
-    apply plugin: 'org.gradle.test-retry'
+    apply plugin: 'maven-publish'
 
     java {
         registerFeature('optional') {
@@ -56,8 +43,6 @@ subprojects {
     }
 
     dependencies {
-        // JSR-305 only used for non-required meta-annotations
-        optionalApi 'com.google.code.findbugs:jsr305:latest.release'
         checkstyle 'io.spring.javaformat:spring-javaformat-checkstyle:latest.release'
     }
 
@@ -80,91 +65,15 @@ subprojects {
         }
     }
 
-    normalization {
-        runtimeClasspath {
-            metaInf {
-                [
-                        'Build-Date',
-                        'Build-Date-UTC',
-                        'Built-By',
-                        'Built-OS',
-                        'Build-Host',
-                        'Build-Job',
-                        'Build-Number',
-                        'Build-Id',
-                        'Change',
-                        'Full-Change',
-                        'Branch',
-                        'Module-Origin',
-                        'Created-By',
-                        'Build-Java-Version'
-                ].each {
-                    ignoreAttribute it
-                    ignoreProperty it
-                }
-            }
-        }
-    }
-
     //noinspection GroovyAssignabilityCheck
     test {
-        // set heap size for the test JVM(s)
-        maxHeapSize = "1500m"
-
         useJUnitPlatform()
-
-        retry {
-            maxFailures = 5
-            maxRetries = 3
-        }
     }
 
     project.tasks.withType(Test) { Test testTask ->
         testTask.testLogging.exceptionFormat = 'full'
     }
 
-    // license {
-    //     header rootProject.file('gradle/licenseHeader.txt')
-    //     strictCheck true
-    //     mapping {
-    //         java = 'SLASHSTAR_STYLE'
-    //     }
-    //     sourceSets = project.sourceSets
-
-    //     ext.year = Calendar.getInstance().get(Calendar.YEAR)
-    //     skipExistingHeaders = true
-    //     exclude '**/*.json' // comments not supported
-    // }
-
-    nohttp {
-        source.exclude '**/docker/**/*.yml'
-    }
-
-    dependencyLocking {
-        lockAllConfigurations()
-    }
-
-    tasks.register('resolveAndLockAll') {
-        description = 'Resolves dependencies of all configurations and writes them into the lock file.'
-        outputs.upToDateWhen { false }
-        doFirst {
-            assert gradle.startParameter.writeDependencyLocks || gradle.startParameter.lockedDependenciesToUpdate: 'Execute resolveAndLockAll --write-locks or --update-locks <dependencies>'
-        }
-        doLast {
-            project.configurations.findAll { it.canBeResolved }*.resolve()
-        }
-    }
-
-    tasks.register('downloadDependencies') {
-        outputs.upToDateWhen { false }
-        doLast {
-            project.configurations.findAll { it.canBeResolved }*.files
-        }
-    }
-}
-
-task deleteLockFiles(type: Delete) {
-    delete fileTree(dir: '.', include: '**/gradle.lockfile')
 }
 
 wrapper {

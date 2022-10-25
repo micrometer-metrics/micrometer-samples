@@ -13,7 +13,9 @@ public class NewTransactionService {
     private final CustomerRepository repository;
 
     private final ContinuedTransactionService continuedTransactionService;
-    public NewTransactionService(CustomerRepository repository, ContinuedTransactionService continuedTransactionService) {
+
+    public NewTransactionService(CustomerRepository repository,
+            ContinuedTransactionService continuedTransactionService) {
         this.repository = repository;
         this.continuedTransactionService = continuedTransactionService;
     }

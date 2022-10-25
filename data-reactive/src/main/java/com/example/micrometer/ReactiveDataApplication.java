@@ -24,15 +24,14 @@ public class ReactiveDataApplication {
     }
 
     @Bean
-    public CommandLineRunner demo(ReactiveNewTransactionService reactiveNewTransactionService, ObservationRegistry observationRegistry) {
+    public CommandLineRunner demo(ReactiveNewTransactionService reactiveNewTransactionService,
+            ObservationRegistry observationRegistry) {
         return (args) -> {
             try {
                 Observation observation = Observation.start("reactive-data", observationRegistry);
-                reactiveNewTransactionService
-                        .newTransaction()
+                reactiveNewTransactionService.newTransaction()
                         .contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation))
-                        .doFinally(signalType -> observation.stop())
-                        .block(Duration.ofSeconds(50));
+                        .doFinally(signalType -> observation.stop()).block(Duration.ofSeconds(50));
             }
             catch (DataAccessException e) {
                 log.info("Expected to throw an exception so that we see if rollback works", e);

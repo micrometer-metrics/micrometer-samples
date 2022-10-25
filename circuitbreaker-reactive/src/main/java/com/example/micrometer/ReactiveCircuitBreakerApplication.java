@@ -59,21 +59,22 @@ class CircuitService {
         return Mono.deferContextual(contextView -> {
             // You don't need this in your code unless you want to create new spans
             // manually
-                return this.factory.create("circuit").run(Mono.defer(() -> {
-                    scoped(contextView, () -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
-                            this.tracer.currentSpan().context().traceId()));
-                    return Mono.error(new IllegalStateException("BOOM"));
-                }), throwable -> {
-                    scoped(contextView, () -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer",
-                            this.tracer.currentSpan().context().traceId()));
-                    return Mono.just("fallback");
-                });
-            }).contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation))
-            .doFinally(signalType -> observation.stop());
+            return this.factory.create("circuit").run(Mono.defer(() -> {
+                scoped(contextView, () -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
+                        this.tracer.currentSpan().context().traceId()));
+                return Mono.error(new IllegalStateException("BOOM"));
+            }), throwable -> {
+                scoped(contextView, () -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer",
+                        this.tracer.currentSpan().context().traceId()));
+                return Mono.just("fallback");
+            });
+        }).contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation))
+                .doFinally(signalType -> observation.stop());
     }
 
     private void scoped(ContextView contextView, Runnable runnable) {
-        try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView, ObservationThreadLocalAccessor.KEY)) {
+        try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+                ObservationThreadLocalAccessor.KEY)) {
             runnable.run();
         }
     }

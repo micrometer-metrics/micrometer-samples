@@ -23,7 +23,7 @@ jobs:
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
 
-    - name: Clone the projects
-      run: ./scripts/build_all_projects_locally.sh
+#    - name: Clone the projects
+#      run: ./scripts/build_all_projects_locally.sh
     - name: Execute Gradle build
       run: ./gradlew build pTML -x test && ./gradlew acceptanceTest

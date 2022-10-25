@@ -40,7 +40,8 @@ class ManualConfiguration {
     }
 
     @Bean
-    static ObservationConnectionFactoryBeanPostProcessor observationConnectionFactoryBeanPostProcessor(BeanFactory beanFactory) {
+    static ObservationConnectionFactoryBeanPostProcessor observationConnectionFactoryBeanPostProcessor(
+            BeanFactory beanFactory) {
         return new ObservationConnectionFactoryBeanPostProcessor(beanFactory);
     }
 
@@ -59,7 +60,8 @@ class ObservationProxyExecutionListener implements ProxyExecutionListener {
 
     private final R2dbcProperties r2dbcProperties;
 
-    public ObservationProxyExecutionListener(ObservationRegistry observationRegistry, ConnectionFactory connectionFactory, R2dbcProperties r2dbcProperties) {
+    public ObservationProxyExecutionListener(ObservationRegistry observationRegistry,
+            ConnectionFactory connectionFactory, R2dbcProperties r2dbcProperties) {
         this.observationRegistry = observationRegistry;
         this.connectionFactory = connectionFactory;
         this.r2dbcProperties = r2dbcProperties;
@@ -70,7 +72,15 @@ class ObservationProxyExecutionListener implements ProxyExecutionListener {
         if (observationRegistry.isNoop()) {
             return;
         }
-        Observation parentObservation = executionInfo.getValueStore().getOrDefault(ContextView.class, new DelegatingContextView(Context.empty())).getOrDefault(ObservationThreadLocalAccessor.KEY,  observationRegistry.getCurrentObservation()); // TODO: Won't work until https://github.com/r2dbc/r2dbc-proxy/pull/121 gets merged
+        Observation parentObservation = executionInfo.getValueStore()
+                .getOrDefault(ContextView.class, new DelegatingContextView(Context.empty()))
+                .getOrDefault(ObservationThreadLocalAccessor.KEY, observationRegistry.getCurrentObservation()); // TODO:
+                                                                                                                // Won't
+                                                                                                                // work
+                                                                                                                // until
+                                                                                                                // https://github.com/r2dbc/r2dbc-proxy/pull/121
+                                                                                                                // gets
+                                                                                                                // merged
         if (parentObservation == null) {
             if (log.isDebugEnabled()) {
                 log.debug("Parent observation not present, won't do any instrumentation");
@@ -103,14 +113,17 @@ class ObservationProxyExecutionListener implements ProxyExecutionListener {
     private void tagQueries(QueryExecutionInfo executionInfo, Observation observation) {
         int i = 0;
         for (QueryInfo queryInfo : executionInfo.getQueries()) {
-            observation.highCardinalityKeyValue(String.format(R2DbcObservationDocumentation.HighCardinalityKeys.QUERY.name(), i), queryInfo.getQuery());
+            observation.highCardinalityKeyValue(
+                    String.format(R2DbcObservationDocumentation.HighCardinalityKeys.QUERY.name(), i),
+                    queryInfo.getQuery());
             i = i + 1;
         }
     }
 
     @Override
     public void afterQuery(QueryExecutionInfo executionInfo) {
-        Observation observation = executionInfo.getValueStore().get(ObservationThreadLocalAccessor.KEY, Observation.class);
+        Observation observation = executionInfo.getValueStore().get(ObservationThreadLocalAccessor.KEY,
+                Observation.class);
         if (observation != null) {
             if (log.isDebugEnabled()) {
                 log.debug("Continued the child observation in after query [" + observation + "]");
@@ -125,7 +138,8 @@ class ObservationProxyExecutionListener implements ProxyExecutionListener {
 
     @Override
     public void eachQueryResult(QueryExecutionInfo executionInfo) {
-        Observation observation = executionInfo.getValueStore().get(ObservationThreadLocalAccessor.KEY, Observation.class);
+        Observation observation = executionInfo.getValueStore().get(ObservationThreadLocalAccessor.KEY,
+                Observation.class);
         if (observation != null) {
             if (log.isDebugEnabled()) {
                 log.debug("Marking after query result for observation [" + observation + "]");
@@ -160,12 +174,14 @@ class ObservationConnectionFactoryBeanPostProcessor implements BeanPostProcessor
                 this.beanFactory);
         return proxyPostProcessor.apply(bean);
     }
+
 }
 
 /**
  * Since we don't want to eagerly read beans - we will create a lazy proxy.
  */
-class LazyObservationProxyExecutionListener implements ProxyExecutionListener, ApplicationListener<ContextRefreshedEvent> {
+class LazyObservationProxyExecutionListener
+        implements ProxyExecutionListener, ApplicationListener<ContextRefreshedEvent> {
 
     private ObservationProxyExecutionListener delegate;
 
@@ -214,10 +230,13 @@ class LazyObservationProxyExecutionListener implements ProxyExecutionListener, A
         }
         this.delegate.eachQueryResult(execInfo);
     }
+
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        this.delegate = new ObservationProxyExecutionListener(this.beanFactory.getBean(ObservationRegistry.class), this.beanFactory.getBean(ConnectionFactory.class), this.beanFactory.getBean(R2dbcProperties.class));
+        this.delegate = new ObservationProxyExecutionListener(this.beanFactory.getBean(ObservationRegistry.class),
+                this.beanFactory.getBean(ConnectionFactory.class), this.beanFactory.getBean(R2dbcProperties.class));
     }
+
 }
 
 /**
@@ -291,6 +310,7 @@ enum R2DbcObservationDocumentation implements ObservationDocumentation {
     };
 
     enum Events implements Observation.Event {
+
         /**
          * Annotated before executing a method annotated with @ContinueSpan or @NewSpan.
          */

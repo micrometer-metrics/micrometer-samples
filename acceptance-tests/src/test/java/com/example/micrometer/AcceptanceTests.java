@@ -1,5 +1,6 @@
 package com.example.micrometer;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,6 +41,7 @@ class AcceptanceTests extends AcceptanceTestsBase {
         assertThatTraceIdGotPropagated(producerId, consumerId);
     }
 
+    @Disabled("TODO: https://github.com/OpenFeign/feign/pull/1760")
     @Test
     void should_pass_tracing_context_from_openfeign_to_mvc(TestInfo testInfo) throws Exception {
         // given
@@ -111,6 +113,7 @@ class AcceptanceTests extends AcceptanceTestsBase {
         assertThatTraceIdGotPropagated(appId);
     }
 
+    @Disabled("TODO: https://github.com/rsocket/rsocket-java/pull/1075")
     @Test
     void should_pass_tracing_context_from_rsocket(TestInfo testInfo) throws Exception {
         // given
@@ -150,15 +153,6 @@ class AcceptanceTests extends AcceptanceTestsBase {
 
         // then
         assertThatLogsContainPropagatedIdAtLeastXNumberOfTimes(appId, "config-server", 2);
-    }
-
-    @Test
-    void should_pass_tracing_context_with_deployer(TestInfo testInfo) {
-        // when
-        String appId = deploy(testInfo, "deployer");
-
-        // then
-        assertThatLogsContainPropagatedIdAtLeastXNumberOfTimes(appId, "deployer", 9);
     }
 
     @Test

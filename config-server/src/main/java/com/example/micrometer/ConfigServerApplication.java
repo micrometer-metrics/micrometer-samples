@@ -63,12 +63,11 @@ class WebClientService {
     }
 
     void call() {
-        Observation.createNotStarted("hello", observationRegistry)
-                .observe(() -> {
-                    int port = environment.getProperty("server.port", Integer.class, 8888);
-                    log.info("Got back the following response from config server \n{}",
-                            this.restTemplate.getForObject("http://localhost:" + port + "/main-application.yml", String.class));
-                });
+        Observation.createNotStarted("hello", observationRegistry).observe(() -> {
+            int port = environment.getProperty("server.port", Integer.class, 8888);
+            log.info("Got back the following response from config server \n{}",
+                    this.restTemplate.getForObject("http://localhost:" + port + "/main-application.yml", String.class));
+        });
 
     }
 

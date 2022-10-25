@@ -25,16 +25,16 @@ public class ReactiveCassandraApplication {
     }
 
     @Bean
-    public CommandLineRunner demo(BasicUserRepository basicUserRepository, ObservationRegistry observationRegistry, Tracer tracer) {
+    public CommandLineRunner demo(BasicUserRepository basicUserRepository, ObservationRegistry observationRegistry,
+            Tracer tracer) {
         return (args) -> {
             Observation observation = Observation.start("cassandra-reactive-app", observationRegistry);
-            Mono.just(observation)
-                    .flatMap(span -> {
-                        observation.scoped(() -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", tracer.currentSpan().context().traceId()));
+            Mono.just(observation).flatMap(span -> {
+                observation.scoped(() -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer",
+                        tracer.currentSpan().context().traceId()));
                 return basicUserRepository.save(new User("foo", "bar", "baz", 1L))
                         .flatMap(user -> basicUserRepository.findUserByIdIn(user.getId()));
-            })
-                    .doFinally(signalType -> observation.stop())
+            }).doFinally(signalType -> observation.stop())
                     .contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation))
                     .block(Duration.ofMinutes(1));
         };

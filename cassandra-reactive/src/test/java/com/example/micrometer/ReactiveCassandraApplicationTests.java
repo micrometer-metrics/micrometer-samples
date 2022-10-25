@@ -13,7 +13,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @SpringBootTest
 @Testcontainers
-//@AutoConfigureObservability
+// @AutoConfigureObservability
 @Disabled
 class ReactiveCassandraApplicationTests {
 

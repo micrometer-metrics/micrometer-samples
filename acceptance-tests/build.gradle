@@ -48,7 +48,7 @@ dependencies {
 }
 
 test {
-	exclude(".*")
+	exclude("com/example/**")
 }
 
 task acceptanceTests(type: Test) {

@@ -21,7 +21,8 @@ public class DataApplication {
     }
 
     @Bean
-    public CommandLineRunner demo(NewTransactionService newTransactionService, ObservationRegistry observationRegistry) {
+    public CommandLineRunner demo(NewTransactionService newTransactionService,
+            ObservationRegistry observationRegistry) {
         return (args) -> {
             try {
                 Observation.start("data", observationRegistry).observe(newTransactionService::newTransaction);

@@ -18,3 +18,4 @@ bin/
 .java-version
 
 target/
+log.log

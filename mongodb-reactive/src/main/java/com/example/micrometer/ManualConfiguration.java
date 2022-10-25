@@ -18,9 +18,13 @@ public class ManualConfiguration {
 
     // You must set this manually until this is registered in Boot
     @Bean
-    MongoClientSettingsBuilderCustomizer mongoObservabilityCustomizer(ObservationRegistry observationRegistry, MongoProperties mongoProperties) {
-        return clientSettingsBuilder -> clientSettingsBuilder.contextProvider(ContextProviderFactory.create(observationRegistry))
-                .addCommandListener(new MongoObservationCommandListener(observationRegistry, new ConnectionString(mongoProperties.determineUri())));
+    MongoClientSettingsBuilderCustomizer mongoObservabilityCustomizer(ObservationRegistry observationRegistry,
+            MongoProperties mongoProperties) {
+        return clientSettingsBuilder -> clientSettingsBuilder
+                .contextProvider(ContextProviderFactory.create(observationRegistry))
+                .addCommandListener(new MongoObservationCommandListener(observationRegistry,
+                        new ConnectionString(mongoProperties.determineUri())));
 
     }
+
 }

@@ -23,7 +23,8 @@ public class ReactiveNestedTransactionService {
 
     private final ReactiveCustomerRepository repository;
 
-    public ReactiveNestedTransactionService(Tracer tracer, ObservationRegistry observationRegistry, ReactiveCustomerRepository repository) {
+    public ReactiveNestedTransactionService(Tracer tracer, ObservationRegistry observationRegistry,
+            ReactiveCustomerRepository repository) {
         this.tracer = tracer;
         this.observationRegistry = observationRegistry;
         this.repository = repository;
@@ -31,17 +32,15 @@ public class ReactiveNestedTransactionService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Mono<Void> requiresNew() {
-        return Mono
-                .deferContextual(contextView -> {
-                    try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView, ObservationThreadLocalAccessor.KEY)) {
-                        log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer requires new",
-                                tracer.currentSpan().context().traceId());
-                    }
-                    // save a few customers
-                    return repository.save(new ReactiveCustomer("Hello", "From Propagated Transaction"));
-                })
-                .doOnNext(customerFlux -> repository.deleteById(10238L))
-                .then();
+        return Mono.deferContextual(contextView -> {
+            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+                    ObservationThreadLocalAccessor.KEY)) {
+                log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer requires new",
+                        tracer.currentSpan().context().traceId());
+            }
+            // save a few customers
+            return repository.save(new ReactiveCustomer("Hello", "From Propagated Transaction"));
+        }).doOnNext(customerFlux -> repository.deleteById(10238L)).then();
     }
 
 }

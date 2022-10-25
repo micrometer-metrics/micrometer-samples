@@ -122,7 +122,7 @@ class ProjectDeployer {
 
     private AppDeploymentRequest deploymentRequest(String appName, AppDefinition appDefinition) {
         return new AppDeploymentRequest(appDefinition, new MavenResource.Builder()
-                .groupId("com.example.micrometersamples").artifactId(appName).version("0.0.1-SNAPSHOT").build());
+                .groupId("com.example.micrometersamples").artifactId(appName).version("0.1.0-SNAPSHOT").build());
     }
 
     String getLog(String id) {

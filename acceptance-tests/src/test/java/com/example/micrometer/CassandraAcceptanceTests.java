@@ -52,7 +52,7 @@ class CassandraAcceptanceTests extends AcceptanceTestsBase {
     }
 
     private Map<String, String> port() {
-        return Map.of("spring.data.cassandra.contact-points",
+        return Map.of("spring.cassandra.contact-points",
                 cassandra.getContainerIpAddress() + ":" + cassandra.getFirstMappedPort());
     }
 

@@ -41,7 +41,7 @@ public class ReactiveMongoApplication {
                 return basicUserRepository.save(new User("foo" + time, "bar", "baz", null))
                         .flatMap(user -> basicUserRepository.findUserByUsername("foo" + time));
             }).contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation))
-            .doFinally(signalType -> observation.stop()).block(Duration.ofMinutes(1));
+                    .doFinally(signalType -> observation.stop()).block(Duration.ofMinutes(1));
             log.info("Done!");
         };
     }

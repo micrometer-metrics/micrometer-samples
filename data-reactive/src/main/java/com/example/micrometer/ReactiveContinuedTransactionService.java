@@ -24,7 +24,8 @@ public class ReactiveContinuedTransactionService {
     private final ReactiveNestedTransactionService reactiveNestedTransactionService;
 
     public ReactiveContinuedTransactionService(ReactiveCustomerRepository repository, Tracer tracer,
-            ObservationRegistry observationRegistry, ReactiveNestedTransactionService reactiveNestedTransactionService) {
+            ObservationRegistry observationRegistry,
+            ReactiveNestedTransactionService reactiveNestedTransactionService) {
         this.repository = repository;
         this.tracer = tracer;
         this.observationRegistry = observationRegistry;
@@ -33,16 +34,16 @@ public class ReactiveContinuedTransactionService {
 
     @Transactional
     public Mono<Void> continuedTransaction() {
-        return Mono
-                .deferContextual(contextView -> {
-                    try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView, ObservationThreadLocalAccessor.KEY)) {
-                        log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
-                                tracer.currentSpan().context().traceId());
-                    }
-                    return repository.findById(1L);
-                })
-                .transformDeferredContextual((reactiveCustomerMono, contextView) -> reactiveCustomerMono.doOnNext(customer -> {
-                    try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView, ObservationThreadLocalAccessor.KEY)) {
+        return Mono.deferContextual(contextView -> {
+            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+                    ObservationThreadLocalAccessor.KEY)) {
+                log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", tracer.currentSpan().context().traceId());
+            }
+            return repository.findById(1L);
+        }).transformDeferredContextual(
+                (reactiveCustomerMono, contextView) -> reactiveCustomerMono.doOnNext(customer -> {
+                    try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+                            ObservationThreadLocalAccessor.KEY)) {
                         // fetch an individual customer by ID
                         log.info("Customer found with findById(1L):");
                         log.info("--------------------------------");
@@ -52,13 +53,12 @@ public class ReactiveContinuedTransactionService {
                         log.info("Customer found with findByLastName('Bauer'):");
                         log.info("--------------------------------------------");
                     }
-                }).flatMapMany(customer -> repository.findByLastName("Bauer"))
-                        .doOnNext(reactiveCustomer -> {
-                            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView, ObservationThreadLocalAccessor.KEY)) {
-                                log.info(reactiveCustomer.toString());
-                            }
-                        })
-                        .then(this.reactiveNestedTransactionService.requiresNew()));
+                }).flatMapMany(customer -> repository.findByLastName("Bauer")).doOnNext(reactiveCustomer -> {
+                    try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+                            ObservationThreadLocalAccessor.KEY)) {
+                        log.info(reactiveCustomer.toString());
+                    }
+                }).then(this.reactiveNestedTransactionService.requiresNew()));
     }
 
 }

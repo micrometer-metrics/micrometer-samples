@@ -1,6 +1,7 @@
 spring:
   application:
     name: batch
+
 management:
   tracing:
     sampling:

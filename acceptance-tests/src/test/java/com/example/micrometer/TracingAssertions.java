@@ -36,7 +36,7 @@ class TracingAssertions {
 
     void assertThatTraceIdGotPropagated(String... appIds) {
         try {
-            Awaitility.await().pollInterval(1, TimeUnit.SECONDS).atMost(40, TimeUnit.SECONDS).untilAsserted(() -> {
+            Awaitility.await().pollInterval(1, TimeUnit.SECONDS).atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
                 AtomicBoolean consumerPresent = new AtomicBoolean();
                 AtomicBoolean producerPresent = new AtomicBoolean();
                 List<String> traceIds = Arrays.stream(appIds).map(this.projectDeployer::getLog)
@@ -72,7 +72,7 @@ class TracingAssertions {
             int minNumberOfOccurrences) {
         Pattern pattern = Pattern.compile("^.*\\[" + springApplicationName + ",([a-z|0-9]+?),([a-z|0-9]+?)].*$");
         try {
-            Awaitility.await().pollInterval(1, TimeUnit.SECONDS).atMost(120, TimeUnit.SECONDS).untilAsserted(() -> {
+            Awaitility.await().pollInterval(1, TimeUnit.SECONDS).atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
                 AtomicInteger counter = new AtomicInteger();
                 List<String> traceIds = Arrays.stream(this.projectDeployer.getLog(appId).split(System.lineSeparator()))
                         .map(s -> {

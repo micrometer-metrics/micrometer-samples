@@ -25,7 +25,8 @@ public class ReactiveNewTransactionService {
     private final ObservationRegistry observationRegistry;
 
     public ReactiveNewTransactionService(ReactiveCustomerRepository repository,
-            ReactiveContinuedTransactionService reactiveContinuedTransactionService, Tracer tracer, ObservationRegistry observationRegistry) {
+            ReactiveContinuedTransactionService reactiveContinuedTransactionService, Tracer tracer,
+            ObservationRegistry observationRegistry) {
         this.repository = repository;
         this.reactiveContinuedTransactionService = reactiveContinuedTransactionService;
         this.tracer = tracer;
@@ -34,26 +35,27 @@ public class ReactiveNewTransactionService {
 
     @Transactional
     public Mono<Void> newTransaction() {
-        return Mono
-                .deferContextual(contextView -> {
-                    try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView, ObservationThreadLocalAccessor.KEY)) {
-                        log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", tracer.currentSpan().context().traceId());
-                        log.info("Customers found with findAll():");
-                        log.info("-------------------------------");
-                    }
-                    // save a few customers
-                    return repository.save(new ReactiveCustomer("Jack", "Bauer"));
-                })
-                .then(repository.save(new ReactiveCustomer("Chloe", "O'Brian")))
+        return Mono.deferContextual(contextView -> {
+            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+                    ObservationThreadLocalAccessor.KEY)) {
+                log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", tracer.currentSpan().context().traceId());
+                log.info("Customers found with findAll():");
+                log.info("-------------------------------");
+            }
+            // save a few customers
+            return repository.save(new ReactiveCustomer("Jack", "Bauer"));
+        }).then(repository.save(new ReactiveCustomer("Chloe", "O'Brian")))
                 .then(repository.save(new ReactiveCustomer("Kim", "Bauer")))
                 .then(repository.save(new ReactiveCustomer("David", "Palmer")))
                 .then(repository.save(new ReactiveCustomer("Michelle", "Dessler")))
-                .flatMapMany(reactiveCustomer -> repository.findAll())
-                .transformDeferredContextual((reactiveCustomerFlux, contextView) -> reactiveCustomerFlux.doOnNext(reactiveCustomer -> {
-                    try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView, ObservationThreadLocalAccessor.KEY)) {
-                        log.info(reactiveCustomer.toString());
-                    }
-                })).then(this.reactiveContinuedTransactionService.continuedTransaction());
+                .flatMapMany(reactiveCustomer -> repository.findAll()).transformDeferredContextual(
+                        (reactiveCustomerFlux, contextView) -> reactiveCustomerFlux.doOnNext(reactiveCustomer -> {
+                            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+                                    ObservationThreadLocalAccessor.KEY)) {
+                                log.info(reactiveCustomer.toString());
+                            }
+                        }))
+                .then(this.reactiveContinuedTransactionService.continuedTransaction());
 
     }
 
