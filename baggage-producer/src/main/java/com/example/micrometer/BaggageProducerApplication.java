@@ -14,8 +14,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -40,17 +39,6 @@ public class BaggageProducerApplication implements CommandLineRunner {
 
 }
 
-@Configuration
-class Config {
-
-    // You must register RestTemplate as a bean!
-    @Bean
-    RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-
-}
-
 @Service
 class BaggageRestTemplateService {
 
@@ -60,8 +48,8 @@ class BaggageRestTemplateService {
 
     private final Tracer tracer;
 
-    BaggageRestTemplateService(RestTemplate restTemplate, Tracer tracer) {
-        this.restTemplate = restTemplate;
+    BaggageRestTemplateService(RestTemplateBuilder restTemplateBuilder, Tracer tracer) {
+        this.restTemplate = restTemplateBuilder.build();
         this.tracer = tracer;
     }
 

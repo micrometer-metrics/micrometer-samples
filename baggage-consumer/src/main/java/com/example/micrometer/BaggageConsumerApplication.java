@@ -7,9 +7,9 @@ import io.micrometer.tracing.Tracer;
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,13 +57,8 @@ class BaggageController {
 class TestConfiguration {
 
     @Bean
-    RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-
-    @Bean
-    RemoteFieldsTestChecker remoteFieldsChecker(RestTemplate restTemplate) {
-        return new RemoteFieldsTestChecker(restTemplate);
+    RemoteFieldsTestChecker remoteFieldsChecker(RestTemplateBuilder restTemplateBuilder) {
+        return new RemoteFieldsTestChecker(restTemplateBuilder.build());
     }
 
 }
