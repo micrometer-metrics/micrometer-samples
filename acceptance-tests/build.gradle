@@ -5,12 +5,10 @@ buildscript {
 		gradlePluginPortal()
 	}
 	dependencies {
-		classpath "org.springframework.boot:spring-boot-gradle-plugin:2.7.4"
 		classpath 'io.spring.gradle:dependency-management-plugin:1.0.14.RELEASE'
 	}
 }
 
-apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 repositories {
@@ -25,6 +23,7 @@ ext {
 
 dependencyManagement {
 	imports {
+		mavenBom "org.springframework.boot:spring-boot-dependencies:2.7.5"
 		mavenBom "org.springframework.cloud:spring-cloud-deployer-dependencies:${deployerVersion}"
 	}
 }
@@ -53,9 +52,5 @@ test {
 
 task acceptanceTests(type: Test) {
 	useJUnitPlatform()
-}
-
-bootJar {
-	enabled = false
 }
 

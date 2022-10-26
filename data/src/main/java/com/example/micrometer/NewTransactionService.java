@@ -1,5 +1,6 @@
 package com.example.micrometer;
 
+import io.micrometer.tracing.Tracer;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,17 +15,19 @@ public class NewTransactionService {
 
     private final ContinuedTransactionService continuedTransactionService;
 
+    private final Tracer tracer;
+
     public NewTransactionService(CustomerRepository repository,
-            ContinuedTransactionService continuedTransactionService) {
+            ContinuedTransactionService continuedTransactionService, Tracer tracer) {
         this.repository = repository;
         this.continuedTransactionService = continuedTransactionService;
+        this.tracer = tracer;
     }
 
     @Transactional
     public void newTransaction() {
-        // log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer",
-        // tracer.currentSpan().context().traceId());
-        // TX is not working
+         log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer",
+         tracer.currentSpan().context().traceId()); // TODO: TX is not working
 
         // save a few customers
         repository.save(new Customer("Jack", "Bauer"));

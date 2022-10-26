@@ -57,8 +57,13 @@ class BaggageController {
 class TestConfiguration {
 
     @Bean
-    RemoteFieldsTestChecker remoteFieldsChecker(RestTemplateBuilder restTemplateBuilder) {
-        return new RemoteFieldsTestChecker(restTemplateBuilder.build());
+    RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder.build();
+    }
+
+    @Bean
+    RemoteFieldsTestChecker remoteFieldsChecker(RestTemplate restTemplate) {
+        return new RemoteFieldsTestChecker(restTemplate);
     }
 
 }

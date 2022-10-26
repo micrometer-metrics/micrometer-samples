@@ -1,9 +1,12 @@
 buildscript {
     repositories {
+        maven { url 'https://repo.spring.io/milestone' }
+        maven { url 'https://repo.spring.io/snapshot' }
         mavenCentral()
         gradlePluginPortal()
     }
     dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
         classpath 'io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.35'
     }
 }
@@ -72,6 +75,18 @@ subprojects {
 
     project.tasks.withType(Test) { Test testTask ->
         testTask.testLogging.exceptionFormat = 'full'
+    }
+
+    if (project.name != "acceptance-tests") {
+        apply plugin: 'org.springframework.boot'
+
+        publishing {
+            publications {
+                bootJava(MavenPublication) {
+                    artifact tasks.named("bootJar")
+                }
+            }
+        }
     }
 
 }

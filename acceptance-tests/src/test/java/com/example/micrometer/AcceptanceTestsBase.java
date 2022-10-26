@@ -6,8 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.deployer.spi.app.AppDeployer;
 import org.springframework.cloud.deployer.spi.app.DeploymentState;
+import org.springframework.cloud.deployer.spi.local.LocalAppDeployer;
+import org.springframework.cloud.deployer.spi.local.LocalDeployerProperties;
+import org.springframework.context.annotation.Bean;
 
 import java.time.Duration;
 import java.util.Map;
@@ -85,8 +90,13 @@ class AcceptanceTestsBase {
     }
 
     @SpringBootApplication
+    @EnableConfigurationProperties(LocalDeployerProperties.class)
     static class Config {
 
+        @Bean
+        AppDeployer appDeployer(LocalDeployerProperties localDeployerProperties) {
+            return new LocalAppDeployer(localDeployerProperties);
+        }
     }
 
 }

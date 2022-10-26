@@ -56,8 +56,11 @@ class TracingAssertions {
                         }).filter(Objects::nonNull).distinct().collect(Collectors.toList());
                 log.info("Found the following trace id {}", traceIds);
                 then(traceIds).as("TraceId should have only one value").hasSize(1);
+                log.info("Checking if producer code was called");
                 then(producerPresent).as("Producer code must be called").isTrue();
+                log.info("Producer code got called! Checking if consumer code was called");
                 then(consumerPresent).as("Consumer code must be called").isTrue();
+                log.info("Consumer code got called!");
             });
         }
         catch (Throwable er) {
