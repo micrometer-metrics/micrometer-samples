@@ -44,8 +44,8 @@ include 'mongodb-reactive'
 include "mvc"
 include "openfeign"
 include "resttemplate"
-include "rsocket-client"
-include "rsocket-server"
+//include "rsocket-client" //TODO: Bring me back once snapshots are back on repo.spring.io
+//include "rsocket-server" //TODO: Bring me back once snapshots are back on repo.spring.io
 include "security"
 include "stream-producer"
 include "stream-consumer"

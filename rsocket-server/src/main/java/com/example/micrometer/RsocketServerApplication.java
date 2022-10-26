@@ -1,5 +1,7 @@
 package com.example.micrometer;
 
+import io.micrometer.context.ContextSnapshot;
+import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
 import io.micrometer.tracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +33,13 @@ class RSocketController {
 
     @MessageMapping("foo")
     public Mono<String> span() {
-        String traceId = this.tracer.currentSpan().context().traceId();
-        log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", traceId);
-        return Mono.just(traceId);
+        return Mono.deferContextual(contextView -> {
+            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView, ObservationThreadLocalAccessor.KEY)) {
+                String traceId = this.tracer.currentSpan().context().traceId();
+                log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", traceId);
+                return Mono.just(traceId);
+            }
+        });
     }
 
 }

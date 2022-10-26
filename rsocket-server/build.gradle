@@ -14,24 +14,20 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 repositories {
+	mavenLocal()
 	mavenCentral()
 	maven { url 'https://maven.pkg.github.com/rsocket/rsocket-java' }
 	maven { url 'https://repo.spring.io/milestone' }
 	maven { url 'https://repo.spring.io/snapshot' }
 }
 
-//dependencyManagement {
-//	imports {
-//		mavenBom "io.rsocket:rsocket-bom:1.2.0-SNAPSHOT"
-//	}
-//}
-
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
 	implementation 'org.springframework.boot:spring-boot-starter-rsocket'
-	implementation 'io.rsocket:rsocket-micrometer'
+	implementation 'io.rsocket:rsocket-micrometer:1.1.4-SNAPSHOT' // TODO: Remove me
+	implementation "io.micrometer:context-propagation:1.0.0-RC1" // TODO: Should come from Micrometer-Bom ?
 
 	implementation "io.micrometer:micrometer-tracing-bridge-${project.hasProperty("brave") ? "brave" : "otel" }"
 	// Default is OTel + Zipkin. You can opt in via "wavefront" to Wavefront and "brave" for Brave
