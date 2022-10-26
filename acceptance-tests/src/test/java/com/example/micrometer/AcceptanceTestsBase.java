@@ -97,6 +97,7 @@ class AcceptanceTestsBase {
         AppDeployer appDeployer(LocalDeployerProperties localDeployerProperties) {
             return new LocalAppDeployer(localDeployerProperties);
         }
+
     }
 
 }

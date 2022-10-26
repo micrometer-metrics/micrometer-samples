@@ -17,8 +17,8 @@ public class NewTransactionService {
 
     private final Tracer tracer;
 
-    public NewTransactionService(CustomerRepository repository,
-            ContinuedTransactionService continuedTransactionService, Tracer tracer) {
+    public NewTransactionService(CustomerRepository repository, ContinuedTransactionService continuedTransactionService,
+            Tracer tracer) {
         this.repository = repository;
         this.continuedTransactionService = continuedTransactionService;
         this.tracer = tracer;
@@ -26,8 +26,11 @@ public class NewTransactionService {
 
     @Transactional
     public void newTransaction() {
-         log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer",
-         tracer.currentSpan().context().traceId()); // TODO: TX is not working
+        log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", tracer.currentSpan().context().traceId()); // TODO:
+                                                                                                                // TX
+                                                                                                                // is
+                                                                                                                // not
+                                                                                                                // working
 
         // save a few customers
         repository.save(new Customer("Jack", "Bauer"));

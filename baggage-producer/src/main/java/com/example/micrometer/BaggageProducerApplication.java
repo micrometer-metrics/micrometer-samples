@@ -49,10 +49,10 @@ class Config {
         return builder
                 // Test code to print out all headers - you don't need this code
                 .additionalInterceptors((request, body, execution) -> {
-                    request.getHeaders().forEach((s, strings) -> System.out.println("HEADER [" + s + "] VALUE " + strings));
+                    request.getHeaders()
+                            .forEach((s, strings) -> System.out.println("HEADER [" + s + "] VALUE " + strings));
                     return execution.execute(request, body);
-                })
-                .build();
+                }).build();
     }
 
 }
@@ -75,7 +75,8 @@ class BaggageRestTemplateService {
         Span span = this.tracer.nextSpan();
         try (Tracer.SpanInScope ws = this.tracer.withSpan(span.start())) {
             try (BaggageInScope baggage = this.tracer.createBaggage("mybaggage", "my-baggage-value")) {
-                log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", this.tracer.currentSpan().context().traceId());
+                log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
+                        this.tracer.currentSpan().context().traceId());
                 log.info("<BAGGAGE VALUE: {}> Baggage is set", baggage.get());
                 return this.restTemplate.exchange(
                         RequestEntity.get(URI.create(url)).header("myremotefield", "my-remote-field-value").build(),
