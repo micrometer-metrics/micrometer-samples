@@ -24,8 +24,8 @@ gradleEnterprise {
 }
 
 include "acceptance-tests"
-include "baggage-producer"
-include "baggage-consumer"
+// include "baggage-producer" // TODO: Bring me back once ready
+// include "baggage-consumer" // TODO: Bring me back once ready
 include "batch"
 include "cassandra"
 include "cassandra-reactive"
@@ -33,7 +33,7 @@ include "circuitbreaker"
 include "circuitbreaker-reactive"
 include "config-server"
 include "data"
-include "data-reactive"
+// include "data-reactive" // TODO: Bring me back once ready
 include "gateway"
 include "integration"
 include "kafka-producer"
@@ -44,8 +44,8 @@ include 'mongodb-reactive'
 include "mvc"
 include "openfeign"
 include "resttemplate"
-//include "rsocket-client" //TODO: Bring me back once snapshots are back on repo.spring.io
-//include "rsocket-server" //TODO: Bring me back once snapshots are back on repo.spring.io
+// include "rsocket-client" // TODO: Bring me back once snapshots are back on repo.spring.io
+// include "rsocket-server" // TODO: Bring me back once snapshots are back on repo.spring.io
 include "security"
 include "stream-producer"
 include "stream-consumer"
