@@ -48,7 +48,7 @@ class CassandraAcceptanceTests extends AcceptanceTestsBase {
         String producerId = deploy(testInfo, "cassandra-reactive", port());
 
         // then
-        assertThatLogsContainPropagatedIdAtLeastXNumberOfTimes(producerId, "cassandra-reactive", 7);
+        assertThatLogsContainPropagatedIdAtLeastXNumberOfTimes(producerId, "cassandra-reactive", 1);
     }
 
     private Map<String, String> port() {
