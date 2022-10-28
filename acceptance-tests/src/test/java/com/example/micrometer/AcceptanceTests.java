@@ -41,7 +41,7 @@ class AcceptanceTests extends AcceptanceTestsBase {
         assertThatTraceIdGotPropagated(producerId, consumerId);
     }
 
-    @Disabled("TODO: https://github.com/OpenFeign/feign/pull/1760")
+    @Disabled("TODO: https://github.com/OpenFeign/feign/pull/1760") // TODO: Fix me
     @Test
     void should_pass_tracing_context_from_openfeign_to_mvc(TestInfo testInfo) throws Exception {
         // given
@@ -95,6 +95,7 @@ class AcceptanceTests extends AcceptanceTestsBase {
         assertThatTraceIdGotPropagated(appId);
     }
 
+    @Disabled("Need to turn the module back on") // TODO: Fix me
     @Test
     void should_pass_tracing_context_with_data_reactive(TestInfo testInfo) {
         // when
@@ -113,7 +114,7 @@ class AcceptanceTests extends AcceptanceTestsBase {
         assertThatTraceIdGotPropagated(appId);
     }
 
-    @Disabled("TODO: https://github.com/rsocket/rsocket-java/pull/1075")
+    @Disabled("https://github.com/rsocket/rsocket-java/pull/1075") // TODO: Fix me
     @Test
     void should_pass_tracing_context_from_rsocket(TestInfo testInfo) throws Exception {
         // given
@@ -155,6 +156,7 @@ class AcceptanceTests extends AcceptanceTestsBase {
         assertThatLogsContainPropagatedIdAtLeastXNumberOfTimes(appId, "config-server", 2);
     }
 
+    @Disabled("Waiting for https://github.com/spring-projects/spring-boot/pull/32898")
     @Test
     void should_pass_baggage_and_remote_fields(TestInfo testInfo) throws Exception {
         // given
