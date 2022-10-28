@@ -33,7 +33,7 @@ include 'circuitbreaker'
 include 'circuitbreaker-reactive'
 include 'config-server'
 include 'data'
-// include 'data-reactive' // TODO: Bring me back once ready
+include 'data-reactive'
 include 'gateway'
 include 'integration'
 include 'kafka-producer'
