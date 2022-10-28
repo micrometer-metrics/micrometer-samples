@@ -1,5 +1,6 @@
 package com.example.micrometer;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,6 +24,7 @@ class RedisAcceptanceTests extends AcceptanceTestsBase {
     static GenericContainer redis = new GenericContainer(DockerImageName.parse("redis:6.2.3-alpine"))
             .withExposedPorts(6379);
 
+    @Disabled("TODO: Add session module back")
     @Test
     void should_pass_tracing_context_from_client_to_redis_based_session_app(TestInfo testInfo) throws Exception {
         // given
