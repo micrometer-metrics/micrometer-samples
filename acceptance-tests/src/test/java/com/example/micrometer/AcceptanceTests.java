@@ -96,7 +96,6 @@ class AcceptanceTests extends AcceptanceTestsBase {
         assertThatTraceIdGotPropagated(appId);
     }
 
-    @Disabled("Need to turn the module back on") // TODO: Fix me
     @Test
     void should_pass_tracing_context_with_data_reactive(TestInfo testInfo) {
         // when
