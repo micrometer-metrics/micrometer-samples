@@ -50,7 +50,10 @@ test {
 	exclude("com/example/**")
 }
 
-task acceptanceTests(type: Test) {
+task acceptanceTest(type: Test) {
+	rootProject.subprojects
+		.findAll { it != project }
+		.each { dependsOn ":$it.name:publishToMavenLocal" }
+
 	useJUnitPlatform()
 }
-
