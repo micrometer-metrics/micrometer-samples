@@ -156,7 +156,6 @@ class AcceptanceTests extends AcceptanceTestsBase {
         assertThatLogsContainPropagatedIdAtLeastXNumberOfTimes(appId, "config-server", 2);
     }
 
-    @Disabled("Waiting for https://github.com/spring-projects/spring-boot/pull/32898")
     @Test
     void should_pass_baggage_and_remote_fields(TestInfo testInfo) throws Exception {
         // given
