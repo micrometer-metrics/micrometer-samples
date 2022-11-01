@@ -75,11 +75,14 @@ class TestMongoClientSettingsBuilderCustomizer implements MongoClientSettingsBui
 
             @Override
             public void commandSucceeded(CommandSucceededEvent event) {
+                if (!event.getCommandName().equals("insert")) {
+                    return;
+                }
                 RequestContext requestContext = event.getRequestContext();
                 if (requestContext == null) {
                     return;
                 }
-                Observation parent = requestContext.getOrDefault(Observation.class, null);
+                Observation parent = requestContext.getOrDefault(ObservationThreadLocalAccessor.KEY, null);
                 if (parent == null) {
                     return;
                 }
