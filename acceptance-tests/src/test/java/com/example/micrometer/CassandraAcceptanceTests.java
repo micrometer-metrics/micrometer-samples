@@ -39,7 +39,7 @@ class CassandraAcceptanceTests extends AcceptanceTestsBase {
         String producerId = deploy(testInfo, "cassandra", port());
 
         // then
-        assertThatLogsContainPropagatedIdAtLeastXNumberOfTimes(producerId, "cassandra", 7);
+        assertThatLogsContainPropagatedIdAtLeastXNumberOfTimes(producerId, "cassandra", 1);
     }
 
     @Test
