@@ -21,17 +21,18 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 public class BusApplication implements CommandLineRunner {
 
-	public static void main(String... args) {
-		new SpringApplicationBuilder(BusApplication.class).web(WebApplicationType.NONE).run(args);
-	}
+    public static void main(String... args) {
+        new SpringApplicationBuilder(BusApplication.class).web(WebApplicationType.NONE).run(args);
+    }
 
-	@Autowired
-	MyEventService myEventService;
+    @Autowired
+    MyEventService myEventService;
 
-	@Override
-	public void run(String... args) throws Exception {
-		this.myEventService.publish();
-	}
+    @Override
+    public void run(String... args) throws Exception {
+        this.myEventService.publish();
+    }
+
 }
 
 @Configuration
@@ -42,34 +43,35 @@ class EventConfig {
 
 @RestController
 class MyEventService {
-	private static final Logger log = LoggerFactory.getLogger(MyEventService.class);
 
-	private final ApplicationEventPublisher publisher;
+    private static final Logger log = LoggerFactory.getLogger(MyEventService.class);
 
-	private final BusProperties bus;
+    private final ApplicationEventPublisher publisher;
 
-	private final Tracer tracer;
+    private final BusProperties bus;
 
-	MyEventService(ApplicationEventPublisher publisher, BusProperties bus, Tracer tracer) {
-		this.publisher = publisher;
-		this.bus = bus;
-		this.tracer = tracer;
-	}
+    private final Tracer tracer;
 
-	void publish() {
-		Span span = this.tracer.nextSpan();
-		try (Tracer.SpanInScope ws = this.tracer.withSpan(span.start())) {
-			log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", this.tracer.currentSpan().context().traceId());
-			publisher.publishEvent(new MyEvent(this, this.bus.getId()));
-		}
-		finally {
-			span.end();
-		}
-	}
+    MyEventService(ApplicationEventPublisher publisher, BusProperties bus, Tracer tracer) {
+        this.publisher = publisher;
+        this.bus = bus;
+        this.tracer = tracer;
+    }
 
-	@EventListener(MyEvent.class)
-	public void gotLoanIssued() {
-		log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", this.tracer.currentSpan().context().traceId());
-	}
+    void publish() {
+        Span span = this.tracer.nextSpan();
+        try (Tracer.SpanInScope ws = this.tracer.withSpan(span.start())) {
+            log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", this.tracer.currentSpan().context().traceId());
+            publisher.publishEvent(new MyEvent(this, this.bus.getId()));
+        }
+        finally {
+            span.end();
+        }
+    }
+
+    @EventListener(MyEvent.class)
+    public void gotLoanIssued() {
+        log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", this.tracer.currentSpan().context().traceId());
+    }
 
 }
