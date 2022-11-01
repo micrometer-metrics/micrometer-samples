@@ -43,14 +43,15 @@ public class BaggageProducerApplication implements CommandLineRunner {
 @Configuration
 class Config {
 
+    private static final Logger log = LoggerFactory.getLogger(BaggageProducerApplication.class);
+
     // You must register RestTemplate as a bean!
     @Bean
     RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder
                 // Test code to print out all headers - you don't need this code
                 .additionalInterceptors((request, body, execution) -> {
-                    request.getHeaders()
-                            .forEach((s, strings) -> System.out.println("HEADER [" + s + "] VALUE " + strings));
+                    request.getHeaders().forEach((s, strings) -> log.info("HEADER [{}] VALUE {}", s, strings));
                     return execution.execute(request, body);
                 }).build();
     }
@@ -74,7 +75,7 @@ class BaggageRestTemplateService {
     String call(String url) {
         Span span = this.tracer.nextSpan();
         try (Tracer.SpanInScope ws = this.tracer.withSpan(span.start())) {
-            try (BaggageInScope baggage = this.tracer.createBaggage("mybaggage", "my-baggage-value")) {
+            try (BaggageInScope baggage = this.tracer.createBaggage("mybaggage", "my-baggage-value").makeCurrent()) {
                 log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
                         this.tracer.currentSpan().context().traceId());
                 log.info("<BAGGAGE VALUE: {}> Baggage is set", baggage.get());

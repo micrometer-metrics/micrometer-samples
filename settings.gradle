@@ -24,8 +24,8 @@ gradleEnterprise {
 }
 
 include 'acceptance-tests'
-// include 'baggage-producer' // TODO: Bring me back once ready
-// include 'baggage-consumer // TODO: Bring me back once ready
+include 'baggage-producer'
+include 'baggage-consumer'
 include 'batch'
 include 'cassandra'
 include 'cassandra-reactive'
