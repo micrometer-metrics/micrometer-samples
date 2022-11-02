@@ -67,8 +67,9 @@ public class MicrometerSamplesObservabilityTestAutoConfiguration {
 
         private void storeAsFile(File output, List<NameAndTags> nameAndTags) throws IOException {
             String lines = nameAndTags.stream()
-                    .map(nt -> this.appName + ";" + nt.name + ";" + nt.tags.entrySet().stream()
-                            .map(e -> e.getKey() + "=" + e.getValue()).collect(Collectors.joining(",")))
+                    .map(nt -> this.appName + ";" + nt.name + ";"
+                            + nt.tags.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
+                                    .collect(Collectors.joining(",")))
                     .collect(Collectors.joining(System.lineSeparator()));
 
             Files.writeString(output.toPath(), lines);

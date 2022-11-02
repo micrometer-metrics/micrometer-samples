@@ -12,6 +12,10 @@ buildscript {
 
 apply plugin: 'io.spring.dependency-management'
 
+bootJar {
+	enabled = false
+}
+
 repositories {
 	mavenCentral()
 	maven { url 'https://repo.spring.io/milestone' }
