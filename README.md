@@ -10,10 +10,16 @@ Sample apps to demo [Micrometer](https://github.com/micrometer-metrics/micromete
 
 ## Building
 
-First run `./scripts/build_all_projects_locally.sh` to clone and install locally all the projects that will be then used by the samples (that's only required if we need to use branches that are not yet released, this will not be needed later).
+To build the project with OpenTelemetry tracer just run 
 
 ```bash
 $ ./gradlew build
+```
+
+To build the project with Brave tracer just run 
+
+```bash
+$ ./gradlew build -Pbrave
 ```
 
 ## Running
