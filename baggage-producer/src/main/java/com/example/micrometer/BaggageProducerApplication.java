@@ -20,8 +20,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 
-import static com.example.micrometer.BaggageRestTemplateService.LOGGER;
-
 @SpringBootApplication
 public class BaggageProducerApplication implements CommandLineRunner {
 
@@ -44,6 +42,8 @@ public class BaggageProducerApplication implements CommandLineRunner {
 
 @Configuration
 class Config {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Config.class);
 
     // You must register RestTemplate as a bean!
     @Bean
