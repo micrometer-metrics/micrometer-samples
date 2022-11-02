@@ -28,7 +28,6 @@ dependencyManagement {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-	implementation "io.micrometer:context-propagation:1.0.0-SNAPSHOT" // TODO: Should come from Micrometer-Bom ?
 	implementation 'org.springframework.cloud:spring-cloud-stream-binder-rabbit'
 
 	implementation "io.micrometer:micrometer-tracing-bridge-${project.hasProperty("brave") ? "brave" : "otel" }"
