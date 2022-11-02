@@ -39,6 +39,9 @@ public class MicrometerSamplesObservabilityTestAutoConfiguration {
         @Autowired
         ToFinishedSpans toFinishedSpans;
 
+        @Value("${spring.application.name}")
+        String appName;
+
         @Value("${metrics.output.file:build/metrics.csv}")
         File metricsOutput;
 
@@ -62,8 +65,8 @@ public class MicrometerSamplesObservabilityTestAutoConfiguration {
         }
 
         private void storeAsFile(File output, List<NameAndTags> nameAndTags) throws IOException {
-            String lines = nameAndTags
-                    .stream().map(nt -> nt.name + ";" + nt.tags.entrySet().stream()
+            String lines = nameAndTags.stream()
+                    .map(nt -> this.appName + ";" + nt.name + ";" + nt.tags.entrySet().stream()
                             .map(e -> e.getKey() + "=" + e.getValue()).collect(Collectors.joining(",")))
                     .collect(Collectors.joining("\n"));
 
