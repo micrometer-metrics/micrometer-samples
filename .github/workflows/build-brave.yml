@@ -27,4 +27,4 @@ jobs:
 #    - name: Clone the projects
 #      run: ./scripts/build_all_projects_locally.sh
     - name: Execute Gradle build with Brave
-      run:./gradlew -Pbrave acceptanceTest
+      run: ./gradlew -Pbrave acceptanceTest
