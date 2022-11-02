@@ -43,7 +43,9 @@ public class BaggageProducerApplication implements CommandLineRunner {
 @Configuration
 class Config {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Config.class);
+    // The logger here should not be Config since that does not add too much extra
+    // information.
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaggageRestTemplateService.class);
 
     // You must register RestTemplate as a bean!
     @Bean
@@ -61,7 +63,7 @@ class Config {
 @Service
 class BaggageRestTemplateService {
 
-    static final Logger LOGGER = LoggerFactory.getLogger(BaggageRestTemplateService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaggageRestTemplateService.class);
 
     private final RestTemplate restTemplate;
 
