@@ -14,6 +14,7 @@ import io.opentelemetry.api.trace.Tracer;
 import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 public class MicrometerSamplesObservabilityTestAutoConfiguration {
 
     @Configuration(proxyBeanMethods = false)
@@ -68,7 +69,7 @@ public class MicrometerSamplesObservabilityTestAutoConfiguration {
             String lines = nameAndTags.stream()
                     .map(nt -> this.appName + ";" + nt.name + ";" + nt.tags.entrySet().stream()
                             .map(e -> e.getKey() + "=" + e.getValue()).collect(Collectors.joining(",")))
-                    .collect(Collectors.joining("\n"));
+                    .collect(Collectors.joining(System.lineSeparator()));
 
             Files.writeString(output.toPath(), lines);
         }
