@@ -9,7 +9,6 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
 import org.springframework.boot.web.embedded.tomcat.ConfigurableTomcatWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -25,10 +24,11 @@ public class ManualConfiguration {
 
     static final String CUSTOMIZER_NAME = "observedTomcatWebServerFactoryCustomizer";
 
-    // If you want to have logs in error logs of Tomcat - this will result in 2 spans on
-    // the server side that look the same
+    // If you want to have logs in error logs of Tomcat uncomment the @Bean method
+    // - this will result in 2 spans on the server side that look the same
     // but one will be longer (the one on Tomcat level). The other one comes from MVC.
-    @Bean(name = CUSTOMIZER_NAME)
+
+    // @Bean(name = CUSTOMIZER_NAME)
     @Order(Ordered.HIGHEST_PRECEDENCE)
     WebServerFactoryCustomizer<ConfigurableTomcatWebServerFactory> observedTomcatWebServerFactoryCustomizer(
             ObservationRegistry observationRegistry) {

@@ -1,0 +1,27 @@
+buildscript {
+	repositories {
+		maven { url 'https://repo.spring.io/milestone' }
+		maven { url 'https://repo.spring.io/snapshot' }
+		gradlePluginPortal()
+	}
+	dependencies {
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+		classpath "io.spring.gradle:dependency-management-plugin:$springDependencyManagementPlugin"
+	}
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+repositories {
+	mavenCentral()
+	maven { url 'https://repo.spring.io/milestone' }
+	maven { url 'https://repo.spring.io/snapshot' }
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	optionalApi "io.micrometer:micrometer-tracing-bridge-brave"
+	optionalApi "io.micrometer:micrometer-tracing-bridge-otel"
+}
