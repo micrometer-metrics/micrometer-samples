@@ -21,6 +21,7 @@ repositories {
 }
 
 dependencies {
+	implementation project(':common')
 	implementation 'org.springframework.data:spring-data-mongodb:4.0.0-SNAPSHOT'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'

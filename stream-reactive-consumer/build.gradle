@@ -26,16 +26,21 @@ dependencyManagement {
 }
 
 dependencies {
+	implementation project(':common')
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-	implementation 'org.springframework.cloud:spring-cloud-stream-binder-rabbit'
+	implementation('org.springframework.cloud:spring-cloud-stream-binder-rabbit') {
+		if (!project.hasProperty("brave")) {
+			exclude group: 'io.projectreactor.netty', module: 'reactor-netty-http-brave'
+		}
+	}
 
 	implementation "io.micrometer:micrometer-tracing-bridge-${project.hasProperty("brave") ? "brave" : "otel" }"
 	// Default is OTel + Zipkin. You can opt in via "wavefront" to Wavefront and "brave" for Brave
 	if (project.hasProperty("wavefront")) {
 		implementation "io.micrometer:micrometer-tracing-reporter-wavefront"
 	} else {
-		implementation 'io.zipkin.reporter2:zipkin-sender-urlconnection' // we need a way to send spans to Zipkin
+//		implementation 'io.zipkin.reporter2:zipkin-sender-urlconnection' // we need a way to send spans to Zipkin
 	}
 	if (project.hasProperty("brave")) {
 		implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
