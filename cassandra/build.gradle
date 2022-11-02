@@ -24,7 +24,6 @@ ext {
 }
 
 dependencies {
-	implementation project(':common')
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
 	implementation 'org.springframework.data:spring-data-cassandra:4.0.0-SNAPSHOT' // TODO: Remove
@@ -43,6 +42,7 @@ dependencies {
 		implementation "io.opentelemetry:opentelemetry-exporter-zipkin"
 	}
 
+	testImplementation project(':common')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation "org.testcontainers:junit-jupiter:${testContainersVersion}"
 	testImplementation "org.testcontainers:cassandra:${testContainersVersion}"

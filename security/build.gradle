@@ -22,7 +22,6 @@ repositories {
 ext['spring-security.version'] = "6.0.0-RC1" // TODO: Make this come from Boot once Boot switches to RC1
 
 dependencies {
-	implementation project(':common')
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -39,5 +38,6 @@ dependencies {
 		implementation "io.opentelemetry:opentelemetry-exporter-zipkin"
 	}
 
+	testImplementation project(':common')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

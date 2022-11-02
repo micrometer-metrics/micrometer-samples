@@ -27,7 +27,6 @@ configurations {
 }
 
 dependencies {
-	implementation project(':common')
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
@@ -37,6 +36,7 @@ dependencies {
     implementation 'io.micrometer:micrometer-tracing'
     implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
 
+	testImplementation project(':common')
     testImplementation platform('org.testcontainers:testcontainers-bom:1.+')
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.rest-assured:rest-assured'

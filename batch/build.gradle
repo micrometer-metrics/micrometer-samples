@@ -20,7 +20,6 @@ repositories {
 }
 
 dependencies {
-	implementation project(':common')
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-batch'
 
@@ -39,5 +38,6 @@ dependencies {
 		implementation "io.opentelemetry:opentelemetry-exporter-zipkin"
 	}
 
+	testImplementation project(':common')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

@@ -26,7 +26,6 @@ dependencyManagement {
 }
 
 dependencies {
-	implementation project(':common')
 	implementation 'org.springframework.boot:spring-boot-starter-webflux' // TODO: Remove this. We're just trying to not fail on https://github.com/spring-projects/spring-boot/issues/32857
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -44,5 +43,6 @@ dependencies {
 		implementation "io.opentelemetry:opentelemetry-exporter-zipkin"
 	}
 
+	testImplementation project(':common')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

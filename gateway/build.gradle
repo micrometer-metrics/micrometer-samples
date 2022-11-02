@@ -27,7 +27,6 @@ dependencyManagement {
 }
 
 dependencies {
-	implementation project(':common')
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
@@ -44,5 +43,6 @@ dependencies {
 		implementation "io.opentelemetry:opentelemetry-exporter-zipkin"
 	}
 
+	testImplementation project(':common')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
