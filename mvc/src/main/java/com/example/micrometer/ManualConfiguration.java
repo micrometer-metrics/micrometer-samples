@@ -1,6 +1,5 @@
 package com.example.micrometer;
 
-
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import jakarta.servlet.ServletException;
@@ -26,7 +25,8 @@ public class ManualConfiguration {
 
     static final String CUSTOMIZER_NAME = "observedTomcatWebServerFactoryCustomizer";
 
-    // If you want to have logs in error logs of Tomcat - this will result in 2 spans on the server side that look the same
+    // If you want to have logs in error logs of Tomcat - this will result in 2 spans on
+    // the server side that look the same
     // but one will be longer (the one on Tomcat level). The other one comes from MVC.
     @Bean(name = CUSTOMIZER_NAME)
     @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -39,13 +39,15 @@ public class ManualConfiguration {
 }
 
 class ObservedValve extends ValveBase {
+
     private static final ServerRequestObservationConvention DEFAULT_OBSERVATION_CONVENTION = new DefaultServerRequestObservationConvention();
 
     private final ObservationRegistry observationRegistry;
 
     private final ServerRequestObservationConvention observationConvention;
 
-    public ObservedValve(ObservationRegistry observationRegistry, ServerRequestObservationConvention observationConvention) {
+    public ObservedValve(ObservationRegistry observationRegistry,
+            ServerRequestObservationConvention observationConvention) {
         this.observationRegistry = observationRegistry;
         this.observationConvention = observationConvention;
         setAsyncSupported(true);
@@ -71,8 +73,8 @@ class ObservedValve extends ValveBase {
             }
         }
         ServerRequestObservationContext context = new ServerRequestObservationContext(request, response);
-        observation = ServerHttpObservationDocumentation.HTTP_REQUESTS.observation(this.observationConvention, DEFAULT_OBSERVATION_CONVENTION, () -> context, this.observationRegistry)
-                .start();
+        observation = ServerHttpObservationDocumentation.HTTP_REQUESTS.observation(this.observationConvention,
+                DEFAULT_OBSERVATION_CONVENTION, () -> context, this.observationRegistry).start();
         request.setAttribute(Observation.class.getName(), observation);
         try (Observation.Scope scope = observation.openScope()) {
             Valve next = getNext();
