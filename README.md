@@ -13,9 +13,8 @@ Sample apps to demo [Micrometer](https://github.com/micrometer-metrics/micromete
 First run `./scripts/build_all_projects_locally.sh` to clone and install locally all the projects that will be then used by the samples (that's only required if we need to use branches that are not yet released, this will not be needed later).
 
 ```bash
-$ ./gradlew build acceptanceTest
+$ ./gradlew build
 ```
-(We will make `build` depend on `acceptanceTest` later so that you will only need to run `build`)
 
 ## Running
 
