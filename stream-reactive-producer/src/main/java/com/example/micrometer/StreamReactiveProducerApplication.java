@@ -36,27 +36,34 @@ public class StreamReactiveProducerApplication implements CommandLineRunner {
         this.streamBridgeService.call();
     }
 
-    // Function<Mono<?>, Mono<?>> and Supplier<Mono<?>> and Consumer<Mono<?>> are not supported in Stream
+    // Function<Mono<?>, Mono<?>> and Supplier<Mono<?>> and Consumer<Mono<?>> are not
+    // supported in Stream
 
     @Bean
     Function<Flux<Message<String>>, Flux<Message<String>>> tracingFunction(Tracer tracer) {
-        return s -> s.doOnNext(i -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer function flux", tracer.currentSpan().context().traceId()));
+        return s -> s.doOnNext(i -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer function flux",
+                tracer.currentSpan().context().traceId()));
     }
 
     // @PollableBean
     Supplier<Flux<String>> supplier(Tracer tracer) {
         return () -> Flux.just("HELLO")
-                .doOnNext(s -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer supplier mono", tracer.currentSpan().context().traceId()));
+                .doOnNext(s -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer supplier mono",
+                        tracer.currentSpan().context().traceId()));
     }
 
     // @PollableBean
     Supplier<Flux<String>> stringSupplier(Tracer tracer) {
-        return () -> Flux.just("a", "b").doOnNext(s -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer supplier flux", tracer.currentSpan().context().traceId()));
+        return () -> Flux.just("a", "b")
+                .doOnNext(s -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer supplier flux",
+                        tracer.currentSpan().context().traceId()));
     }
+
 }
 
 @Service
 class StreamBridgeService {
+
     private static final Logger log = LoggerFactory.getLogger(StreamBridgeService.class);
 
     private final StreamBridge streamBridge;
@@ -77,4 +84,5 @@ class StreamBridgeService {
             this.streamBridge.send("tracingFunction-in-0", "HELLO");
         });
     }
+
 }

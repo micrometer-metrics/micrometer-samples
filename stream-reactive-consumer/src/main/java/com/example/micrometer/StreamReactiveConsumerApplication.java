@@ -43,23 +43,22 @@ public class StreamReactiveConsumerApplication implements CommandLineRunner {
 
         Consumer<Flux<Message<String>>> result = messageFlux -> {
             messageFlux.flatMap(message -> Mono.deferContextual(contextView -> {
-                        Runnable runnable = () -> {
-                            log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
-                                    tracer.currentSpan().context().traceId());
-                        };
-                        scoped(contextView, runnable);
-                        return Mono.just(message);
+                Runnable runnable = () -> {
+                    log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
+                            tracer.currentSpan().context().traceId());
+                };
+                scoped(contextView, runnable);
+                return Mono.just(message);
 
-                    }))
-                    .doOnNext(s -> {
-//                        tracer.currentSpan().end();
-//                        tracer.withSpan(null);
-                    })
-                    .doFinally(signalType -> observation.stop())
-                    .contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation))
-                    .subscribe();
+            })).doOnNext(s -> {
+                // tracer.currentSpan().end();
+                // tracer.withSpan(null);
+            }).doFinally(signalType -> observation.stop())
+                    .contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation)).subscribe();
         };
         return result;
+
+// @formatter:off
 //		return i -> i
 //					.doOnNext(s ->
 //						log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", tracer.currentSpan().context().traceId()))
@@ -70,6 +69,7 @@ public class StreamReactiveConsumerApplication implements CommandLineRunner {
 //						tracer.withSpan(null);
 //					})
 //					.subscribe();
+// @formatter:on
     }
 
     private void scoped(ContextView contextView, Runnable runnable) {
