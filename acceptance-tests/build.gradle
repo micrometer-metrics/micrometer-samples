@@ -57,3 +57,7 @@ task acceptanceTest(type: Test) {
 
 	useJUnitPlatform()
 }
+
+check {
+	dependsOn acceptanceTest
+}
