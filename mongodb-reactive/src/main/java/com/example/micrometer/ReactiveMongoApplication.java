@@ -6,7 +6,6 @@ import com.mongodb.event.CommandSucceededEvent;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
-import io.micrometer.tracing.CurrentTraceContext;
 import io.micrometer.tracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,9 +47,8 @@ public class ReactiveMongoApplication {
 
     // This is for tests only. You don't need this in your production code.
     @Bean
-    public MongoClientSettingsBuilderCustomizer testMongoClientSettingsBuilderCustomizer(Tracer tracer,
-            CurrentTraceContext currentTraceContext) {
-        return new TestMongoClientSettingsBuilderCustomizer(tracer, currentTraceContext);
+    public MongoClientSettingsBuilderCustomizer testMongoClientSettingsBuilderCustomizer(Tracer tracer) {
+        return new TestMongoClientSettingsBuilderCustomizer(tracer);
     }
 
 }
@@ -62,11 +60,8 @@ class TestMongoClientSettingsBuilderCustomizer implements MongoClientSettingsBui
 
     private final Tracer tracer;
 
-    private final CurrentTraceContext currentTraceContext;
-
-    public TestMongoClientSettingsBuilderCustomizer(Tracer tracer, CurrentTraceContext currentTraceContext) {
+    public TestMongoClientSettingsBuilderCustomizer(Tracer tracer) {
         this.tracer = tracer;
-        this.currentTraceContext = currentTraceContext;
     }
 
     @Override
