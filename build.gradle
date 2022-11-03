@@ -123,15 +123,12 @@ subprojects {
         }
     }
 
-    if (project.name != "acceptance-tests") {
+    if (project.name !in ['acceptance-tests', 'common']) {
         apply plugin: 'org.springframework.boot'
-
-        if (project.name != "common") {
-            publishing {
-                publications {
-                    bootJava(MavenPublication) {
-                        artifact tasks.named("bootJar")
-                    }
+        publishing {
+            publications {
+                bootJava(MavenPublication) {
+                    artifact tasks.named("bootJar")
                 }
             }
         }

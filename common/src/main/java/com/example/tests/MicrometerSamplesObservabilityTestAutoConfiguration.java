@@ -11,13 +11,14 @@ import io.micrometer.tracing.exporter.FinishedSpan;
 import io.micrometer.tracing.otel.bridge.ArrayListSpanProcessor;
 import io.micrometer.tracing.otel.bridge.OtelFinishedSpan;
 import io.opentelemetry.api.trace.Tracer;
-import jakarta.annotation.PreDestroy;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,8 +32,8 @@ import java.util.stream.Collectors;
 @AutoConfiguration
 public class MicrometerSamplesObservabilityTestAutoConfiguration {
 
-    @Configuration(proxyBeanMethods = false)
-    static class ObservabilityDumpingConfig {
+    @Component
+    static class ObservabilityDumpingConfig implements DisposableBean {
 
         @Autowired
         MeterRegistry meterRegistry;
@@ -49,8 +50,8 @@ public class MicrometerSamplesObservabilityTestAutoConfiguration {
         @Value("${metrics.output.file:build/spans.csv}")
         File spansOutput;
 
-        @PreDestroy
-        void dumpObservabilityData() throws IOException {
+        @Override
+        public void destroy() throws Exception {
             storeMetricsAsFile();
             storeSpansAsFile();
         }
