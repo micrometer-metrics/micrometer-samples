@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micrometer.boot3.samples;
+package io.micrometer.boot3.samples.db;
 
 import io.micrometer.observation.ObservationRegistry;
 import org.junit.jupiter.api.Test;
@@ -43,14 +43,15 @@ import static io.restassured.http.ContentType.JSON;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @Testcontainers
-@AutoConfigureObservability
 @ActiveProfiles("test")
+@AutoConfigureObservability
 @ExtendWith(OutputCaptureExtension.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-class PrometheusAndZipkinWithBraveSampleTests {
+class PrometheusAndZipkinWithBraveAndDatabaseSampleTests {
 
     private static final Pattern TRACE_PATTERN = Pattern
             .compile("^.+INFO \\[(.+),(\\p{XDigit}+),(\\p{XDigit}+)\\] .+ <ACCEPTANCE_TEST>.+$");
@@ -145,23 +146,32 @@ class PrometheusAndZipkinWithBraveSampleTests {
         .then()
                 .statusCode(200)
                 .contentType(JSON)
-                .body("size()", equalTo(2))
+                .body("size()", equalTo(5))
                 .body("findAll { it.name == 'greeting' }.size()", equalTo(1))
+                .body("findAll { it.name == 'query' }.size()", equalTo(1))
                 .body("findAll { it.name == 'http get /greet/{name}' }.size()", equalTo(1))
                 .rootPath("find { it.name == 'greeting' }")
                     .body("traceId", equalTo(traceInfo.traceId))
                     .body("id", equalTo(traceInfo.spanId))
                     .body("parentId", not(nullValue()))
-                    .body("localEndpoint.serviceName", equalTo("boot3-sample"))
+                    .body("localEndpoint.serviceName", equalTo("boot3-db-sample"))
                     .body("annotations[0].value", equalTo("greeted"))
                     .body("tags['greeting.name']", equalTo("suzy"))
+                .detachRootPath("")
+                .rootPath("find { it.name == 'query' }")
+                    .body("traceId", equalTo(traceInfo.traceId))
+                    .body("id", not(equalTo(traceInfo.spanId)))
+                    .body("parentId", not(nullValue()))
+                    .body("kind", equalTo("CLIENT"))
+                    .body("remoteEndpoint.serviceName", equalTo("testdb"))
+                    .body("tags['jdbc.query[0]']", equalTo("SELECT count(name) FROM emp where name=?"))
                 .detachRootPath("")
                 .rootPath("find { it.name == 'http get /greet/{name}' }")
                     .body("traceId", equalTo(traceInfo.traceId))
                     .body("id", not(nullValue()))
                     .body("parentId", is(nullValue()))
                     .body("kind", equalTo("SERVER"))
-                    .body("localEndpoint.serviceName", equalTo("boot3-sample"))
+                    .body("localEndpoint.serviceName", equalTo("boot3-db-sample"))
                     .body("tags['method']", equalTo("GET"))
                     .body("tags['http.url']", equalTo("/greet/suzy"))
                     .body("tags['outcome']", equalTo("SUCCESS"))

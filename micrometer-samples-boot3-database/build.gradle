@@ -17,6 +17,7 @@ repositories {
     mavenCentral()
     maven { url 'https://repo.spring.io/milestone' }
     maven { url 'https://repo.spring.io/snapshot' }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 }
 
 configurations {
@@ -29,12 +30,18 @@ configurations {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
     implementation 'io.micrometer:micrometer-registry-prometheus'
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'
     implementation 'io.micrometer:micrometer-observation'
     implementation 'io.micrometer:micrometer-tracing'
     implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+
+    implementation 'net.ttddyy.observation:datasource-micrometer-spring-boot:1.+'
+
+    runtimeOnly 'org.flywaydb:flyway-core'
+    runtimeOnly 'com.h2database:h2'
 
     testImplementation platform('org.testcontainers:testcontainers-bom:1.+')
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

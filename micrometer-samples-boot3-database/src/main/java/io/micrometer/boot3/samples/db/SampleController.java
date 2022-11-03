@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micrometer.boot3.samples;
+package io.micrometer.boot3.samples.db;
 
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -33,17 +33,19 @@ class SampleController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SampleController.class);
 
-    private static final List<String> PEOPLE = Arrays.asList("suzy", "mike");
-
     private final ObservationRegistry registry;
 
-    SampleController(ObservationRegistry registry) {
+    private final JdbcTemplate jdbcTemplate;
+
+    SampleController(ObservationRegistry registry, JdbcTemplate jdbcTemplate) {
         this.registry = registry;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @GetMapping("/")
     List<String> allPeople() {
-        return Observation.createNotStarted("allPeople", registry).observe(slowDown(() -> PEOPLE));
+        return Observation.createNotStarted("allPeople", registry).observe(slowDown(() -> jdbcTemplate
+                .queryForList("SELECT * FROM emp").stream().map(map -> map.get("name").toString()).toList()));
     }
 
     @GetMapping("/greet/{name}")
@@ -73,7 +75,7 @@ class SampleController {
     }
 
     private boolean foundByName(String name) {
-        return PEOPLE.contains(name);
+        return jdbcTemplate.queryForObject("SELECT count(name) FROM emp where name=?", Integer.class, name) > 0;
     }
 
     private <T> Supplier<T> slowDown(Supplier<T> supplier) {

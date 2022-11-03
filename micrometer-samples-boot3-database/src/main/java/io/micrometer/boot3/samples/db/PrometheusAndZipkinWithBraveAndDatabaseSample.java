@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.micrometer.boot3.samples;
+package io.micrometer.boot3.samples.db;
 
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationHandler;
@@ -24,10 +24,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-public class PrometheusAndZipkinWithBraveSample {
+public class PrometheusAndZipkinWithBraveAndDatabaseSample {
 
     public static void main(String[] args) {
-        SpringApplication.run(PrometheusAndZipkinWithBraveSample.class, args);
+        SpringApplication.run(PrometheusAndZipkinWithBraveAndDatabaseSample.class, args);
     }
 
     @Bean

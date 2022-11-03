@@ -1,7 +1,7 @@
-# Spring Boot 3 Sample
+# Spring Boot 3 DataBase Sample
 
 1. Start Prometheus Grafana, and Zipkin: `docker compose up` in this directory
-2. Start the application: use your IDE or `./gradlew :micrometer-samples-boot3-database:bootRun` from the project root
+2. Start the application: use your IDE or `./gradlew :micrometer-samples-boot3:bootRun` from the project root
 3. Generate some load: `./generate-load.sh` in this directory
 
 Backends:
