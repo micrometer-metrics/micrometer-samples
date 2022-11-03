@@ -26,7 +26,7 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-rsocket'
 	implementation 'io.rsocket:rsocket-micrometer:1.1.4-SNAPSHOT' // TODO: Remove me
-	implementation "io.micrometer:context-propagation:1.0.0-RC1" // TODO: Should come from Micrometer-Bom ?
+	implementation 'io.micrometer:context-propagation:1.0.0-SNAPSHOT' // TODO: Should come from Micrometer-Bom ?
 
 	implementation "io.micrometer:micrometer-tracing-bridge-${project.hasProperty("brave") ? "brave" : "otel" }"
 	// Default is OTel + Zipkin. You can opt in via "wavefront" to Wavefront and "brave" for Brave
