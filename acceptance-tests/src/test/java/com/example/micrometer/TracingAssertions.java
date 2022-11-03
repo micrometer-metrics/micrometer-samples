@@ -36,7 +36,7 @@ class TracingAssertions {
 
     void assertThatTraceIdGotPropagated(String... appIds) {
         try {
-            Awaitility.await().pollInterval(1, TimeUnit.SECONDS).atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+            Awaitility.await().pollInterval(1, TimeUnit.SECONDS).atMost(30, TimeUnit.SECONDS).untilAsserted(() -> {
                 AtomicBoolean consumerPresent = new AtomicBoolean();
                 AtomicBoolean producerPresent = new AtomicBoolean();
                 List<String> traceIds = Arrays.stream(appIds).map(this.projectDeployer::getLog)
