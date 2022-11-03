@@ -24,20 +24,21 @@ public class ManualConfiguration {
     // You must set this manually until this is registered in Boot
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 10)
-    RSocketResponderTracingObservationHandler rSocketResponderTracingObservationHandler(Tracer tracer, Propagator propagator) {
-        return new RSocketResponderTracingObservationHandler(tracer, propagator, new
-                ByteBufGetter(), false);
+    RSocketResponderTracingObservationHandler rSocketResponderTracingObservationHandler(Tracer tracer,
+            Propagator propagator) {
+        return new RSocketResponderTracingObservationHandler(tracer, propagator, new ByteBufGetter(), false);
     }
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 10)
-    RSocketRequesterTracingObservationHandler rSocketRequesterTracingObservationHandler(Tracer tracer, Propagator propagator) {
-        return new RSocketRequesterTracingObservationHandler(tracer, propagator, new
-                ByteBufSetter(), false);
+    RSocketRequesterTracingObservationHandler rSocketRequesterTracingObservationHandler(Tracer tracer,
+            Propagator propagator) {
+        return new RSocketRequesterTracingObservationHandler(tracer, propagator, new ByteBufSetter(), false);
     }
 
     @Bean
-    ObservationRSocketConnectorConfigurer observationRSocketConnectorConfigurer(ObservationRegistry observationRegistry) {
+    ObservationRSocketConnectorConfigurer observationRSocketConnectorConfigurer(
+            ObservationRegistry observationRegistry) {
         return new ObservationRSocketConnectorConfigurer(observationRegistry);
     }
 
@@ -47,6 +48,7 @@ public class ManualConfiguration {
     }
 
 }
+
 class ObservationRSocketConnectorConfigurer implements RSocketConnectorConfigurer {
 
     private final ObservationRegistry observationRegistry;
@@ -57,9 +59,10 @@ class ObservationRSocketConnectorConfigurer implements RSocketConnectorConfigure
 
     @Override
     public void configure(RSocketConnector rSocketConnector) {
-        rSocketConnector.interceptors(ir -> ir
-                .forResponder((RSocketInterceptor) rSocket -> new ObservationResponderRSocketProxy(rSocket, this.observationRegistry))
-                .forRequester((RSocketInterceptor) rSocket -> new ObservationRequesterRSocketProxy(rSocket, this.observationRegistry)));
+        rSocketConnector.interceptors(ir -> ir.forResponder(
+                (RSocketInterceptor) rSocket -> new ObservationResponderRSocketProxy(rSocket, this.observationRegistry))
+                .forRequester((RSocketInterceptor) rSocket -> new ObservationRequesterRSocketProxy(rSocket,
+                        this.observationRegistry)));
     }
 
 }
@@ -72,13 +75,12 @@ class ObservationRSocketServerCustomizer implements RSocketServerCustomizer {
         this.observationRegistry = observationRegistry;
     }
 
-
     @Override
     public void customize(RSocketServer rSocketServer) {
-        rSocketServer.interceptors(ir -> ir
-                .forResponder((RSocketInterceptor) rSocket -> new ObservationResponderRSocketProxy(rSocket, this.observationRegistry))
-                .forRequester((RSocketInterceptor) rSocket -> new ObservationRequesterRSocketProxy(rSocket, this.observationRegistry)));
+        rSocketServer.interceptors(ir -> ir.forResponder(
+                (RSocketInterceptor) rSocket -> new ObservationResponderRSocketProxy(rSocket, this.observationRegistry))
+                .forRequester((RSocketInterceptor) rSocket -> new ObservationRequesterRSocketProxy(rSocket,
+                        this.observationRegistry)));
     }
 
 }
-

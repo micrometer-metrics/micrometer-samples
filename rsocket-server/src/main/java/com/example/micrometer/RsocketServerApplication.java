@@ -34,7 +34,8 @@ class RSocketController {
     @MessageMapping("foo")
     public Mono<String> span() {
         return Mono.deferContextual(contextView -> {
-            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView, ObservationThreadLocalAccessor.KEY)) {
+            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+                    ObservationThreadLocalAccessor.KEY)) {
                 String traceId = this.tracer.currentSpan().context().traceId();
                 log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", traceId);
                 return Mono.just(traceId);

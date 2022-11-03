@@ -73,14 +73,16 @@ class RsocketService {
     Mono<String> call() {
         Observation client = Observation.start("client", observationRegistry);
         return Mono.deferContextual(contextView -> {
-                    // You could use the client Obseravtion directy, but we're trying to show how you would interact with
-                    // setting thread locals from Reactor Context
-                    try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView, ObservationThreadLocalAccessor.KEY)) {
-                        log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", this.tracer.currentSpan().context().traceId());
-                    }
-                    return this.rSocketRequester.route("foo").retrieveMono(String.class);
-                })
-                .contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, client))
+            // You could use the client Obseravtion directy, but we're trying to show how
+            // you would interact with
+            // setting thread locals from Reactor Context
+            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+                    ObservationThreadLocalAccessor.KEY)) {
+                log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer",
+                        this.tracer.currentSpan().context().traceId());
+            }
+            return this.rSocketRequester.route("foo").retrieveMono(String.class);
+        }).contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, client))
                 .doFinally(signalType -> client.stop());
     }
 

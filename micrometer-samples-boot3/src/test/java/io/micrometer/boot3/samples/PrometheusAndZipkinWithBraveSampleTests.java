@@ -147,7 +147,7 @@ class PrometheusAndZipkinWithBraveSampleTests {
                 .contentType(JSON)
                 .body("size()", equalTo(2))
                 .body("findAll { it.name == 'greeting' }.size()", equalTo(1))
-                .body("findAll { it.name == 'http get' }.size()", equalTo(1))
+                .body("findAll { it.name == 'http get /greet/suzy' }.size()", equalTo(1))
                 .rootPath("find { it.name == 'greeting' }")
                     .body("traceId", equalTo(traceInfo.traceId))
                     .body("id", equalTo(traceInfo.spanId))

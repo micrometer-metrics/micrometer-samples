@@ -28,7 +28,6 @@ class AcceptanceTests extends AcceptanceTestsBase {
         assertThatTraceIdGotPropagated(producerId, consumerId);
     }
 
-    @Disabled("Waiting for https://github.com/spring-projects/spring-framework/pull/29388")
     @Test
     void should_pass_tracing_context_from_web_client_to_webflux(TestInfo testInfo) throws Exception {
         // given
@@ -114,7 +113,6 @@ class AcceptanceTests extends AcceptanceTestsBase {
         assertThatTraceIdGotPropagated(appId);
     }
 
-    @Disabled("https://github.com/rsocket/rsocket-java/pull/1075") // TODO: Fix me
     @Test
     void should_pass_tracing_context_from_rsocket(TestInfo testInfo) throws Exception {
         // given
