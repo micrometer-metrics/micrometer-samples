@@ -1,0 +1,9 @@
+spring:
+    autoconfigure:
+        exclude: # For tests - you don't need this in your code
+            - "org.springframework.boot.actuate.autoconfigure.metrics.JvmMetricsAutoConfiguration"
+            - "org.springframework.boot.actuate.autoconfigure.metrics.SystemMetricsAutoConfiguration"
+            - "org.springframework.boot.actuate.autoconfigure.metrics.LogbackMetricsAutoConfiguration"
+            - "org.springframework.boot.actuate.autoconfigure.metrics.web.tomcat.TomcatMetricsAutoConfiguration"
+            - "org.springframework.boot.actuate.autoconfigure.metrics.task.TaskExecutorMetricsAutoConfiguration"
+            - "org.springframework.boot.actuate.autoconfigure.metrics.startup.StartupTimeMetricsListenerAutoConfiguration"

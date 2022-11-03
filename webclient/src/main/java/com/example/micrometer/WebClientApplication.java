@@ -68,7 +68,7 @@ class WebClientService {
     }
 
     Mono<String> call() {
-        Observation observation = Observation.start("client", observationRegistry);
+        Observation observation = Observation.start("webclient-sample", observationRegistry);
         return Mono.just(observation).flatMap(span -> {
             observation.scoped(() -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
                     this.tracer.currentSpan().context().traceId()));

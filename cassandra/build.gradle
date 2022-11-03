@@ -42,7 +42,7 @@ dependencies {
 		implementation "io.opentelemetry:opentelemetry-exporter-zipkin"
 	}
 
-	testImplementation project(':common')
+	testImplementation project(':test-common')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation "org.testcontainers:junit-jupiter:${testContainersVersion}"
 	testImplementation "org.testcontainers:cassandra:${testContainersVersion}"

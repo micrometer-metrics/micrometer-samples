@@ -43,6 +43,8 @@ dependencies {
 		implementation "io.opentelemetry:opentelemetry-exporter-zipkin"
 	}
 
-	testImplementation project(':common')
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation project(':test-common')
+    testImplementation 'io.micrometer:micrometer-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation "com.github.tomakehurst:wiremock-jre8-standalone:latest.release"
 }

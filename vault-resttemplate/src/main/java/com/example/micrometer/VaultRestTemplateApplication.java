@@ -58,7 +58,7 @@ class RestTemplateService {
     }
 
     VaultResponse call() {
-        return Observation.createNotStarted("rest-template", observationRegistry).observe(() -> {
+        return Observation.createNotStarted("vault-rest-template-sample", observationRegistry).observe(() -> {
             log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", this.tracer.currentSpan().context().traceId());
             return this.vaultTemplate.read("/secret/foo");
         });

@@ -1,6 +1,7 @@
 package com.example.micrometer;
 
-import io.micrometer.tracing.Span;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,20 +59,19 @@ class RestTemplateService {
 
     private final Tracer tracer;
 
-    RestTemplateService(RestTemplate restTemplate, Tracer tracer) {
+    private final ObservationRegistry observationRegistry;
+
+    RestTemplateService(RestTemplate restTemplate, Tracer tracer, ObservationRegistry observationRegistry) {
         this.restTemplate = restTemplate;
         this.tracer = tracer;
+        this.observationRegistry = observationRegistry;
     }
 
     String call(String url) {
-        Span span = this.tracer.nextSpan().name("rest-template");
-        try (Tracer.SpanInScope ws = this.tracer.withSpan(span.start())) {
+        return Observation.start("rest-template-sample", observationRegistry).observe(() -> {
             log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", this.tracer.currentSpan().context().traceId());
             return this.restTemplate.getForObject(url, String.class);
-        }
-        finally {
-            span.end();
-        }
+        });
     }
 
 }
