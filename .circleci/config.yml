@@ -23,7 +23,7 @@ commands:
             - gradle-dependencies-{{ .Branch }}
       - run:
           name: downloadDependencies
-          command: ./gradlew downloadDependencies --console=plain --refresh-dependencies
+          command: ./gradlew downloadDependencies --console=plain --refresh-dependencies --no-build-cache
       - save_cache:
           key: gradle-dependencies-{{ .Branch }}-{{ checksum "build.gradle" }}
           paths:
@@ -33,7 +33,7 @@ commands:
           command: java --version
       - run:
           name: run gradle command
-          command: ./gradlew << parameters.command >>
+          command: ./gradlew << parameters.command >> --refresh-dependencies
       - run:
           name: collect test reports
           when: always
@@ -54,7 +54,7 @@ jobs:
     executor: machine-executor
     steps:
       - gradlew-build:
-          command: --refresh-dependencies --no-build-cache
+          command: --no-build-cache
 
 workflows:
   version: 2
