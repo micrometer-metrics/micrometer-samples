@@ -42,4 +42,5 @@ class WebClientApplicationTests {
         MeterRegistryAssert.then(meterRegistry).hasTimerWithNameAndTagKeys("http.client.requests", "error", "exception",
                 "method", "outcome", "status", "uri");
     }
+
 }

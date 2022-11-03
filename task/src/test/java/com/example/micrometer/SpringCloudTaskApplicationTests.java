@@ -16,8 +16,8 @@ class SpringCloudTaskApplicationTests {
 
     @Test
     void should_record_metrics() {
-        MeterRegistryAssert.then(meterRegistry)
-                .hasTimerWithNameAndTagKeys("spring.cloud.task.runner", "error", "spring.cloud.task.runner.bean-name");
+        MeterRegistryAssert.then(meterRegistry).hasTimerWithNameAndTagKeys("spring.cloud.task.runner", "error",
+                "spring.cloud.task.runner.bean-name");
     }
 
 }

@@ -32,7 +32,8 @@ class VaultRestTemplateApplicationTests {
     @BeforeAll
     static void setup() {
         wireMockServer.start();
-        wireMockServer.stubFor(WireMock.get("/secret/foo").willReturn(WireMock.aResponse().withBody("{ }").withStatus(200)));
+        wireMockServer
+                .stubFor(WireMock.get("/secret/foo").willReturn(WireMock.aResponse().withBody("{ }").withStatus(200)));
     }
 
     @AfterAll
@@ -46,11 +47,15 @@ class VaultRestTemplateApplicationTests {
                 "method", "outcome", "status", "uri");
     }
 
-    @TestConfiguration(proxyBeanMethods = false) // otherwise the Vault autoconfig doesn't hook in
+    @TestConfiguration(proxyBeanMethods = false) // otherwise the Vault autoconfig doesn't
+                                                 // hook in
     static class Config {
+
         @Bean
         ObservationRegistry testObservationRegistry() {
             return ObservationRegistry.create();
         }
+
     }
+
 }

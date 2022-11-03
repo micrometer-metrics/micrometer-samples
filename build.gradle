@@ -122,7 +122,7 @@ subprojects {
         }
     }
 
-    if (project.name !in ['acceptance-tests', 'common']) {
+    if (project.name !in ['acceptance-tests', 'test-common']) {
         apply plugin: 'org.springframework.boot'
         publishing {
             publications {
