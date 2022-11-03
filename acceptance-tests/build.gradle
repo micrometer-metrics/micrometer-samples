@@ -52,7 +52,7 @@ test {
 
 task acceptanceTest(type: Test) {
 	rootProject.subprojects
-		.findAll { it != project }
+		.findAll { it.name !in [project.name, 'common']}
 		.each { dependsOn ":$it.name:publishToMavenLocal" }
 
 	useJUnitPlatform()
