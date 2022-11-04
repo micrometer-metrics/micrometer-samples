@@ -24,15 +24,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-public class PrometheusAndZipkinWithBraveAndDatabaseSample {
+public class Boot3WithDatabaseSampleApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(PrometheusAndZipkinWithBraveAndDatabaseSample.class, args);
+        SpringApplication.run(Boot3WithDatabaseSampleApplication.class, args);
     }
 
     @Bean
     ObservationHandler<Observation.Context> errorHandler() {
-        return new ObservationHandler<Observation.Context>() {
+        return new ObservationHandler<>() {
             private static final Logger LOGGER = LoggerFactory.getLogger("errorHandler");
 
             @Override

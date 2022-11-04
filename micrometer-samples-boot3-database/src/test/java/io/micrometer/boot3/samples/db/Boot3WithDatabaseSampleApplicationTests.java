@@ -51,7 +51,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @AutoConfigureObservability
 @ExtendWith(OutputCaptureExtension.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-class PrometheusAndZipkinWithBraveAndDatabaseSampleTests {
+class Boot3WithDatabaseSampleApplicationTests {
 
     private static final Pattern TRACE_PATTERN = Pattern
             .compile("^.+INFO \\[(.+),(\\p{XDigit}+),(\\p{XDigit}+)\\] .+ <ACCEPTANCE_TEST>.+$");
@@ -163,7 +163,9 @@ class PrometheusAndZipkinWithBraveAndDatabaseSampleTests {
                     .body("id", not(equalTo(traceInfo.spanId)))
                     .body("parentId", not(nullValue()))
                     .body("kind", equalTo("CLIENT"))
-                    .body("remoteEndpoint.serviceName", equalTo("testdb"))
+                // TODO: OTel does not add remoteEndpoint, it has a tag instead
+//                    .body("remoteEndpoint.serviceName", equalTo("testdb"))
+//                    .body("tags['peer.service']", equalTo("TESTDB"))
                     .body("tags['jdbc.query[0]']", equalTo("SELECT count(name) FROM emp where name=?"))
                 .detachRootPath("")
                 .rootPath("find { it.name == 'http get /greet/{name}' }")

@@ -33,10 +33,17 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
     implementation 'io.micrometer:micrometer-registry-prometheus'
-    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
-    implementation 'io.micrometer:micrometer-observation'
-    implementation 'io.micrometer:micrometer-tracing'
-    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+    implementation "io.micrometer:micrometer-tracing-bridge-${project.hasProperty("brave") ? "brave" : "otel" }"
+    // Default is OTel + Zipkin. You can opt in via "wavefront" to Wavefront and "brave" for Brave
+    if (project.hasProperty("wavefront")) {
+        implementation "io.micrometer:micrometer-tracing-reporter-wavefront"
+    }
+    if (project.hasProperty("brave")) {
+        implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+    }
+    else {
+        implementation "io.opentelemetry:opentelemetry-exporter-zipkin"
+    }
 
     implementation 'net.ttddyy.observation:datasource-micrometer-spring-boot:1.+'
 
