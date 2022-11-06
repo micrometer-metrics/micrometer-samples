@@ -151,7 +151,7 @@ subprojects {
     // }
 
     nohttp {
-        source.exclude '**/docker/**/*.yml', '**/docker-compose.yml'
+        source.exclude '**/docker/**/*.yml', '**/docker-compose.yml', '**/test/**/*.java'
     }
 
     dependencyLocking {

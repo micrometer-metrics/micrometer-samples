@@ -54,5 +54,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.rest-assured:rest-assured'
     testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:selenium'
+    testImplementation 'org.seleniumhq.selenium:selenium-chrome-driver:4.+'
     testImplementation 'org.awaitility:awaitility'
 }

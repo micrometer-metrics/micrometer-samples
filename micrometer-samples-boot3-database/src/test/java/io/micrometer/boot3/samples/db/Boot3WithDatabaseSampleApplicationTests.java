@@ -18,6 +18,9 @@ package io.micrometer.boot3.samples.db;
 import io.micrometer.observation.ObservationRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,11 +30,15 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -40,10 +47,13 @@ import java.util.regex.Pattern;
 import static io.prometheus.client.exporter.common.TextFormat.CONTENT_TYPE_OPENMETRICS_100;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.WRITE;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.openqa.selenium.OutputType.BYTES;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @Testcontainers
@@ -59,6 +69,10 @@ class Boot3WithDatabaseSampleApplicationTests {
     @Container
     static GenericContainer<?> zipkin = new GenericContainer(DockerImageName.parse("openzipkin/zipkin:latest"))
             .withExposedPorts(9411);
+
+    @Container
+    static BrowserWebDriverContainer<?> chrome = new BrowserWebDriverContainer<>().withCapabilities(new ChromeOptions())
+            .withExtraHost("host.docker.internal", "host-gateway");
 
     @Autowired
     ObservationRegistry observationRegistry;
@@ -90,6 +104,21 @@ class Boot3WithDatabaseSampleApplicationTests {
                 .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> verifyIfTraceIsInZipkin(traceInfo));
         // @formatter:on
+        takeZipkinScreenShot(traceInfo.traceId);
+    }
+
+    private void takeZipkinScreenShot(String traceId) {
+        RemoteWebDriver webDriver = chrome.getWebDriver();
+        webDriver.manage().window().setSize(new Dimension(1920, 1080));
+        String url = "http://host.docker.internal:%d/zipkin/traces/%s".formatted(zipkin.getFirstMappedPort(), traceId);
+        webDriver.get(url);
+
+        try {
+            Files.write(Path.of("build/screenshot.png"), webDriver.getScreenshotAs(BYTES), CREATE, WRITE);
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void verifyIfGreetingApiWorks() {
