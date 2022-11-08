@@ -1,34 +1,29 @@
-ext.deployerVersion = '2.7.1'
-
-repositories {
-	mavenCentral()
-	maven { url 'https://repo.spring.io/milestone' }
-	maven { url 'https://repo.spring.io/snapshot' }
-}
+ext.deployerVersion = '2.7.+'
 
 dependencies {
-	implementation platform('org.springframework.boot:spring-boot-dependencies:2.7.5')
+	implementation platform('org.springframework.boot:spring-boot-dependencies:2.7.+')
 	implementation platform("org.springframework.cloud:spring-cloud-deployer-dependencies:${deployerVersion}")
 
-	implementation "org.springframework.cloud:spring-cloud-deployer-autoconfigure"
-	implementation "org.springframework.cloud:spring-cloud-deployer-resource-maven"
-	implementation "org.springframework.cloud:spring-cloud-deployer-resource-support"
-	implementation "org.springframework.cloud:spring-cloud-deployer-spi"
+	implementation 'org.springframework.cloud:spring-cloud-deployer-autoconfigure'
+	implementation 'org.springframework.cloud:spring-cloud-deployer-resource-maven'
+	implementation 'org.springframework.cloud:spring-cloud-deployer-resource-support'
+	implementation 'org.springframework.cloud:spring-cloud-deployer-spi'
 	implementation "org.springframework.cloud:spring-cloud-deployer-local:${deployerVersion}"
-	implementation "org.apache.maven.shared:maven-invoker:3.1.0"
+	implementation 'org.apache.maven.shared:maven-invoker:3.+'
 
+	testImplementation platform('org.testcontainers:testcontainers-bom:1.+')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.awaitility:awaitility:latest.release'
-	testImplementation "org.testcontainers:junit-jupiter:latest.release"
-	testImplementation "org.testcontainers:cassandra:latest.release"
-	testImplementation "org.testcontainers:rabbitmq:latest.release"
-	testImplementation "org.testcontainers:mongodb:latest.release"
-	testImplementation "org.testcontainers:vault:latest.release"
-	testImplementation "org.testcontainers:kafka:latest.release"
+	testImplementation 'org.awaitility:awaitility'
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testImplementation 'org.testcontainers:cassandra'
+	testImplementation 'org.testcontainers:rabbitmq'
+	testImplementation 'org.testcontainers:mongodb'
+	testImplementation 'org.testcontainers:vault'
+	testImplementation 'org.testcontainers:kafka'
 }
 
 test {
-	exclude("com/example/**")
+	exclude('com/example/**')
 }
 
 task acceptanceTest(type: Test) {

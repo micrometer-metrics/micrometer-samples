@@ -12,38 +12,15 @@ buildscript {
 apply plugin: 'org.springframework.boot'
 
 repositories {
-    mavenCentral()
-    maven { url 'https://repo.spring.io/milestone' }
-    maven { url 'https://repo.spring.io/snapshot' }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-}
-
-configurations {
-    implementation {
-        // see gh-1599; pause detection is not configured so this dependency can be excluded
-        exclude module: 'LatencyUtils'
-    }
 }
 
 dependencies {
     implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-
-    implementation 'io.micrometer:micrometer-registry-prometheus'
-    implementation "io.micrometer:micrometer-tracing-bridge-${project.hasProperty("brave") ? "brave" : "otel" }"
-    // Default is OTel + Zipkin. You can opt in via "wavefront" to Wavefront and "brave" for Brave
-    if (project.hasProperty("wavefront")) {
-        implementation "io.micrometer:micrometer-tracing-reporter-wavefront"
-    }
-    if (project.hasProperty("brave")) {
-        implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
-    }
-    else {
-        implementation "io.opentelemetry:opentelemetry-exporter-zipkin"
-    }
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     implementation 'net.ttddyy.observation:datasource-micrometer-spring-boot:1.+'
 

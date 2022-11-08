@@ -11,31 +11,12 @@ buildscript {
 
 apply plugin: 'org.springframework.boot'
 
-repositories {
-	mavenCentral()
-	maven { url 'https://repo.spring.io/milestone' }
-	maven { url 'https://repo.spring.io/snapshot' }
-}
-
 dependencies {
 	implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
 
 	implementation 'org.springframework.boot:spring-boot-starter-integration'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.integration:spring-integration-file'
-
-	implementation "io.micrometer:micrometer-tracing-bridge-${project.hasProperty("brave") ? "brave" : "otel" }"
-	// Default is OTel + Zipkin. You can opt in via "wavefront" to Wavefront and "brave" for Brave
-	if (project.hasProperty("wavefront")) {
-		implementation "io.micrometer:micrometer-tracing-reporter-wavefront"
-	} else {
-		implementation 'io.zipkin.reporter2:zipkin-sender-urlconnection' // we need a way to send spans to Zipkin
-	}
-	if (project.hasProperty("brave")) {
-		implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
-	} else {
-		implementation "io.opentelemetry:opentelemetry-exporter-zipkin"
-	}
 
 	testImplementation project(':test-common')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

@@ -12,37 +12,19 @@ buildscript {
 apply plugin: 'org.springframework.boot'
 
 repositories {
-	mavenCentral()
-	maven { url 'https://repo.spring.io/milestone' }
-	maven { url 'https://repo.spring.io/snapshot' }
-	maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+	maven { url "https://oss.sonatype.org/content/repositories/snapshots" } // for datasource-micrometer-spring-boot
 }
 
 dependencies {
 	implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
 
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-
-	implementation 'io.micrometer:context-propagation:1.0.0-SNAPSHOT' // TODO: Should come from Micrometer-Bom ?
 	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'io.r2dbc:r2dbc-proxy:1.+'
+
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'io.r2dbc:r2dbc-h2'
-	implementation 'io.r2dbc:r2dbc-proxy:1.0.1.BUILD-SNAPSHOT'
-
-	implementation "io.micrometer:micrometer-observation:1.10.0-SNAPSHOT" // TODO: Remove me
-	implementation "io.micrometer:micrometer-tracing:1.0.0-SNAPSHOT" // TODO: Remove me
-
-	implementation "io.micrometer:micrometer-tracing-bridge-${project.hasProperty("brave") ? "brave" : "otel" }"
-	// Default is OTel + Zipkin. You can opt in via "wavefront" to Wavefront and "brave" for Brave
-	if (project.hasProperty("wavefront")) {
-		implementation "io.micrometer:micrometer-tracing-reporter-wavefront"
-	}
-	if (project.hasProperty("brave")) {
-		implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
-	} else {
-		implementation "io.opentelemetry:opentelemetry-exporter-zipkin"
-	}
 
 	testImplementation project(':test-common')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

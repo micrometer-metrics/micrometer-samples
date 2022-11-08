@@ -52,16 +52,31 @@ subprojects {
 
     repositories {
         mavenCentral()
-        maven {
-            url 'https://repo.spring.io/milestone/' // we only need this repo for the context-propagation
-            content { includeModule 'io.micrometer', 'context-propagation' }
-        }
+        maven { url 'https://repo.spring.io/milestone' }
+        maven { url 'https://repo.spring.io/snapshot' }
     }
 
     dependencies {
         // JSR-305 only used for non-required meta-annotations
         optionalApi 'com.google.code.findbugs:jsr305:latest.release'
         checkstyle 'io.spring.javaformat:spring-javaformat-checkstyle:latest.release'
+
+        if (project.name !in ['acceptance-tests', 'test-common']) {
+            implementation 'io.micrometer:micrometer-registry-prometheus'
+
+            // Default is OTel + Zipkin, you can opt in via "wavefront" to Wavefront and "brave" for Brave
+            if (project.hasProperty('wavefront')) {
+                implementation 'io.micrometer:micrometer-tracing-reporter-wavefront'
+            }
+            if (project.hasProperty('brave')) {
+                implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+                implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+            }
+            else {
+                implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+                implementation 'io.opentelemetry:opentelemetry-exporter-zipkin'
+            }
+        }
     }
 
     tasks {

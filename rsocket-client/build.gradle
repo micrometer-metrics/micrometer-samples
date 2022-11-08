@@ -12,10 +12,7 @@ buildscript {
 apply plugin: 'org.springframework.boot'
 
 repositories {
-	mavenCentral()
-	maven { url 'https://repo.spring.io/milestone' }
-	maven { url 'https://repo.spring.io/snapshot' }
-	maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' } // for rsocket-micrometer
 }
 
 dependencies {
@@ -23,21 +20,8 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-
 	implementation 'org.springframework.boot:spring-boot-starter-rsocket'
-	implementation 'io.rsocket:rsocket-micrometer:1.1.4-SNAPSHOT' // TODO: Remove me
-	implementation 'io.micrometer:context-propagation:1.0.0-SNAPSHOT' // TODO: Should come from Micrometer-Bom ?
-
-	implementation "io.micrometer:micrometer-tracing-bridge-${project.hasProperty("brave") ? "brave" : "otel" }"
-	// Default is OTel + Zipkin. You can opt in via "wavefront" to Wavefront and "brave" for Brave
-	if (project.hasProperty("wavefront")) {
-		implementation "io.micrometer:micrometer-tracing-reporter-wavefront"
-	}
-	if (project.hasProperty("brave")) {
-		implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
-	} else {
-		implementation "io.opentelemetry:opentelemetry-exporter-zipkin"
-	}
+	implementation 'io.rsocket:rsocket-micrometer:1.+' // TODO: Remove me
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
