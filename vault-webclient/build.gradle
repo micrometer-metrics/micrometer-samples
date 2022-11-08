@@ -6,12 +6,10 @@ buildscript {
 	}
 	dependencies {
 		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
-		classpath "io.spring.gradle:dependency-management-plugin:$springDependencyManagementPlugin"
 	}
 }
 
 apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
 
 repositories {
 	mavenCentral()
@@ -19,13 +17,10 @@ repositories {
 	maven { url 'https://repo.spring.io/snapshot' }
 }
 
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
-}
-
 dependencies {
+	implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+	implementation platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
+
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 

@@ -1,15 +1,4 @@
-buildscript {
-	repositories {
-		maven { url 'https://repo.spring.io/milestone' }
-		maven { url 'https://repo.spring.io/snapshot' }
-		gradlePluginPortal()
-	}
-	dependencies {
-		classpath "io.spring.gradle:dependency-management-plugin:$springDependencyManagementPlugin"
-	}
-}
-
-apply plugin: 'io.spring.dependency-management'
+ext.deployerVersion = '2.7.1'
 
 repositories {
 	mavenCentral()
@@ -17,18 +6,10 @@ repositories {
 	maven { url 'https://repo.spring.io/snapshot' }
 }
 
-ext {
-	deployerVersion="2.7.1"
-}
-
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.boot:spring-boot-dependencies:2.7.5"
-		mavenBom "org.springframework.cloud:spring-cloud-deployer-dependencies:${deployerVersion}"
-	}
-}
-
 dependencies {
+	implementation platform('org.springframework.boot:spring-boot-dependencies:2.7.5')
+	implementation platform("org.springframework.cloud:spring-cloud-deployer-dependencies:${deployerVersion}")
+
 	implementation "org.springframework.cloud:spring-cloud-deployer-autoconfigure"
 	implementation "org.springframework.cloud:spring-cloud-deployer-resource-maven"
 	implementation "org.springframework.cloud:spring-cloud-deployer-resource-support"

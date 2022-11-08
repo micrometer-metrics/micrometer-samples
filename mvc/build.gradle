@@ -6,7 +6,6 @@ buildscript {
 	}
 	dependencies {
 		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
-		classpath "io.spring.gradle:dependency-management-plugin:$springDependencyManagementPlugin"
 	}
 }
 
@@ -20,6 +19,7 @@ repositories {
 }
 
 dependencies {
+	implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 

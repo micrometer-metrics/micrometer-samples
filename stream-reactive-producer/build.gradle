@@ -6,7 +6,6 @@ buildscript {
 	}
 	dependencies {
 		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
-		classpath "io.spring.gradle:dependency-management-plugin:$springDependencyManagementPlugin"
 	}
 }
 
@@ -19,15 +18,11 @@ repositories {
 	maven { url 'https://repo.spring.io/snapshot' }
 }
 
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
-}
-
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+	implementation platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
 
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.cloud:spring-cloud-stream-binder-rabbit'
 
 	implementation "io.micrometer:micrometer-tracing-bridge-${project.hasProperty("brave") ? "brave" : "otel" }"
