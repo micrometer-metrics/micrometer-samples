@@ -180,4 +180,17 @@ class AcceptanceTests extends AcceptanceTestsBase {
         assertThatTraceIdGotPropagated(producerId, consumerId);
     }
 
+    @Test
+    void should_pass_tracing_context_from_grpc(TestInfo testInfo) throws Exception {
+        // given
+        int port = SocketUtils.findAvailableTcpPort();
+        String consumerId = waitUntilStarted(() -> deployWebApp(testInfo, "grpc-server", port));
+
+        // when
+        String producerId = deploy(testInfo, "grpc-client", Map.of("url", "localhost:" + port));
+
+        // then
+        assertThatTraceIdGotPropagated(producerId, consumerId);
+    }
+
 }
