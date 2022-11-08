@@ -73,8 +73,10 @@ class ObservedValve extends ValveBase {
             }
         }
         ServerRequestObservationContext context = new ServerRequestObservationContext(request, response);
-        observation = ServerHttpObservationDocumentation.HTTP_REQUESTS.observation(this.observationConvention,
-                DEFAULT_OBSERVATION_CONVENTION, () -> context, this.observationRegistry).start();
+        observation = ServerHttpObservationDocumentation.HTTP_SERVLET_SERVER_EXCHANGES
+                .observation(this.observationConvention, DEFAULT_OBSERVATION_CONVENTION, () -> context,
+                        this.observationRegistry)
+                .start();
         request.setAttribute(Observation.class.getName(), observation);
         try (Observation.Scope scope = observation.openScope()) {
             Valve next = getNext();

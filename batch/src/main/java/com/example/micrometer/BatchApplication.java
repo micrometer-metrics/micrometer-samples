@@ -1,5 +1,6 @@
 package com.example.micrometer;
 
+import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ public class BatchApplication {
     }
 
     @Bean
-    Job myJob(Step step, JobRepository jobRepository, Tracer tracer) {
+    Job myJob(Step step, JobRepository jobRepository, Tracer tracer, ObservationRegistry observationRegistry) {
         return new JobBuilder("myJob", jobRepository).listener(new JobExecutionListener() {
             @Override
             public void beforeJob(JobExecution jobExecution) {
@@ -38,7 +39,7 @@ public class BatchApplication {
             public void afterJob(JobExecution jobExecution) {
 
             }
-        }).start(step).build();
+        }).observationRegistry(observationRegistry).start(step).build();
     }
 
     @Bean
