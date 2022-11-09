@@ -75,17 +75,15 @@ class Boot3WithDatabaseSampleApplicationTests {
     @Test
     void verifyLogsMetricsTraces(CapturedOutput output) {
         // @formatter:off
+        await().atMost(Duration.ofSeconds(5)).untilAsserted(this::verifyIfZipkinIsUp);
         verifyIfGreetingApiWorks();
         TraceInfo traceInfo = await()
-                .atMost(Duration.ofMillis(200))
-                .pollDelay(Duration.ofMillis(10))
-                .pollInterval(Duration.ofMillis(100))
+                .atMost(Duration.ofSeconds(5))
                 .until(() -> getTraceInfoFromLogs(output), Optional::isPresent)
                 .orElseThrow();
-
         verifyIfPrometheusEndpointWorks(traceInfo);
         await()
-                .atMost(Duration.ofSeconds(5))
+                .atMost(Duration.ofSeconds(10))
                 .pollDelay(Duration.ofMillis(100))
                 .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> verifyIfTraceIsInZipkin(traceInfo));
@@ -133,6 +131,17 @@ class Boot3WithDatabaseSampleApplicationTests {
                         containsString("greeting_active_seconds_bucket"), // active histogram
                         containsString(String.format("{span_id=\"%s\",trace_id=\"%s\"}", traceInfo.spanId, traceInfo.traceId)) // exemplar
                 );
+        // @formatter:on
+    }
+
+    private void verifyIfZipkinIsUp() {
+        // @formatter:off
+        given()
+                .port(zipkin.getFirstMappedPort())
+        .when()
+                .get("/zipkin")
+        .then()
+                .statusCode(200);
         // @formatter:on
     }
 
