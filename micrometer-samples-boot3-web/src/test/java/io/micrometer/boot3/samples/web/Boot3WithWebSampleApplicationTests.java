@@ -53,7 +53,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 class Boot3WithWebSampleApplicationTests {
 
     private static final Pattern TRACE_PATTERN = Pattern
-            .compile("^.+INFO \\[(.+),(\\p{XDigit}+),(\\p{XDigit}+)\\] .+ <ACCEPTANCE_TEST>.+$");
+            .compile("^.+INFO \\[(.+),(\\p{XDigit}+),(\\p{XDigit}+)\\] .+ <TEST_MARKER>.+$");
 
     @Container
     static GenericContainer<?> zipkin = new GenericContainer(DockerImageName.parse("openzipkin/zipkin:latest"))
@@ -105,7 +105,7 @@ class Boot3WithWebSampleApplicationTests {
     private Optional<TraceInfo> getTraceInfoFromLogs(CharSequence output) {
         // @formatter:off
         return output.toString().lines()
-                .filter(line -> line.contains("<ACCEPTANCE_TEST>"))
+                .filter(line -> line.contains("<TEST_MARKER>"))
                 .map(TRACE_PATTERN::matcher)
                 .flatMap(Matcher::results)
                 .map(matchResult -> new TraceInfo(matchResult.group(2), matchResult.group(3)))

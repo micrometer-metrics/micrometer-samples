@@ -79,7 +79,7 @@ class SampleController {
     private <T> Supplier<T> slowDown(Supplier<T> supplier) {
         return () -> {
             try {
-                LOGGER.info("<ACCEPTANCE_TEST> Fetching the data");
+                LOGGER.info("<TEST_MARKER> Fetching the data");
                 if (Math.random() < 0.02) { // huge latency, less frequent
                     Thread.sleep(1_000);
                 }
