@@ -16,10 +16,10 @@ import java.util.Map;
 class AcceptanceTests extends AcceptanceTestsBase {
 
     @Test
-    void should_pass_tracing_context_from_rest_template_to_mvc(TestInfo testInfo) throws Exception {
+    void should_pass_tracing_context_from_rest_template_to_web(TestInfo testInfo) throws Exception {
         // given
         int port = SocketUtils.findAvailableTcpPort();
-        String producerId = waitUntilStarted(() -> deployWebApp(testInfo, "mvc", port));
+        String producerId = waitUntilStarted(() -> deployWebApp(testInfo, "micrometer-samples-boot3-web", port));
 
         // when
         String consumerId = deploy(testInfo, "resttemplate", Map.of("url", "http://localhost:" + port));
@@ -43,10 +43,10 @@ class AcceptanceTests extends AcceptanceTestsBase {
 
     @Disabled("TODO: https://github.com/OpenFeign/feign/pull/1760") // TODO: Fix me
     @Test
-    void should_pass_tracing_context_from_openfeign_to_mvc(TestInfo testInfo) throws Exception {
+    void should_pass_tracing_context_from_openfeign_to_web(TestInfo testInfo) throws Exception {
         // given
         int port = SocketUtils.findAvailableTcpPort();
-        String producerId = waitUntilStarted(() -> deployWebApp(testInfo, "mvc", port));
+        String producerId = waitUntilStarted(() -> deployWebApp(testInfo, "micrometer-samples-boot3-web", port));
 
         // when
         String consumerId = deploy(testInfo, "openfeign", Map.of("url", "http://localhost:" + port));
@@ -56,10 +56,10 @@ class AcceptanceTests extends AcceptanceTestsBase {
     }
 
     @Test
-    void should_pass_tracing_context_from_gateway_to_mvc(TestInfo testInfo) throws Exception {
+    void should_pass_tracing_context_from_gateway_to_web(TestInfo testInfo) throws Exception {
         // given
         int port = SocketUtils.findAvailableTcpPort();
-        String producerId = waitUntilStarted(() -> deployWebApp(testInfo, "mvc", port));
+        String producerId = waitUntilStarted(() -> deployWebApp(testInfo, "micrometer-samples-boot3-web", port));
 
         // when
         String consumerId = deploy(testInfo, "gateway", Map.of("url", "http://localhost:" + port));

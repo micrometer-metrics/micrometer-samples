@@ -17,6 +17,7 @@ package io.micrometer.boot3.samples.web;
 
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.tracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,8 +38,18 @@ class SampleController {
 
     private final ObservationRegistry registry;
 
-    SampleController(ObservationRegistry registry) {
+    private final Tracer tracer;
+
+    SampleController(ObservationRegistry registry, Tracer tracer) {
         this.registry = registry;
+        this.tracer = tracer;
+    }
+
+    @GetMapping("/")
+    public String span() {
+        String traceId = this.tracer.currentSpan().context().traceId();
+        LOGGER.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", traceId);
+        return traceId;
     }
 
     @GetMapping("/people")
