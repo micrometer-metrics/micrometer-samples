@@ -42,7 +42,7 @@ class SampleController {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    @GetMapping("/")
+    @GetMapping("/people")
     List<String> allPeople() {
         return Observation.createNotStarted("allPeople", registry).observe(slowDown(() -> jdbcTemplate
                 .queryForList("SELECT * FROM emp").stream().map(map -> map.get("name").toString()).toList()));

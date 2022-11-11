@@ -41,7 +41,7 @@ class SampleController {
         this.registry = registry;
     }
 
-    @GetMapping("/")
+    @GetMapping("/people")
     List<String> allPeople() {
         return Observation.createNotStarted("allPeople", registry).observe(slowDown(() -> PEOPLE));
     }
