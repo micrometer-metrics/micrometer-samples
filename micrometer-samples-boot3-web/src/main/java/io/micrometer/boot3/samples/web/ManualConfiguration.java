@@ -12,10 +12,10 @@ import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.observation.DefaultServerRequestObservationConvention;
-import org.springframework.http.observation.ServerHttpObservationDocumentation;
-import org.springframework.http.observation.ServerRequestObservationContext;
-import org.springframework.http.observation.ServerRequestObservationConvention;
+import org.springframework.http.server.observation.DefaultServerRequestObservationConvention;
+import org.springframework.http.server.observation.ServerHttpObservationDocumentation;
+import org.springframework.http.server.observation.ServerRequestObservationContext;
+import org.springframework.http.server.observation.ServerRequestObservationConvention;
 
 import java.io.IOException;
 
@@ -73,7 +73,7 @@ class ObservedValve extends ValveBase {
             }
         }
         ServerRequestObservationContext context = new ServerRequestObservationContext(request, response);
-        observation = ServerHttpObservationDocumentation.HTTP_SERVLET_SERVER_EXCHANGES
+        observation = ServerHttpObservationDocumentation.HTTP_SERVLET_SERVER_REQUESTS
                 .observation(this.observationConvention, DEFAULT_OBSERVATION_CONVENTION, () -> context,
                         this.observationRegistry)
                 .start();
