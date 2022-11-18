@@ -20,6 +20,9 @@ import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,6 +55,12 @@ class SampleController {
         return traceId;
     }
 
+    @GetMapping("/trouble")
+    String trouble() {
+        LOGGER.info("<TEST_MARKER> 3,2,1... Boom!");
+        throw new IllegalStateException("Noooooo!");
+    }
+
     @GetMapping("/people")
     List<String> allPeople() {
         return Observation.createNotStarted("allPeople", registry).observe(slowDown(() -> PEOPLE));
@@ -81,6 +90,14 @@ class SampleController {
         finally {
             observation.stop();
         }
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    ProblemDetail handleIllegalState(IllegalStateException exception) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        problemDetail.setTitle(exception.getMessage());
+
+        return problemDetail;
     }
 
     private boolean foundByName(String name) {

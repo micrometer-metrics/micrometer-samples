@@ -17,9 +17,13 @@ package io.micrometer.boot3.samples.db;
 
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.tracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,11 +39,27 @@ class SampleController {
 
     private final ObservationRegistry registry;
 
+    private final Tracer tracer;
+
     private final JdbcTemplate jdbcTemplate;
 
-    SampleController(ObservationRegistry registry, JdbcTemplate jdbcTemplate) {
+    SampleController(ObservationRegistry registry, Tracer tracer, JdbcTemplate jdbcTemplate) {
         this.registry = registry;
+        this.tracer = tracer;
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @GetMapping("/")
+    public String span() {
+        String traceId = this.tracer.currentSpan().context().traceId();
+        LOGGER.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", traceId);
+        return traceId;
+    }
+
+    @GetMapping("/trouble")
+    String trouble() {
+        LOGGER.info("<TEST_MARKER> 3,2,1... Boom!");
+        throw new IllegalStateException("Noooooo!");
     }
 
     @GetMapping("/people")
@@ -72,6 +92,14 @@ class SampleController {
         finally {
             observation.stop();
         }
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    ProblemDetail handleIllegalState(IllegalStateException exception) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        problemDetail.setTitle(exception.getMessage());
+
+        return problemDetail;
     }
 
     private boolean foundByName(String name) {
