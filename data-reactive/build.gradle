@@ -12,8 +12,7 @@ buildscript {
 apply plugin: 'org.springframework.boot'
 
 repositories {
-	maven { url "https://oss.sonatype.org/content/repositories/snapshots" } // for datasource-micrometer-spring-boot
-	maven { url "https://oss.sonatype.org/content/repositories/release" } // once datasource-micrometer-spring-boot is released
+	maven { url 'https://repo.spring.io/release' }  // Once r2dbc-micrometer-spring-boot is released
 }
 
 dependencies {
