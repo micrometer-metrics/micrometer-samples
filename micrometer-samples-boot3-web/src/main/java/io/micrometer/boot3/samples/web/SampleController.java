@@ -18,9 +18,9 @@ package io.micrometer.boot3.samples.web;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.Tracer;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +31,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.web.util.WebUtils.ERROR_EXCEPTION_ATTRIBUTE;
 
 @RestController
 class SampleController {
@@ -92,10 +95,14 @@ class SampleController {
         }
     }
 
-    @ExceptionHandler(IllegalStateException.class)
-    ProblemDetail handleIllegalState(IllegalStateException exception) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        problemDetail.setTitle(exception.getMessage());
+    @ExceptionHandler(Throwable.class)
+    ProblemDetail handleThrowable(HttpServletRequest request, Throwable error) {
+        LOGGER.error(error.toString());
+        request.setAttribute(ERROR_EXCEPTION_ATTRIBUTE, error);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatus(INTERNAL_SERVER_ERROR);
+        problemDetail.setTitle(INTERNAL_SERVER_ERROR.getReasonPhrase());
+        problemDetail.setDetail(error.toString());
 
         return problemDetail;
     }
