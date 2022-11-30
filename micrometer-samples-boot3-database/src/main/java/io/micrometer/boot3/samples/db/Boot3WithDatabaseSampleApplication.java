@@ -15,36 +15,14 @@
  */
 package io.micrometer.boot3.samples.db;
 
-import io.micrometer.observation.Observation;
-import io.micrometer.observation.ObservationHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class Boot3WithDatabaseSampleApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(Boot3WithDatabaseSampleApplication.class, args);
-    }
-
-    @Bean
-    ObservationHandler<Observation.Context> errorHandler() {
-        return new ObservationHandler<>() {
-            private static final Logger LOGGER = LoggerFactory.getLogger("errorHandler");
-
-            @Override
-            public void onError(Observation.Context context) {
-                LOGGER.error("Ooops!", context.getError());
-            }
-
-            @Override
-            public boolean supportsContext(Observation.Context context) {
-                return true;
-            }
-        };
     }
 
 }
