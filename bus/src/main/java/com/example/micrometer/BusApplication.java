@@ -1,6 +1,7 @@
 package com.example.micrometer;
 
-import io.micrometer.tracing.Span;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,21 +53,20 @@ class MyEventService {
 
     private final Tracer tracer;
 
-    MyEventService(ApplicationEventPublisher publisher, BusProperties bus, Tracer tracer) {
+    private final ObservationRegistry observationRegistry;
+
+    MyEventService(ApplicationEventPublisher publisher, BusProperties bus, Tracer tracer, ObservationRegistry observationRegistry) {
         this.publisher = publisher;
         this.bus = bus;
         this.tracer = tracer;
+        this.observationRegistry = observationRegistry;
     }
 
     void publish() {
-        Span span = this.tracer.nextSpan();
-        try (Tracer.SpanInScope ws = this.tracer.withSpan(span.start())) {
+        Observation.createNotStarted("bus", observationRegistry).observe(() -> {
             log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", this.tracer.currentSpan().context().traceId());
             publisher.publishEvent(new MyEvent(this, this.bus.getId()));
-        }
-        finally {
-            span.end();
-        }
+        });
     }
 
     @EventListener(MyEvent.class)
