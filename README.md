@@ -8,6 +8,24 @@
 
 Sample apps to demo [Micrometer](https://github.com/micrometer-metrics/micrometer) features.
 
+## Building
+
+To build the project with OpenTelemetry tracer just run 
+
+```bash
+$ ./gradlew build
+```
+
+To build the project with Brave tracer just run 
+
+```bash
+$ ./gradlew build -Pbrave
+```
+
+## Running
+
+You can run each of the samples individually.
+
 ## Join the discussion
 
 Join the [Micrometer Slack](https://slack.micrometer.io) to share your questions, concerns, and feature requests.

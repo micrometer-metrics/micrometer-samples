@@ -1,0 +1,39 @@
+ext.deployerVersion = '2.7.+'
+
+dependencies {
+	implementation platform('org.springframework.boot:spring-boot-dependencies:2.7.+')
+	implementation platform("org.springframework.cloud:spring-cloud-deployer-dependencies:${deployerVersion}")
+
+	implementation 'org.springframework.cloud:spring-cloud-deployer-autoconfigure'
+	implementation 'org.springframework.cloud:spring-cloud-deployer-resource-maven'
+	implementation 'org.springframework.cloud:spring-cloud-deployer-resource-support'
+	implementation 'org.springframework.cloud:spring-cloud-deployer-spi'
+	implementation "org.springframework.cloud:spring-cloud-deployer-local:${deployerVersion}"
+	implementation 'org.apache.maven.shared:maven-invoker:3.+'
+
+	testImplementation platform('org.testcontainers:testcontainers-bom:1.+')
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.awaitility:awaitility'
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testImplementation 'org.testcontainers:cassandra'
+	testImplementation 'org.testcontainers:rabbitmq'
+	testImplementation 'org.testcontainers:mongodb'
+	testImplementation 'org.testcontainers:vault'
+	testImplementation 'org.testcontainers:kafka'
+}
+
+test {
+	exclude('com/example/**')
+}
+
+task acceptanceTest(type: Test) {
+	rootProject.subprojects
+		.findAll { it.name !in [project.name, 'test-common']}
+		.each { dependsOn ":$it.name:publishToMavenLocal" }
+
+	useJUnitPlatform()
+}
+
+check {
+	dependsOn acceptanceTest
+}

@@ -1,0 +1,21 @@
+buildscript {
+	repositories {
+		gradlePluginPortal()
+	}
+	dependencies {
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+	}
+}
+
+apply plugin: 'org.springframework.boot'
+
+dependencies {
+	implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+
+	implementation 'org.springframework.data:spring-data-mongodb:4.0.0-SNAPSHOT'
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	testImplementation project(':test-common')
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}

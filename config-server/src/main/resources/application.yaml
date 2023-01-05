@@ -1,0 +1,13 @@
+server.port: 8888
+spring.cloud.config.server.git.uri: https://github.com/spring-cloud-samples/config-repo
+
+spring:
+  application:
+    name: config-server
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+logging.pattern.level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

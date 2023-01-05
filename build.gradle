@@ -8,11 +8,13 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1'
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+        // TODO: this plugin brings in org.springframework:spring-core:3.1.3.RELEASE and org.springframework:spring-asm:3.1.3.RELEASE
+        // Because of this, it fails Boot's mainClass lookup mechanism, we need to find a better way to guard license headers
+        // classpath ('gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1')
         classpath 'io.spring.nohttp:nohttp-gradle:0.0.10'
         classpath 'org.gradle:test-retry-gradle-plugin:1.4.1'
-        classpath 'io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.34'
-        classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.10.0'
+        classpath 'io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.35'
     }
 
     configurations.classpath.resolutionStrategy.cacheDynamicVersionsFor 0, 'minutes'
@@ -21,7 +23,8 @@ buildscript {
 description = 'Micrometer Samples'
 
 allprojects {
-    group = 'io.micrometer'
+    group = 'com.example.micrometersamples'
+    version = '0.1.0-SNAPSHOT'
 
     afterEvaluate { project -> println "I'm configuring $project.name with version $project.version" }
 }
@@ -30,10 +33,10 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'checkstyle'
     apply plugin: 'io.spring.javaformat'
-    apply plugin: 'com.diffplug.spotless'
-    apply plugin: 'com.github.hierynomus.license'
+    // apply plugin: 'com.github.hierynomus.license'
     apply plugin: 'io.spring.nohttp'
     apply plugin: 'org.gradle.test-retry'
+    apply plugin: 'maven-publish'
 
     java {
         registerFeature('optional') {
@@ -47,16 +50,29 @@ subprojects {
 
     repositories {
         mavenCentral()
-        maven {
-            url 'https://repo.spring.io/milestone/' // we only need this repo for the context-propagation
-            content { includeModule 'io.micrometer', 'context-propagation' }
-        }
     }
 
     dependencies {
         // JSR-305 only used for non-required meta-annotations
         optionalApi 'com.google.code.findbugs:jsr305:latest.release'
         checkstyle 'io.spring.javaformat:spring-javaformat-checkstyle:latest.release'
+
+        if (project.name !in ['acceptance-tests', 'test-common']) {
+            implementation 'io.micrometer:micrometer-registry-prometheus'
+
+            // Default is OTel + Zipkin, you can opt in via "wavefront" to Wavefront and "brave" for Brave
+            if (project.hasProperty('wavefront')) {
+                implementation 'io.micrometer:micrometer-tracing-reporter-wavefront'
+            }
+            if (project.hasProperty('brave')) {
+                implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+                implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+            }
+            else {
+                implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+                implementation 'io.opentelemetry:opentelemetry-exporter-zipkin'
+            }
+        }
     }
 
     tasks {
@@ -117,31 +133,36 @@ subprojects {
         }
     }
 
+    if (project.name !in ['acceptance-tests', 'test-common']) {
+        apply plugin: 'org.springframework.boot'
+        publishing {
+            publications {
+                bootJava(MavenPublication) {
+                    artifact tasks.named("bootJar")
+                }
+            }
+        }
+    }
+
     project.tasks.withType(Test) { Test testTask ->
         testTask.testLogging.exceptionFormat = 'full'
     }
 
-    license {
-        header rootProject.file('gradle/licenseHeader.txt')
-        strictCheck true
-        mapping {
-            java = 'SLASHSTAR_STYLE'
-        }
-        sourceSets = project.sourceSets
+    // license {
+    //     header rootProject.file('gradle/licenseHeader.txt')
+    //     strictCheck true
+    //     mapping {
+    //         java = 'SLASHSTAR_STYLE'
+    //     }
+    //     sourceSets = project.sourceSets
 
-        ext.year = Calendar.getInstance().get(Calendar.YEAR)
-        skipExistingHeaders = true
-        exclude '**/*.json' // comments not supported
-    }
+    //     ext.year = Calendar.getInstance().get(Calendar.YEAR)
+    //     skipExistingHeaders = true
+    //     exclude '**/*.json' // comments not supported
+    // }
 
     nohttp {
-        source.exclude '**/docker/**/*.yml'
-    }
-
-    spotless {
-        kotlin {
-            ktlint().editorConfigOverride([disabled_rules: "no-wildcard-imports"])
-        }
+        source.exclude '**/docker/**/*.yml', '**/docker-compose.yml'
     }
 
     dependencyLocking {
@@ -168,7 +189,7 @@ subprojects {
 }
 
 task deleteLockFiles(type: Delete) {
-    delete fileTree(dir: '.', include: '**/*.lockfile')
+    delete fileTree(dir: '.', include: '**/gradle.lockfile')
 }
 
 wrapper {

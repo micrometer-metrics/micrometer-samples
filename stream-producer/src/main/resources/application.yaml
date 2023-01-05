@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: stream-producer
+
+spring.cloud.stream:
+  source: channel
+  bindings.channel-out-0:
+    destination: channeldestination
+    group: channelgroup
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+logging.pattern.level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

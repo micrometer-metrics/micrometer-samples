@@ -23,7 +23,7 @@ commands:
             - gradle-dependencies-{{ .Branch }}
       - run:
           name: downloadDependencies
-          command: ./gradlew downloadDependencies --console=plain
+          command: ./gradlew downloadDependencies --console=plain --refresh-dependencies --no-build-cache
       - save_cache:
           key: gradle-dependencies-{{ .Branch }}-{{ checksum "build.gradle" }}
           paths:
@@ -33,7 +33,7 @@ commands:
           command: java --version
       - run:
           name: run gradle command
-          command: ./gradlew << parameters.command >>
+          command: ./gradlew << parameters.command >> --refresh-dependencies
       - run:
           name: collect test reports
           when: always
@@ -46,16 +46,32 @@ commands:
           path: ~/micrometer-samples/test-results/
 
 jobs:
-  build:
+  otel-build:
     executor: machine-executor
     steps:
       - gradlew-build
+  brave-build:
+    executor: machine-executor
+    steps:
+      - gradlew-build:
+          command: -Pbrave
+  nightly-otel-build:
+    executor: machine-executor
+    steps:
+      - gradlew-build:
+          command: --no-build-cache
+  nightly-brave-build:
+    executor: machine-executor
+    steps:
+      - gradlew-build:
+          command: -Pbrave --no-build-cache
 
 workflows:
   version: 2
   build_prs:
     jobs:
-      - build
+      - otel-build
+      - brave-build
   nightly:
     triggers:
       - schedule:
@@ -65,4 +81,5 @@ workflows:
               only:
                 - main
     jobs:
-      - build
+      - nightly-otel-build
+      - nightly-brave-build

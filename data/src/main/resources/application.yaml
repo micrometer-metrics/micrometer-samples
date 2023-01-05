@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: data
+  datasource:
+    url: jdbc:h2:mem:my-h2-db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+logging.pattern.level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

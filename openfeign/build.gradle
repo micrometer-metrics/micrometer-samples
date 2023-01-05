@@ -1,58 +1,23 @@
 buildscript {
 	repositories {
-		maven { url 'https://repo.spring.io/milestone' }
-		maven { url 'https://repo.spring.io/snapshot' }
 		gradlePluginPortal()
 	}
 	dependencies {
-		classpath 'org.springframework.boot:spring-boot-gradle-plugin:3.0.0-SNAPSHOT'
-		classpath 'io.spring.gradle:dependency-management-plugin:1.0.13.RELEASE'
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
 	}
 }
 
 apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
-
-repositories {
-	mavenCentral()
-	maven { url 'https://repo.spring.io/milestone' }
-	maven { url 'https://repo.spring.io/snapshot' }
-}
-
-configurations {
-	implementation {
-		// see gh-1599; pause detection is not configured so this dependency can be excluded
-		exclude module: 'LatencyUtils'
-	}
-}
-
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:2022.0.0-SNAPSHOT" // TODO: Parameterize to test against newer versions
-	}
-}
 
 dependencies {
+	implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+	implementation platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
+
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 	implementation 'io.github.openfeign:feign-micrometer'
 
-	implementation 'io.micrometer:micrometer-observation-spring-boot-autoconfigure:0.1.0-SNAPSHOT'
-
-	implementation 'io.micrometer:micrometer-registry-prometheus'
-	implementation 'io.micrometer:micrometer-tracing-bridge-brave' // TODO: Make it parametrized to check OTel too
-	implementation 'io.micrometer:micrometer-tracing:1.0.0-SNAPSHOT'
-	implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
-
+	testImplementation project(':test-common')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-}
-
-bootJar {
-	enabled = false
-}
-
-resolveMainClassName {
-	enabled = false
 }

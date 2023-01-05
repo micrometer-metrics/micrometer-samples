@@ -8,7 +8,7 @@ pluginManagement {
 }
 
 plugins {
-    id 'com.gradle.enterprise' version '3.11.1'
+    id 'com.gradle.enterprise' version '3.11.3'
     id 'io.spring.ge.conventions' version '0.0.11'
 }
 
@@ -23,4 +23,41 @@ gradleEnterprise {
     server = 'https://ge.micrometer.io'
 }
 
-include 'micrometer-samples-boot3', 'micrometer-samples-boot3-database', 'micrometer-samples-native-image', 'openfeign', 'mvc'
+include 'acceptance-tests'
+include 'baggage-producer'
+include 'baggage-consumer'
+include 'batch'
+include 'bus'
+include 'cassandra'
+include 'cassandra-reactive'
+include 'circuitbreaker'
+include 'circuitbreaker-reactive'
+include 'config-server'
+include 'data'
+include 'data-reactive'
+include 'gateway'
+include 'grpc-client'
+include 'grpc-server'
+include 'integration'
+include 'kafka-producer'
+include 'kafka-consumer'
+include 'micrometer-samples-boot3-web'
+include 'micrometer-samples-boot3-database'
+include 'micrometer-samples-native-image'
+include 'mongodb-reactive'
+include 'openfeign'
+include 'resttemplate'
+include 'rsocket-client'
+include 'rsocket-server'
+include 'security'
+include 'stream-producer'
+include 'stream-consumer'
+include 'stream-reactive-consumer'
+include 'stream-reactive-producer'
+include 'task'
+include 'test-common'
+include 'vault-resttemplate'
+include 'vault-webclient'
+include 'webclient'
+include 'webflux'
+
