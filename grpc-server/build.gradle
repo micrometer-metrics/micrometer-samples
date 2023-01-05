@@ -1,0 +1,22 @@
+buildscript {
+	repositories {
+		gradlePluginPortal()
+	}
+	dependencies {
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+	}
+}
+
+apply plugin: 'org.springframework.boot'
+
+dependencies {
+	implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+	implementation platform('io.grpc:grpc-bom:1.+')
+
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'io.grpc:grpc-netty'
+	implementation 'io.grpc:grpc-testing-proto'
+
+	testImplementation project(':test-common')
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}

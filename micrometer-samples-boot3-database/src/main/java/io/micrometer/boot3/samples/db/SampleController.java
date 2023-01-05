@@ -17,9 +17,13 @@ package io.micrometer.boot3.samples.db;
 
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.tracing.Tracer;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ProblemDetail;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +32,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.web.util.WebUtils.ERROR_EXCEPTION_ATTRIBUTE;
+
 @RestController
 class SampleController {
 
@@ -35,14 +42,30 @@ class SampleController {
 
     private final ObservationRegistry registry;
 
+    private final Tracer tracer;
+
     private final JdbcTemplate jdbcTemplate;
 
-    SampleController(ObservationRegistry registry, JdbcTemplate jdbcTemplate) {
+    SampleController(ObservationRegistry registry, Tracer tracer, JdbcTemplate jdbcTemplate) {
         this.registry = registry;
+        this.tracer = tracer;
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @GetMapping("/")
+    public String span() {
+        String traceId = this.tracer.currentSpan().context().traceId();
+        LOGGER.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", traceId);
+        return traceId;
+    }
+
+    @GetMapping("/trouble")
+    String trouble() {
+        LOGGER.info("<TEST_MARKER> 3,2,1... Boom!");
+        throw new IllegalStateException("Noooooo!");
+    }
+
+    @GetMapping("/people")
     List<String> allPeople() {
         return Observation.createNotStarted("allPeople", registry).observe(slowDown(() -> jdbcTemplate
                 .queryForList("SELECT * FROM emp").stream().map(map -> map.get("name").toString()).toList()));
@@ -67,11 +90,23 @@ class SampleController {
         }
         catch (Exception exception) {
             observation.error(exception);
-            return Map.of();
+            throw exception;
         }
         finally {
             observation.stop();
         }
+    }
+
+    @ExceptionHandler(Throwable.class)
+    ProblemDetail handleThrowable(HttpServletRequest request, Throwable error) {
+        LOGGER.error(error.toString());
+        request.setAttribute(ERROR_EXCEPTION_ATTRIBUTE, error);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatus(INTERNAL_SERVER_ERROR);
+        problemDetail.setTitle(INTERNAL_SERVER_ERROR.getReasonPhrase());
+        problemDetail.setDetail(error.toString());
+
+        return problemDetail;
     }
 
     private boolean foundByName(String name) {
@@ -81,7 +116,7 @@ class SampleController {
     private <T> Supplier<T> slowDown(Supplier<T> supplier) {
         return () -> {
             try {
-                LOGGER.info("<ACCEPTANCE_TEST> Fetching the data");
+                LOGGER.info("<TEST_MARKER> Fetching the data");
                 if (Math.random() < 0.02) { // huge latency, less frequent
                     Thread.sleep(1_000);
                 }

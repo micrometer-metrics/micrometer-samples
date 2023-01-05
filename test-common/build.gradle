@@ -1,0 +1,8 @@
+dependencies {
+	implementation platform("org.springframework.boot:spring-boot-dependencies:$springBootVersion")
+	implementation 'org.springframework.boot:spring-boot-autoconfigure'
+	implementation 'io.micrometer:micrometer-test'
+
+	optionalApi 'io.micrometer:micrometer-tracing-bridge-brave'
+	optionalApi 'io.micrometer:micrometer-tracing-bridge-otel'
+}

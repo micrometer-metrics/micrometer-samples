@@ -1,0 +1,54 @@
+#spring:
+#  application:
+#    name: stream-reactive-producer
+#
+## streambridge -> channelreactivedestination-input -> function bean -> channelreactivedestination
+#spring.cloud.stream.bindings.tracingFunction-in-0.destination: channelreactivedestination-input
+#spring.cloud.stream.bindings.tracingFunction-out-0.destination: channelreactivedestination
+#
+#spring.cloud.stream.bindings.supplier-out-0.destination: supplier
+#spring.cloud.stream.bindings.stringSupplier-out-0.destination: stringSupplier
+#
+#spring.cloud.function.definition: tracingFunction
+## spring.cloud.function.definition: tracingFunction;supplier;stringSupplier
+#
+## For tests
+#logging.pattern.level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+#spring:
+#  application:
+#    name: stream-reactive-producer
+#
+#spring.cloud.stream:
+#  source: channel
+#  bindings.channel-out-0:
+#    destination: channeldestination
+#    group: channelgroup
+#
+#management:
+#  tracing:
+#    sampling:
+#      probability: 1.0
+#
+#logging.pattern.level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+spring:
+  application:
+    name: stream-reactive-producer
+
+# streambridge -> channelreactivedestination-input -> function bean -> channelreactivedestination
+  cloud:
+    stream:
+      bindings:
+        tracingFunction-in-0.destination: channelreactivedestination-input
+        tracingFunction-out-0.destination: channelreactivedestination
+        supplier-out-0.destination: supplier
+        stringSupplier-out-0.destination: stringSupplier
+    function:
+      definition: tracingFunction
+# spring.cloud.function.definition: tracingFunction;supplier;stringSupplier
+
+# For tests
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

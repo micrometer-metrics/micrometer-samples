@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: bus
+
+logging.pattern.level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

@@ -1,0 +1,24 @@
+buildscript {
+	repositories {
+		gradlePluginPortal()
+	}
+	dependencies {
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+	}
+}
+
+apply plugin: 'org.springframework.boot'
+
+dependencies {
+	implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+	implementation platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
+
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.cloud:spring-cloud-starter-vault-config'
+
+	testImplementation project(':test-common')
+	testImplementation 'io.micrometer:micrometer-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation "com.github.tomakehurst:wiremock-jre8-standalone:latest.release"
+}
