@@ -3,7 +3,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.9.14'
+        classpath 'org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.9.19'
     }
 }
 
@@ -27,6 +27,7 @@ graalvmNative {
         main {
             javaLauncher = javaToolchains.launcherFor {
                 languageVersion = JavaLanguageVersion.of(17)
+                requiredVersion = '22.3'
                 vendor = JvmVendorSpec.matching('GraalVM Community')
             }
             mainClass = 'io.micrometer.nativeimage.samples.SimpleNativeImageSample'
