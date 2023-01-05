@@ -13,7 +13,6 @@ buildscript {
         // Because of this, it fails Boot's mainClass lookup mechanism, we need to find a better way to guard license headers
         // classpath ('gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1')
         classpath 'io.spring.nohttp:nohttp-gradle:0.0.10'
-        classpath 'org.gradle:test-retry-gradle-plugin:1.4.1'
         classpath 'io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.35'
     }
 
@@ -35,7 +34,6 @@ subprojects {
     apply plugin: 'io.spring.javaformat'
     // apply plugin: 'com.github.hierynomus.license'
     apply plugin: 'io.spring.nohttp'
-    apply plugin: 'org.gradle.test-retry'
     apply plugin: 'maven-publish'
 
     java {
@@ -193,7 +191,7 @@ task deleteLockFiles(type: Delete) {
 }
 
 wrapper {
-    gradleVersion = '7.5.1'
+    gradleVersion = '7.6'
 }
 
 defaultTasks 'build'
