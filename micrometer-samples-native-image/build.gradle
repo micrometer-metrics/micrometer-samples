@@ -9,14 +9,8 @@ buildscript {
 
 apply plugin: 'org.graalvm.buildtools.native'
 
-repositories {
-    mavenCentral()
-    maven { url 'https://repo.spring.io/milestone' }
-    maven { url 'https://repo.spring.io/snapshot' }
-}
-
 dependencies {
-    implementation platform('io.micrometer:micrometer-bom:1.10.0-SNAPSHOT')
+    implementation platform('io.micrometer:micrometer-bom:1.+')
     implementation 'io.micrometer:micrometer-core'
     implementation 'io.micrometer:micrometer-observation'
     implementation 'io.micrometer:micrometer-registry-prometheus'
