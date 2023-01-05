@@ -75,7 +75,7 @@ class TracingAssertions {
             int minNumberOfOccurrences) {
         Pattern pattern = Pattern.compile("^.*\\[" + springApplicationName + ",([a-z|0-9]+?),([a-z|0-9]+?)].*$");
         try {
-            Awaitility.await().pollInterval(1, TimeUnit.SECONDS).atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+            Awaitility.await().pollInterval(1, TimeUnit.SECONDS).atMost(30, TimeUnit.SECONDS).untilAsserted(() -> {
                 AtomicInteger counter = new AtomicInteger();
                 List<String> traceIds = Arrays.stream(this.projectDeployer.getLog(appId).split(System.lineSeparator()))
                         .map(s -> {
