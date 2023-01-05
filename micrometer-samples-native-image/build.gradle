@@ -35,4 +35,5 @@ graalvmNative {
     }
 }
 
-check.dependsOn('nativeTest')
+// TODO: Run nativeTest on build once we have GraalVM on CI
+// check.dependsOn('nativeTest')
