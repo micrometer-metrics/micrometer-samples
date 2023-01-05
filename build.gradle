@@ -55,7 +55,7 @@ subprojects {
         optionalApi 'com.google.code.findbugs:jsr305:latest.release'
         checkstyle 'io.spring.javaformat:spring-javaformat-checkstyle:latest.release'
 
-        if (project.name !in ['acceptance-tests', 'test-common']) {
+        if (project.name !in ['acceptance-tests', 'test-common', 'micrometer-samples-native-image']) {
             implementation 'io.micrometer:micrometer-registry-prometheus'
 
             // Default is OTel + Zipkin, you can opt in via "wavefront" to Wavefront and "brave" for Brave
