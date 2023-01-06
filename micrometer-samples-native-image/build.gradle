@@ -25,15 +25,7 @@ dependencies {
 graalvmNative {
     binaries {
         main {
-            javaLauncher = javaToolchains.launcherFor {
-                languageVersion = JavaLanguageVersion.of(17)
-                requiredVersion = '22.3'
-                vendor = JvmVendorSpec.matching('GraalVM Community')
-            }
             mainClass = 'io.micrometer.nativeimage.samples.SimpleNativeImageSample'
         }
     }
 }
-
-// TODO: Run nativeTest on build once we have GraalVM on CI
-// check.dependsOn('nativeTest')

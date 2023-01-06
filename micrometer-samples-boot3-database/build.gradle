@@ -4,10 +4,12 @@ buildscript {
     }
     dependencies {
         classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+        classpath 'org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.9.19'
     }
 }
 
 apply plugin: 'org.springframework.boot'
+apply plugin: 'org.graalvm.buildtools.native'
 
 repositories {
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
