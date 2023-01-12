@@ -13,7 +13,6 @@ dependencies {
 	implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
 
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.data:spring-data-cassandra:4.0.0-SNAPSHOT' // TODO: Remove
 	implementation 'org.springframework.boot:spring-boot-starter-data-cassandra'
 
 	testImplementation project(':test-common')
