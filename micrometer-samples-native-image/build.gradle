@@ -22,10 +22,22 @@ dependencies {
     testImplementation 'org.assertj:assertj-core:3.23.1'
 }
 
+ext.mainClassName = 'io.micrometer.nativeimage.samples.SimpleNativeImageSample'
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
 graalvmNative {
     binaries {
         main {
-            mainClass = 'io.micrometer.nativeimage.samples.SimpleNativeImageSample'
+            mainClass = mainClassName
         }
     }
 }
