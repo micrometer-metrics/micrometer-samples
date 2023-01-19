@@ -15,24 +15,25 @@
  */
 package io.micrometer.nativeimage.samples;
 
+import io.micrometer.core.instrument.DistributionSummary;
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.binder.MeterBinder;
+import io.micrometer.core.instrument.binder.jvm.*;
+import io.micrometer.core.instrument.binder.system.DiskSpaceMetrics;
+import io.micrometer.core.instrument.binder.system.FileDescriptorMetrics;
+import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
+import io.micrometer.core.instrument.binder.system.UptimeMetrics;
+import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
+
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import io.micrometer.core.instrument.*;
-import io.micrometer.core.instrument.binder.MeterBinder;
-import io.micrometer.core.instrument.binder.jvm.*;
-import io.micrometer.core.instrument.binder.system.FileDescriptorMetrics;
-import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
-import io.micrometer.core.instrument.binder.system.UptimeMetrics;
-import io.micrometer.core.instrument.binder.system.DiskSpaceMetrics;
-import io.micrometer.core.instrument.observation.DefaultMeterObservationHandler;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import io.micrometer.observation.Observation;
-import io.micrometer.observation.ObservationRegistry;
 
 import static java.util.Collections.emptyList;
 
@@ -54,6 +55,7 @@ public class SimpleNativeImageSample {
 
         observationRegistry.observationConfig().observationHandler(new DefaultMeterObservationHandler(meterRegistry));
         binders.forEach(binder -> binder.bindTo(meterRegistry));
+        simulateGC(); // for JvmGcMetrics
         simulateTaskInExecutorService(); // for ExecutorServiceMetrics
     }
 
@@ -126,6 +128,17 @@ public class SimpleNativeImageSample {
                 new UptimeMetrics()
         );
         // @formatter:on
+    }
+
+    private void simulateGC() {
+        createGarbage(); // So that GC will have more reason to run
+        System.gc();
+    }
+
+    private void createGarbage() {
+        int amountInMiB = (int) (Math.random() * 10) + 10;
+        byte[] garbage = new byte[1024 * 1024 * amountInMiB];
+        System.out.printf("Amount of garbage produced: %dMiB%n", garbage.length / 1024 / 1024);
     }
 
     private void simulateTaskInExecutorService() {
