@@ -9,10 +9,6 @@ buildscript {
 
 apply plugin: 'org.springframework.boot'
 
-repositories {
-	maven { url "https://oss.sonatype.org/content/repositories/snapshots" } // for datasource-micrometer-spring-boot
-}
-
 dependencies {
 	implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
 
@@ -20,6 +16,20 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation "net.ttddyy.observation:datasource-micrometer-spring-boot:${datasourceMicrometerSpringBootVersion}"
+	implementation 'io.micrometer:micrometer-registry-prometheus'
+
+	// Default is OTel + Zipkin, you can opt in via "-Pwavefront" to Wavefront and "-Pbrave" for Brave
+	if (project.hasProperty('wavefront')) {
+		implementation 'io.micrometer:micrometer-tracing-reporter-wavefront'
+	}
+	if (project.hasProperty('brave')) {
+		implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+		implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+	}
+	else {
+		implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+		implementation 'io.opentelemetry:opentelemetry-exporter-zipkin'
+	}
 
 	runtimeOnly 'com.h2database:h2'
 
