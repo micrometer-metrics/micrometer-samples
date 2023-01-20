@@ -124,18 +124,6 @@ subprojects {
     }
 
     plugins.withId('org.graalvm.buildtools.native') {
-        graalvmNative {
-            binaries {
-                main {
-                    javaLauncher = javaToolchains.launcherFor {
-                        languageVersion = JavaLanguageVersion.of(17)
-                        requiredVersion = '22.3'
-                        vendor = JvmVendorSpec.matching('GraalVM Community')
-                    }
-                }
-            }
-        }
-
         // TODO: Run nativeTest on build once we have GraalVM on CI
         // TODO: OTel Trcing does not work on native
         // check.dependsOn('nativeTest')

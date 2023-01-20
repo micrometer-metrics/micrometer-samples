@@ -37,6 +37,11 @@ jar {
 graalvmNative {
     binaries {
         main {
+            javaLauncher = javaToolchains.launcherFor {
+                languageVersion = JavaLanguageVersion.of(17)
+                requiredVersion = '22.3'
+                vendor = JvmVendorSpec.matching('GraalVM Community')
+            }
             mainClass = mainClassName
         }
     }
