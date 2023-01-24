@@ -20,17 +20,17 @@ dependencies {
     implementation 'net.ttddyy.observation:datasource-micrometer-spring-boot:1.+'
     implementation 'io.micrometer:micrometer-registry-prometheus'
 
-    // Default is OTel + Zipkin, you can opt in via "-Pwavefront" to Wavefront and "-Pbrave" for Brave
+    // Default is Brave + Zipkin, you can opt in via "-Pwavefront" to Wavefront and "-Potel" for OTel
     if (project.hasProperty('wavefront')) {
         implementation 'io.micrometer:micrometer-tracing-reporter-wavefront'
     }
-    if (project.hasProperty('brave')) {
-        implementation 'io.micrometer:micrometer-tracing-bridge-brave'
-        implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
-    }
-    else {
+    if (project.hasProperty('otel')) {
         implementation 'io.micrometer:micrometer-tracing-bridge-otel'
         implementation 'io.opentelemetry:opentelemetry-exporter-zipkin'
+    }
+    else {
+        implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+        implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
     }
 
     runtimeOnly 'org.flywaydb:flyway-core'

@@ -10,16 +10,16 @@ Sample apps to demo [Micrometer](https://github.com/micrometer-metrics/micromete
 
 ## Building
 
-To build the project with OpenTelemetry tracer just run 
+To build the project with Brave tracer just run 
 
 ```bash
 $ ./gradlew build
 ```
 
-To build the project with Brave tracer just run 
+To build the project with OpenTelemetry tracer just run 
 
 ```bash
-$ ./gradlew build -Pbrave
+$ ./gradlew build -otel
 ```
 
 ## Running
