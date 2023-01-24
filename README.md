@@ -19,7 +19,7 @@ $ ./gradlew build
 To build the project with OpenTelemetry tracer just run 
 
 ```bash
-$ ./gradlew build -otel
+$ ./gradlew build -Potel
 ```
 
 ## Running
