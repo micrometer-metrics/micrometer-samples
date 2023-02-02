@@ -55,7 +55,8 @@ class MyEventService {
 
     private final ObservationRegistry observationRegistry;
 
-    MyEventService(ApplicationEventPublisher publisher, BusProperties bus, Tracer tracer, ObservationRegistry observationRegistry) {
+    MyEventService(ApplicationEventPublisher publisher, BusProperties bus, Tracer tracer,
+            ObservationRegistry observationRegistry) {
         this.publisher = publisher;
         this.bus = bus;
         this.tracer = tracer;

@@ -43,7 +43,6 @@ class WebFluxApplicationTests {
                 "method", "outcome", "status", "uri");
     }
 
-
     @Test
     void should_propagate_tracing_context() {
         Observation parent = Observation.start("parent", registry);
@@ -52,18 +51,15 @@ class WebFluxApplicationTests {
             then(registry.getCurrentObservation()).isSameAs(parent);
             then(tracer.currentSpan().context()).isEqualTo(spanContextFromObservation(parent));
 
-            Observation mvc =
-                    Observation.createNotStarted("mvc", registry).parentObservation(parent).start();
+            Observation mvc = Observation.createNotStarted("mvc", registry).parentObservation(parent).start();
 
-            Observation child =
-                    Observation.createNotStarted("child", registry).parentObservation(mvc).start();
+            Observation child = Observation.createNotStarted("child", registry).parentObservation(mvc).start();
 
             child.scoped(() -> {
                 then(registry.getCurrentObservation()).isSameAs(child);
                 then(tracer.currentSpan().context()).isEqualTo(spanContextFromObservation(child));
 
-                try (ContextSnapshot.Scope scope =
-                             ContextSnapshot.setAllThreadLocalsFrom(Context.empty())) {
+                try (ContextSnapshot.Scope scope = ContextSnapshot.setAllThreadLocalsFrom(Context.empty())) {
                     then(registry.getCurrentObservation()).isNull();
                     then(tracer.currentSpan()).isNull();
                 }
