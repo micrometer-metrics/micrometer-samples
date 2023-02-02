@@ -45,6 +45,12 @@ subprojects {
         }
     }
 
+    dependencies {
+        implementation platform("io.micrometer:micrometer-bom:${micrometerVersion}")
+        implementation platform("io.micrometer:micrometer-tracing-bom:${micrometerTracingVersion}")
+        implementation "io.micrometer:context-propagation:${contextPropagationVersion}" // TODO: This should come from tracing
+    }
+
     repositories {
         mavenLocal()
         mavenCentral()
@@ -110,6 +116,8 @@ subprojects {
         maxHeapSize = "1500m"
 
         useJUnitPlatform()
+        
+        environment "SPRING_CLOUD_COMPATIBILITY_VERIFIER_ENABLED", "false"
 
         retry {
             maxFailures = 5
