@@ -45,6 +45,12 @@ subprojects {
         }
     }
 
+    dependencies {
+        implementation platform("io.micrometer:micrometer-bom:${micrometerVersion}")
+        implementation platform("io.micrometer:micrometer-tracing-bom:${micrometerTracingVersion}")
+        implementation "io.micrometer:context-propagation:${contextPropagationVersion}" // TODO: This should come from tracing
+    }
+
     repositories {
         mavenLocal()
         mavenCentral()
