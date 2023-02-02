@@ -46,6 +46,7 @@ subprojects {
     }
 
     repositories {
+        mavenLocal()
         mavenCentral()
         if ("${springBootVersion}".endsWith("SNAPSHOT") || "${springCloudVersion}".endsWith("SNAPSHOT")) {
             maven { url "https://repo.spring.io/snapshot" }
