@@ -1,9 +1,9 @@
 buildscript {
 	repositories {
 		gradlePluginPortal()
-        if ("${springBootVersion}".endsWith("SNAPSHOT") || "${springCloudVersion}".endsWith("SNAPSHOT")) {
-            maven { url "https://repo.spring.io/snapshot" }
-        }
+		if (springBootVersion.endsWith('SNAPSHOT') || springCloudVersion.endsWith('SNAPSHOT')) {
+			maven { url 'https://repo.spring.io/snapshot' }
+		}
 	}
 	dependencies {
 		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"

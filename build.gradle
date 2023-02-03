@@ -45,17 +45,10 @@ subprojects {
         }
     }
 
-    dependencies {
-        implementation platform("io.micrometer:micrometer-bom:${micrometerVersion}")
-        implementation platform("io.micrometer:micrometer-tracing-bom:${micrometerTracingVersion}")
-        implementation "io.micrometer:context-propagation:${contextPropagationVersion}" // TODO: This should come from tracing
-    }
-
     repositories {
-        mavenLocal()
         mavenCentral()
-        if ("${springBootVersion}".endsWith("SNAPSHOT") || "${springCloudVersion}".endsWith("SNAPSHOT")) {
-            maven { url "https://repo.spring.io/snapshot" }
+        if (springBootVersion.endsWith('SNAPSHOT') || springCloudVersion.endsWith('SNAPSHOT')) {
+            maven { url 'https://repo.spring.io/snapshot' }
         }
     }
 
@@ -63,6 +56,11 @@ subprojects {
         // JSR-305 only used for non-required meta-annotations
         optionalApi 'com.google.code.findbugs:jsr305:latest.release'
         checkstyle 'io.spring.javaformat:spring-javaformat-checkstyle:latest.release'
+
+        // TODO: This is temporary till the next patch release, this should be duplicated in every sub-project
+        implementation platform("io.micrometer:micrometer-bom:${micrometerVersion}")
+        implementation platform("io.micrometer:micrometer-tracing-bom:${micrometerTracingVersion}")
+        implementation "io.micrometer:context-propagation:${contextPropagationVersion}"
     }
 
     tasks {
