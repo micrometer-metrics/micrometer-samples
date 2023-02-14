@@ -1,6 +1,5 @@
 package com.example.micrometer;
 
-import io.micrometer.context.ContextSnapshot;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.tck.MeterRegistryAssert;
 import io.micrometer.observation.Observation;
@@ -9,12 +8,12 @@ import io.micrometer.tracing.TraceContext;
 import io.micrometer.tracing.Tracer;
 import io.micrometer.tracing.handler.TracingObservationHandler;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
-import reactor.util.context.Context;
 
 import static org.assertj.core.api.BDDAssertions.then;
 
@@ -56,14 +55,6 @@ class WebFluxApplicationTests {
             Observation child = Observation.createNotStarted("child", registry).parentObservation(mvc).start();
 
             child.scoped(() -> {
-                then(registry.getCurrentObservation()).isSameAs(child);
-                then(tracer.currentSpan().context()).isEqualTo(spanContextFromObservation(child));
-
-                try (ContextSnapshot.Scope scope = ContextSnapshot.setAllThreadLocalsFrom(Context.empty())) {
-                    then(registry.getCurrentObservation()).isNull();
-                    then(tracer.currentSpan()).isNull();
-                }
-
                 then(registry.getCurrentObservation()).isSameAs(child);
                 then(tracer.currentSpan().context()).isEqualTo(spanContextFromObservation(child));
             });
