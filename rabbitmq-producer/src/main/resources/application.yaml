@@ -1,6 +1,6 @@
 spring:
   application:
-    name: rabbitmq-consumer
+    name: rabbitmq-producer
 
 management:
   tracing:
