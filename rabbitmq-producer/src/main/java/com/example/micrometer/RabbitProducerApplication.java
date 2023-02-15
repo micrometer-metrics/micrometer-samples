@@ -58,8 +58,8 @@ public class RabbitProducerApplication implements CommandLineRunner {
 
 @Service
 class MyRabbitProducer {
-    private static final Logger log = LoggerFactory.getLogger(MessageListener.class);
 
+    private static final Logger log = LoggerFactory.getLogger(MessageListener.class);
 
     private final Tracer tracer;
 
@@ -79,4 +79,5 @@ class MyRabbitProducer {
             rabbitTemplate.convertAndSend("fanout.ex", "", "Sample message using amqp template");
         });
     }
+
 }

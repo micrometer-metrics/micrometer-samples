@@ -54,8 +54,8 @@ public class RabbitConsumerApplication implements CommandLineRunner {
 
 @Service
 class MyRabbitListener {
-    private static final Logger log = LoggerFactory.getLogger(MessageListener.class);
 
+    private static final Logger log = LoggerFactory.getLogger(MessageListener.class);
 
     private final Tracer tracer;
 
@@ -73,4 +73,5 @@ class MyRabbitListener {
             log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", this.tracer.currentSpan().context().traceId());
         });
     }
+
 }
