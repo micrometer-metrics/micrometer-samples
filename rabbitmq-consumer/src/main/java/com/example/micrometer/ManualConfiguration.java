@@ -1,7 +1,7 @@
 package com.example.micrometer;
 
 import org.springframework.amqp.rabbit.config.ContainerCustomizer;
-import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 public class ManualConfiguration {
 
     @Bean
-    ContainerCustomizer<AbstractMessageListenerContainer> containerCustomizer() {
+    ContainerCustomizer<SimpleMessageListenerContainer> containerCustomizer() {
         return (container) -> container.setObservationEnabled(true);
     }
 
