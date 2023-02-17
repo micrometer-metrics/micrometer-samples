@@ -5,12 +5,7 @@ import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.Exchange;
-import org.springframework.amqp.core.FanoutExchange;
-import org.springframework.amqp.core.MessageListener;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.WebApplicationType;
@@ -22,9 +17,9 @@ import org.springframework.stereotype.Service;
 @SpringBootApplication
 public class RabbitConsumerApplication implements CommandLineRunner {
 
-    private static final String EXCHANGE_NAME = "fanout.ex";
+    private static final String EXCHANGE_NAME = "test.exchange";
 
-    private static final String QUEUE_NAME = "queue.ex";
+    private static final String QUEUE_NAME = "test.queue";
 
     public static void main(String... args) {
         new SpringApplicationBuilder(RabbitConsumerApplication.class).web(WebApplicationType.NONE).run(args);
@@ -66,7 +61,7 @@ class MyRabbitListener {
         this.observationRegistry = observationRegistry;
     }
 
-    @RabbitListener(queues = "queue.ex")
+    @RabbitListener(queues = "test.queue")
     public void receiveMessage(String message) {
         Observation.createNotStarted("on-message", this.observationRegistry).observe(() -> {
             log.info("Got message <{}>", message);

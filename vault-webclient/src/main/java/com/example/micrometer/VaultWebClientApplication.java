@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.vault.client.WebClientCustomizer;
 import org.springframework.vault.core.ReactiveVaultTemplate;
 import org.springframework.vault.support.VaultResponse;
+import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -25,6 +26,7 @@ import java.time.Duration;
 public class VaultWebClientApplication {
 
     public static void main(String... args) {
+        Hooks.enableAutomaticContextPropagation();
         new SpringApplicationBuilder(VaultWebClientApplication.class).web(WebApplicationType.NONE).run(args);
     }
 
@@ -50,7 +52,7 @@ class Config {
     }
 
     @Bean
-    WebClientCustomizer testWebClientCustomizer(Tracer tracer) {
+    WebClientCustomizer testWebClientCustomizer(Tracer tracer, ObservationRegistry observationRegistry) {
         return webClientBuilder -> webClientBuilder.filter((request, next) -> Mono.deferContextual(contextView -> {
             try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
                     ObservationThreadLocalAccessor.KEY)) {

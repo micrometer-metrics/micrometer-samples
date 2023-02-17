@@ -23,9 +23,9 @@ import org.springframework.stereotype.Service;
 @SpringBootApplication
 public class RabbitProducerApplication implements CommandLineRunner {
 
-    private static final String EXCHANGE_NAME = "fanout.ex";
+    static final String EXCHANGE_NAME = "test.exchange";
 
-    private static final String QUEUE_NAME = "queue.ex";
+    private static final String QUEUE_NAME = "test.queue";
 
     public static void main(String... args) {
         new SpringApplicationBuilder(RabbitProducerApplication.class).web(WebApplicationType.NONE).run(args);
@@ -76,7 +76,8 @@ class MyRabbitProducer {
     public void call() {
         Observation.createNotStarted("rabbit-producer", this.observationRegistry).observe(() -> {
             log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", this.tracer.currentSpan().context().traceId());
-            rabbitTemplate.convertAndSend("fanout.ex", "", "Sample message using amqp template");
+            rabbitTemplate.convertAndSend(RabbitProducerApplication.EXCHANGE_NAME, "",
+                    "Sample message using amqp template");
         });
     }
 
