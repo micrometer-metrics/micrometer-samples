@@ -1,6 +1,5 @@
 package com.example.micrometer;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,7 +40,6 @@ class AcceptanceTests extends AcceptanceTestsBase {
         assertThatTraceIdGotPropagated(producerId, consumerId);
     }
 
-    @Disabled("TODO: https://github.com/OpenFeign/feign/pull/1760") // TODO: Fix me
     @Test
     void should_pass_tracing_context_from_openfeign_to_web(TestInfo testInfo) throws Exception {
         // given

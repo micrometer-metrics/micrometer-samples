@@ -55,6 +55,18 @@ class RabbitAcceptanceTests extends AcceptanceTestsBase {
         assertThatTraceIdGotPropagated(producerId);
     }
 
+    @Test
+    void should_pass_tracing_context_from_rabbit_producer_to_consumer(TestInfo testInfo) throws Exception {
+        // given
+        String consumerId = wait10seconds(() -> deploy(testInfo, "rabbitmq-consumer", brokerSetup()));
+
+        // when
+        String producerId = deploy(testInfo, "rabbitmq-producer", brokerSetup());
+
+        // then
+        assertThatTraceIdGotPropagated(producerId, consumerId);
+    }
+
     private Map<String, String> brokerSetup() {
         return Map.of("spring.rabbitmq.port", broker.getAmqpPort().toString());
     }
