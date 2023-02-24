@@ -52,6 +52,7 @@ public class SecurityConfiguration {
                 })).httpBasic(withDefaults()).formLogin(withDefaults()).build();
     }
 
+    @SuppressWarnings("deprecation")
     @Bean
     InMemoryUserDetailsManager userDetailsService() {
         return new InMemoryUserDetailsManager(

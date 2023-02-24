@@ -14,6 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 
@@ -21,7 +23,7 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "debug=true")
 class VaultWebClientApplicationTests {
 
-    static WireMockServer wireMockServer = new WireMockServer(wireMockConfig().port(8200));
+    static WireMockServer wireMockServer = new WireMockServer(wireMockConfig().dynamicPort());
 
     @LocalServerPort
     int port;
@@ -39,6 +41,11 @@ class VaultWebClientApplicationTests {
     @AfterAll
     static void close() {
         wireMockServer.stop();
+    }
+
+    @DynamicPropertySource
+    static void vaultProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.cloud.vault.port", () -> wireMockServer.port());
     }
 
     @Test

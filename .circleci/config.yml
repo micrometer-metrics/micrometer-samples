@@ -33,7 +33,7 @@ commands:
           command: java --version
       - run:
           name: run gradle command
-          command: ./gradlew << parameters.command >> --refresh-dependencies --no-build-cache
+          command: ./gradlew << parameters.command >> --refresh-dependencies
       - run:
           name: collect test reports
           when: always
@@ -46,16 +46,32 @@ commands:
           path: ~/micrometer-samples/test-results/
 
 jobs:
-  build:
+  brave-build:
     executor: machine-executor
     steps:
       - gradlew-build
+  otel-build:
+    executor: machine-executor
+    steps:
+      - gradlew-build:
+          command: -Potel
+  nightly-brave-build:
+    executor: machine-executor
+    steps:
+      - gradlew-build:
+          command: --no-build-cache
+  nightly-otel-build:
+    executor: machine-executor
+    steps:
+      - gradlew-build:
+          command: -Potel --no-build-cache
 
 workflows:
   version: 2
   build_prs:
     jobs:
-      - build
+      - brave-build
+      - otel-build
   nightly:
     triggers:
       - schedule:
@@ -64,5 +80,7 @@ workflows:
             branches:
               only:
                 - main
+                - latest-snapshots
     jobs:
-      - build
+      - nightly-brave-build
+      - nightly-otel-build

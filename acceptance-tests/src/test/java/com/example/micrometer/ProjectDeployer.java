@@ -107,6 +107,7 @@ class ProjectDeployer {
     private AppDeploymentRequest appRequest(String appName, Map<String, String> props) {
         Map<String, String> map = new HashMap<>(props);
         attachWavefrontConfigurationIfPresent(map);
+        makeCloud2022WorkWithBoot3_1(map);
         AppDefinition appDefinition = new AppDefinition(appName, map);
         return deploymentRequest(appName, appDefinition);
     }
@@ -118,6 +119,10 @@ class ProjectDeployer {
             }
             map.put("management.metrics.export.wavefront.api-token", System.getenv("WAVEFRONT_API_TOKEN"));
         }
+    }
+
+    private void makeCloud2022WorkWithBoot3_1(Map<String, String> map) {
+        map.put("spring.cloud.compatibility-verifier.compatible-boot-versions", "3.0.x,3.1.x");
     }
 
     private AppDeploymentRequest deploymentRequest(String appName, AppDefinition appDefinition) {

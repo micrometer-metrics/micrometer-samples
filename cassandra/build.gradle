@@ -1,49 +1,40 @@
 buildscript {
 	repositories {
-		maven { url 'https://repo.spring.io/milestone' }
-		maven { url 'https://repo.spring.io/snapshot' }
 		gradlePluginPortal()
+		if (springBootVersion.endsWith('SNAPSHOT') || springCloudVersion.endsWith('SNAPSHOT')) {
+			maven { url 'https://repo.spring.io/snapshot' }
+		}
 	}
 	dependencies {
 		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
-		classpath "io.spring.gradle:dependency-management-plugin:$springDependencyManagementPlugin"
 	}
 }
 
 apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
-
-repositories {
-	mavenCentral()
-	maven { url 'https://repo.spring.io/milestone' }
-	maven { url 'https://repo.spring.io/snapshot' }
-}
-
-ext {
-	testContainersVersion="1.17.4"
-}
 
 dependencies {
+	implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-
-	implementation 'org.springframework.data:spring-data-cassandra:4.0.0-SNAPSHOT' // TODO: Remove
 	implementation 'org.springframework.boot:spring-boot-starter-data-cassandra'
+	implementation 'io.micrometer:micrometer-registry-prometheus'
 
-	implementation "io.micrometer:micrometer-tracing-bridge-${project.hasProperty("brave") ? "brave" : "otel" }"
-	// Default is OTel + Zipkin. You can opt in via "wavefront" to Wavefront and "brave" for Brave
-	if (project.hasProperty("wavefront")) {
-		implementation "io.micrometer:micrometer-tracing-reporter-wavefront"
-	} else {
-		implementation 'io.zipkin.reporter2:zipkin-sender-urlconnection' // we need a way to send spans to Zipkin
+	// Default is Brave + Zipkin, you can opt in via "-Pwavefront" to Wavefront and "-Potel" for OTel
+	if (project.hasProperty('wavefront')) {
+		implementation 'io.micrometer:micrometer-tracing-reporter-wavefront'
 	}
-	if (project.hasProperty("brave")) {
+	if (project.hasProperty('otel')) {
+		implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+		implementation 'io.opentelemetry:opentelemetry-exporter-zipkin'
+	}
+	else {
+		implementation 'io.micrometer:micrometer-tracing-bridge-brave'
 		implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
-	} else {
-		implementation "io.opentelemetry:opentelemetry-exporter-zipkin"
 	}
 
 	testImplementation project(':test-common')
+	testImplementation platform('org.testcontainers:testcontainers-bom:1.+')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation "org.testcontainers:junit-jupiter:${testContainersVersion}"
-	testImplementation "org.testcontainers:cassandra:${testContainersVersion}"
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testImplementation 'org.testcontainers:cassandra'
 }

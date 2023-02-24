@@ -13,9 +13,7 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 17
@@ -25,8 +23,5 @@ jobs:
         java-version: 17
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
-
-#    - name: Clone the projects
-#      run: ./scripts/build_all_projects_locally.sh
     - name: Execute Gradle build with Brave
-      run: ./gradlew -Pbrave acceptanceTest --rerun-tasks
+      run: ./gradlew acceptanceTest --rerun-tasks

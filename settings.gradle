@@ -1,15 +1,12 @@
 pluginManagement {
     repositories {
-        mavenCentral()
-        maven { url 'https://repo.spring.io/release' }
-        // resolve last due to intermittent jcenter issues
         gradlePluginPortal()
     }
 }
 
 plugins {
-    id 'com.gradle.enterprise' version '3.11.3'
-    id 'io.spring.ge.conventions' version '0.0.11'
+    id 'com.gradle.enterprise' version '3.12.3'
+    id 'io.spring.ge.conventions' version '0.0.13'
 }
 
 rootProject.name = 'micrometer-samples'
@@ -36,14 +33,19 @@ include 'config-server'
 include 'data'
 include 'data-reactive'
 include 'gateway'
+include 'grpc-client'
+include 'grpc-server'
 include 'integration'
 include 'kafka-producer'
 include 'kafka-consumer'
-include 'micrometer-samples-boot3'
+include 'micrometer-samples-boot3-web'
+include 'micrometer-samples-boot3-database'
+include 'micrometer-samples-native-image'
 include 'mongodb-reactive'
-include 'mvc'
 include 'openfeign'
 include 'resttemplate'
+include 'rabbitmq-producer'
+include 'rabbitmq-consumer'
 include 'rsocket-client'
 include 'rsocket-server'
 include 'security'
