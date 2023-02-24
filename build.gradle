@@ -49,6 +49,7 @@ subprojects {
         mavenCentral()
         if (springBootVersion.endsWith('SNAPSHOT') || springCloudVersion.endsWith('SNAPSHOT')) {
             maven { url 'https://repo.spring.io/snapshot' }
+            maven { url 'https://repo.spring.io/milestone' }
         }
     }
 
