@@ -24,7 +24,6 @@ dependencies {
 
 test {
 	exclude('com/example/**')
-	environment "SPRING_CLOUD_COMPATIBILITY_VERIFIER_ENABLED", "false"
 }
 
 task acceptanceTest(type: Test) {
@@ -33,7 +32,6 @@ task acceptanceTest(type: Test) {
 		.each { dependsOn ":$it.name:publishToMavenLocal" }
 
 	useJUnitPlatform()
-	environment "SPRING_CLOUD_COMPATIBILITY_VERIFIER_ENABLED", "false"
 }
 
 check {

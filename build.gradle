@@ -115,8 +115,6 @@ subprojects {
         maxHeapSize = "1500m"
 
         useJUnitPlatform()
-        
-        environment "SPRING_CLOUD_COMPATIBILITY_VERIFIER_ENABLED", "false"
 
         retry {
             maxFailures = 5
