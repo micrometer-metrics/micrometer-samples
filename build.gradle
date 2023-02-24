@@ -47,6 +47,10 @@ subprojects {
 
     repositories {
         mavenCentral()
+        if (springBootVersion.endsWith('SNAPSHOT') || springCloudVersion.endsWith('SNAPSHOT')) {
+            maven { url 'https://repo.spring.io/snapshot' }
+            maven { url 'https://repo.spring.io/milestone' }
+        }
     }
 
     dependencies {
@@ -54,22 +58,10 @@ subprojects {
         optionalApi 'com.google.code.findbugs:jsr305:latest.release'
         checkstyle 'io.spring.javaformat:spring-javaformat-checkstyle:latest.release'
 
-        if (project.name !in ['acceptance-tests', 'test-common', 'micrometer-samples-native-image']) {
-            implementation 'io.micrometer:micrometer-registry-prometheus'
-
-            // Default is OTel + Zipkin, you can opt in via "wavefront" to Wavefront and "brave" for Brave
-            if (project.hasProperty('wavefront')) {
-                implementation 'io.micrometer:micrometer-tracing-reporter-wavefront'
-            }
-            if (project.hasProperty('brave')) {
-                implementation 'io.micrometer:micrometer-tracing-bridge-brave'
-                implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
-            }
-            else {
-                implementation 'io.micrometer:micrometer-tracing-bridge-otel'
-                implementation 'io.opentelemetry:opentelemetry-exporter-zipkin'
-            }
-        }
+        // TODO: This is temporary till the next patch release, this should be duplicated in every sub-project
+        implementation platform("io.micrometer:micrometer-bom:${micrometerVersion}")
+        implementation platform("io.micrometer:micrometer-tracing-bom:${micrometerTracingVersion}")
+        implementation "io.micrometer:context-propagation:${contextPropagationVersion}"
     }
 
     tasks {
@@ -87,7 +79,7 @@ subprojects {
         }
 
         javadoc {
-                enabled = false
+            enabled = false
         }
     }
 
@@ -141,18 +133,6 @@ subprojects {
     }
 
     plugins.withId('org.graalvm.buildtools.native') {
-        graalvmNative {
-            binaries {
-                main {
-                    javaLauncher = javaToolchains.launcherFor {
-                        languageVersion = JavaLanguageVersion.of(17)
-                        requiredVersion = '22.3'
-                        vendor = JvmVendorSpec.matching('GraalVM Community')
-                    }
-                }
-            }
-        }
-
         // TODO: Run nativeTest on build once we have GraalVM on CI
         // TODO: OTel Trcing does not work on native
         // check.dependsOn('nativeTest')

@@ -1,6 +1,9 @@
 buildscript {
 	repositories {
 		gradlePluginPortal()
+		if (springBootVersion.endsWith('SNAPSHOT') || springCloudVersion.endsWith('SNAPSHOT')) {
+			maven { url 'https://repo.spring.io/snapshot' }
+		}
 	}
 	dependencies {
 		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
@@ -16,6 +19,20 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'io.grpc:grpc-netty'
 	implementation 'io.grpc:grpc-testing-proto'
+	implementation 'io.micrometer:micrometer-registry-prometheus'
+
+	// Default is Brave + Zipkin, you can opt in via "-Pwavefront" to Wavefront and "-Potel" for OTel
+	if (project.hasProperty('wavefront')) {
+		implementation 'io.micrometer:micrometer-tracing-reporter-wavefront'
+	}
+	if (project.hasProperty('otel')) {
+		implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+		implementation 'io.opentelemetry:opentelemetry-exporter-zipkin'
+	}
+	else {
+		implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+		implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+	}
 
 	testImplementation project(':test-common')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

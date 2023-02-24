@@ -46,32 +46,32 @@ commands:
           path: ~/micrometer-samples/test-results/
 
 jobs:
-  otel-build:
-    executor: machine-executor
-    steps:
-      - gradlew-build
   brave-build:
     executor: machine-executor
     steps:
-      - gradlew-build:
-          command: -Pbrave
-  nightly-otel-build:
+      - gradlew-build
+  otel-build:
     executor: machine-executor
     steps:
       - gradlew-build:
-          command: --no-build-cache
+          command: -Potel
   nightly-brave-build:
     executor: machine-executor
     steps:
       - gradlew-build:
-          command: -Pbrave --no-build-cache
+          command: --no-build-cache
+  nightly-otel-build:
+    executor: machine-executor
+    steps:
+      - gradlew-build:
+          command: -Potel --no-build-cache
 
 workflows:
   version: 2
   build_prs:
     jobs:
-      - otel-build
       - brave-build
+      - otel-build
   nightly:
     triggers:
       - schedule:
@@ -80,6 +80,7 @@ workflows:
             branches:
               only:
                 - main
+                - latest-snapshots
     jobs:
-      - nightly-otel-build
       - nightly-brave-build
+      - nightly-otel-build
