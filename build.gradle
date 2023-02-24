@@ -149,19 +149,6 @@ subprojects {
                 checkstyleAotTest.enabled = false
             }
         }
-
-        if (project.name !in ['micrometer-samples-native-image']) {
-            // This is a hack to prevent collectReachabilityMetadata tasks running in parallel
-            // see: https://github.com/graalvm/native-build-tools/issues/387
-            collectReachabilityMetadata {
-                File fakeOutput = file("$rootProject.buildDir/collectReachabilityMetadata.txt")
-                outputs.file(fakeOutput)
-                doLast {
-                    mkdir fakeOutput.parentFile
-                    fakeOutput.text = "$project.name"
-                }
-            }
-        }
     }
 
     project.tasks.withType(Test) { Test testTask ->
