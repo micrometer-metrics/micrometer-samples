@@ -67,8 +67,11 @@ class SampleController {
 
     @GetMapping("/people")
     List<String> allPeople() {
-        return Observation.createNotStarted("allPeople", registry).observe(slowDown(() -> jdbcTemplate
-                .queryForList("SELECT * FROM emp").stream().map(map -> map.get("name").toString()).toList()));
+        return Observation.createNotStarted("allPeople", registry)
+            .observe(slowDown(() -> jdbcTemplate.queryForList("SELECT * FROM emp")
+                .stream()
+                .map(map -> map.get("name").toString())
+                .toList()));
     }
 
     @GetMapping("/greet/{name}")

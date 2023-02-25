@@ -30,8 +30,9 @@ public class ReactiveDataApplication {
             try {
                 Observation observation = Observation.start("reactive-data", observationRegistry);
                 reactiveNewTransactionService.newTransaction()
-                        .contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation))
-                        .doFinally(signalType -> observation.stop()).block(Duration.ofSeconds(50));
+                    .contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation))
+                    .doFinally(signalType -> observation.stop())
+                    .block(Duration.ofSeconds(50));
             }
             catch (DataAccessException e) {
                 log.info("Expected to throw an exception so that we see if rollback works", e);

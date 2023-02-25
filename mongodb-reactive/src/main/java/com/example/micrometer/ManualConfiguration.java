@@ -21,9 +21,9 @@ public class ManualConfiguration {
     MongoClientSettingsBuilderCustomizer mongoObservabilityCustomizer(ObservationRegistry observationRegistry,
             MongoProperties mongoProperties) {
         return clientSettingsBuilder -> clientSettingsBuilder
-                .contextProvider(ContextProviderFactory.create(observationRegistry))
-                .addCommandListener(new MongoObservationCommandListener(observationRegistry,
-                        new ConnectionString(mongoProperties.determineUri())));
+            .contextProvider(ContextProviderFactory.create(observationRegistry))
+            .addCommandListener(new MongoObservationCommandListener(observationRegistry,
+                    new ConnectionString(mongoProperties.determineUri())));
 
     }
 

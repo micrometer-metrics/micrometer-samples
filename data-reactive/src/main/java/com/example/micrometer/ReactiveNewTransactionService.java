@@ -44,18 +44,20 @@ public class ReactiveNewTransactionService {
             }
             // save a few customers
             return repository.save(new ReactiveCustomer("Jack", "Bauer"));
-        }).then(repository.save(new ReactiveCustomer("Chloe", "O'Brian")))
-                .then(repository.save(new ReactiveCustomer("Kim", "Bauer")))
-                .then(repository.save(new ReactiveCustomer("David", "Palmer")))
-                .then(repository.save(new ReactiveCustomer("Michelle", "Dessler")))
-                .flatMapMany(reactiveCustomer -> repository.findAll()).transformDeferredContextual(
-                        (reactiveCustomerFlux, contextView) -> reactiveCustomerFlux.doOnNext(reactiveCustomer -> {
-                            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
-                                    ObservationThreadLocalAccessor.KEY)) {
-                                log.info(reactiveCustomer.toString());
-                            }
-                        }))
-                .then(this.reactiveContinuedTransactionService.continuedTransaction());
+        })
+            .then(repository.save(new ReactiveCustomer("Chloe", "O'Brian")))
+            .then(repository.save(new ReactiveCustomer("Kim", "Bauer")))
+            .then(repository.save(new ReactiveCustomer("David", "Palmer")))
+            .then(repository.save(new ReactiveCustomer("Michelle", "Dessler")))
+            .flatMapMany(reactiveCustomer -> repository.findAll())
+            .transformDeferredContextual(
+                    (reactiveCustomerFlux, contextView) -> reactiveCustomerFlux.doOnNext(reactiveCustomer -> {
+                        try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+                                ObservationThreadLocalAccessor.KEY)) {
+                            log.info(reactiveCustomer.toString());
+                        }
+                    }))
+            .then(this.reactiveContinuedTransactionService.continuedTransaction());
 
     }
 

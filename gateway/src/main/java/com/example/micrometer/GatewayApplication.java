@@ -29,16 +29,18 @@ public class GatewayApplication implements CommandLineRunner {
     @Bean
     RouteLocator myRouteLocator(RouteLocatorBuilder builder, Tracer tracer,
             @Value("${url:http://localhost:7100}") String url) {
-        return builder.routes().route("mvc_route",
-                route -> route.path("/mvc/**").filters(f -> f.stripPrefix(1).filter((exchange, chain) -> {
-                    Observation gatewayObservation = exchange
+        return builder.routes()
+            .route("mvc_route",
+                    route -> route.path("/mvc/**").filters(f -> f.stripPrefix(1).filter((exchange, chain) -> {
+                        Observation gatewayObservation = exchange
                             .getRequiredAttribute(ServerWebExchangeUtils.GATEWAY_OBSERVATION_ATTR);
-                    gatewayObservation.scoped(() -> {
-                        String traceId = tracer.currentSpan().context().traceId();
-                        log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", traceId);
-                    });
-                    return chain.filter(exchange);
-                }, Ordered.LOWEST_PRECEDENCE)).uri(url)).build();
+                        gatewayObservation.scoped(() -> {
+                            String traceId = tracer.currentSpan().context().traceId();
+                            log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", traceId);
+                        });
+                        return chain.filter(exchange);
+                    }, Ordered.LOWEST_PRECEDENCE)).uri(url))
+            .build();
     }
 
     @Autowired

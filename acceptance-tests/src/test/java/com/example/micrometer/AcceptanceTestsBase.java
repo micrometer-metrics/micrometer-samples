@@ -30,12 +30,12 @@ class AcceptanceTestsBase {
     TracingAssertions tracingAssertions;
 
     AcceptanceTestsBase() {
-        Runtime.getRuntime().addShutdownHook(
-                new Thread(() -> projectDeployer.getIds().forEach((key, values) -> values.forEach(id -> {
-                    if (projectDeployer.status(id).getState() != DeploymentState.undeployed) {
-                        undeploy(id);
-                    }
-                }))));
+        Runtime.getRuntime()
+            .addShutdownHook(new Thread(() -> projectDeployer.getIds().forEach((key, values) -> values.forEach(id -> {
+                if (projectDeployer.status(id).getState() != DeploymentState.undeployed) {
+                    undeploy(id);
+                }
+            }))));
     }
 
     String deployWebApp(TestInfo testInfo, String appName, int port) {

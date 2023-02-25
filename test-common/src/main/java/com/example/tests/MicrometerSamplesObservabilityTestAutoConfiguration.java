@@ -68,10 +68,12 @@ public class MicrometerSamplesObservabilityTestAutoConfiguration {
 
         private void storeAsFile(File output, List<NameAndTags> nameAndTags) throws IOException {
             String lines = nameAndTags.stream()
-                    .map(nt -> this.appName + ";" + nt.name + ";"
-                            + nt.tags.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
-                                    .collect(Collectors.joining(",")))
-                    .collect(Collectors.joining(System.lineSeparator()));
+                .map(nt -> this.appName + ";" + nt.name + ";"
+                        + nt.tags.entrySet()
+                            .stream()
+                            .map(e -> e.getKey() + "=" + e.getValue())
+                            .collect(Collectors.joining(",")))
+                .collect(Collectors.joining(System.lineSeparator()));
 
             Files.writeString(output.toPath(), lines);
         }
@@ -157,9 +159,9 @@ public class MicrometerSamplesObservabilityTestAutoConfiguration {
 
         static List<NameAndTags> fromMetrics(List<Meter> meters) {
             return meters.stream()
-                    .map(meter -> new NameAndTags(meter.getId().getName(),
-                            meter.getId().getTags().stream().collect(Collectors.toMap(Tag::getKey, Tag::getValue))))
-                    .toList();
+                .map(meter -> new NameAndTags(meter.getId().getName(),
+                        meter.getId().getTags().stream().collect(Collectors.toMap(Tag::getKey, Tag::getValue))))
+                .toList();
         }
 
         static List<NameAndTags> fromSpans(List<FinishedSpan> spans) {

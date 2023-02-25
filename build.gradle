@@ -12,7 +12,7 @@ buildscript {
         // Because of this, it fails Boot's mainClass lookup mechanism, we need to find a better way to guard license headers
         // classpath ('gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1')
         classpath 'io.spring.nohttp:nohttp-gradle:0.0.10'
-        classpath 'io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.35'
+        classpath 'io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.38'
     }
 
     configurations.classpath.resolutionStrategy.cacheDynamicVersionsFor 0, 'minutes'

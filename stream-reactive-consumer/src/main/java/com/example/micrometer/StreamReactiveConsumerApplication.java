@@ -31,8 +31,10 @@ public class StreamReactiveConsumerApplication implements CommandLineRunner {
 
     @Bean
     Consumer<Flux<Message<String>>> channel(Tracer tracer, ObservationRegistry observationRegistry) {
-        return flux -> flux.doOnNext(msg -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
-                tracer.currentSpan().context().traceId())).subscribe();
+        return flux -> flux
+            .doOnNext(msg -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
+                    tracer.currentSpan().context().traceId()))
+            .subscribe();
     }
 
 }

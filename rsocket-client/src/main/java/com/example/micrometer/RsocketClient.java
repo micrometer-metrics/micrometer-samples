@@ -82,8 +82,9 @@ class RsocketService {
                         this.tracer.currentSpan().context().traceId());
             }
             return this.rSocketRequester.route("foo").retrieveMono(String.class);
-        }).contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, client))
-                .doFinally(signalType -> client.stop());
+        })
+            .contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, client))
+            .doFinally(signalType -> client.stop());
     }
 
 }

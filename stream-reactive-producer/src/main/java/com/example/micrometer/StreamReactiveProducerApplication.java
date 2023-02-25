@@ -48,15 +48,15 @@ public class StreamReactiveProducerApplication implements CommandLineRunner {
     // @PollableBean
     Supplier<Flux<String>> supplier(Tracer tracer) {
         return () -> Flux.just("HELLO")
-                .doOnNext(s -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer supplier mono",
-                        tracer.currentSpan().context().traceId()));
+            .doOnNext(s -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer supplier mono",
+                    tracer.currentSpan().context().traceId()));
     }
 
     // @PollableBean
     Supplier<Flux<String>> stringSupplier(Tracer tracer) {
         return () -> Flux.just("a", "b")
-                .doOnNext(s -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer supplier flux",
-                        tracer.currentSpan().context().traceId()));
+            .doOnNext(s -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer supplier flux",
+                    tracer.currentSpan().context().traceId()));
     }
 
 }

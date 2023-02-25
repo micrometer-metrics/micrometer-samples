@@ -73,8 +73,9 @@ class WebClientService {
             observation.scoped(() -> log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
                     this.tracer.currentSpan().context().traceId()));
             return this.webClient.get().retrieve().bodyToMono(String.class);
-        }).doFinally(signalType -> observation.stop())
-                .contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation));
+        })
+            .doFinally(signalType -> observation.stop())
+            .contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation));
     }
 
 }

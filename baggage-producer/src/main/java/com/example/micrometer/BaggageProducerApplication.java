@@ -51,11 +51,12 @@ class Config {
     @Bean
     RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder
-                // Test code to print out all headers - you don't need this code
-                .additionalInterceptors((request, body, execution) -> {
-                    request.getHeaders().forEach((s, strings) -> LOGGER.info("HEADER [{}] VALUE {}", s, strings));
-                    return execution.execute(request, body);
-                }).build();
+            // Test code to print out all headers - you don't need this code
+            .additionalInterceptors((request, body, execution) -> {
+                request.getHeaders().forEach((s, strings) -> LOGGER.info("HEADER [{}] VALUE {}", s, strings));
+                return execution.execute(request, body);
+            })
+            .build();
     }
 
 }
@@ -81,9 +82,11 @@ class BaggageRestTemplateService {
                 LOGGER.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
                         this.tracer.currentSpan().context().traceId());
                 LOGGER.info("<BAGGAGE VALUE: {}> Baggage is set", baggage.get());
-                return this.restTemplate.exchange(
-                        RequestEntity.get(URI.create(url)).header("myremotefield", "my-remote-field-value").build(),
-                        String.class).getBody();
+                return this.restTemplate
+                    .exchange(
+                            RequestEntity.get(URI.create(url)).header("myremotefield", "my-remote-field-value").build(),
+                            String.class)
+                    .getBody();
             }
         }
         finally {

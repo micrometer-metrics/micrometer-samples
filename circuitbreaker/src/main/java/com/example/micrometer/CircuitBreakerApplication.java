@@ -51,15 +51,15 @@ class CircuitService {
 
     String call() {
         return Observation.createNotStarted("circuitbreaker", observationRegistry)
-                .observe(() -> this.factory.create("circuit").run(() -> {
-                    log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
-                            this.tracer.currentSpan().context().traceId());
-                    throw new IllegalStateException("BOOM");
-                }, throwable -> {
-                    log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer",
-                            this.tracer.currentSpan().context().traceId());
-                    return "fallback";
-                }));
+            .observe(() -> this.factory.create("circuit").run(() -> {
+                log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
+                        this.tracer.currentSpan().context().traceId());
+                throw new IllegalStateException("BOOM");
+            }, throwable -> {
+                log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer",
+                        this.tracer.currentSpan().context().traceId());
+                return "fallback";
+            }));
     }
 
 }

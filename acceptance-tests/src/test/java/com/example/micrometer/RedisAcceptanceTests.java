@@ -22,7 +22,7 @@ class RedisAcceptanceTests extends AcceptanceTestsBase {
 
     @Container
     static GenericContainer redis = new GenericContainer(DockerImageName.parse("redis:6.2.3-alpine"))
-            .withExposedPorts(6379);
+        .withExposedPorts(6379);
 
     @Disabled("TODO: Add session module back")
     @Test

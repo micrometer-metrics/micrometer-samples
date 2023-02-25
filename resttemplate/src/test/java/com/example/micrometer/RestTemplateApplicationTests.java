@@ -39,8 +39,9 @@ class RestTemplateApplicationTests {
 
     @Test
     void should_record_metrics() {
-        MeterRegistryAssert.then(meterRegistry).hasTimerWithNameAndTagKeys("http.client.requests", "error", "exception",
-                "method", "outcome", "status", "uri");
+        MeterRegistryAssert.then(meterRegistry)
+            .hasTimerWithNameAndTagKeys("http.client.requests", "error", "exception", "method", "outcome", "status",
+                    "uri");
     }
 
 }

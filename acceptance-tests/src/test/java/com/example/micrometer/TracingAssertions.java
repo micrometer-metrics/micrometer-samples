@@ -39,21 +39,26 @@ class TracingAssertions {
             Awaitility.await().pollInterval(1, TimeUnit.SECONDS).atMost(30, TimeUnit.SECONDS).untilAsserted(() -> {
                 AtomicBoolean consumerPresent = new AtomicBoolean();
                 AtomicBoolean producerPresent = new AtomicBoolean();
-                List<String> traceIds = Arrays.stream(appIds).map(this.projectDeployer::getLog)
-                        .flatMap(s -> Arrays.stream(s.split(System.lineSeparator())))
-                        .filter(s -> s.contains("ACCEPTANCE_TEST")).map(s -> {
-                            Matcher matcher = tracePattern.matcher(s);
-                            if (matcher.matches()) {
-                                if (s.contains(expectedConsumerText)) {
-                                    consumerPresent.set(true);
-                                }
-                                else if (s.contains(expectedProducerText)) {
-                                    producerPresent.set(true);
-                                }
-                                return matcher.group(1);
+                List<String> traceIds = Arrays.stream(appIds)
+                    .map(this.projectDeployer::getLog)
+                    .flatMap(s -> Arrays.stream(s.split(System.lineSeparator())))
+                    .filter(s -> s.contains("ACCEPTANCE_TEST"))
+                    .map(s -> {
+                        Matcher matcher = tracePattern.matcher(s);
+                        if (matcher.matches()) {
+                            if (s.contains(expectedConsumerText)) {
+                                consumerPresent.set(true);
                             }
-                            return null;
-                        }).filter(Objects::nonNull).distinct().collect(Collectors.toList());
+                            else if (s.contains(expectedProducerText)) {
+                                producerPresent.set(true);
+                            }
+                            return matcher.group(1);
+                        }
+                        return null;
+                    })
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .collect(Collectors.toList());
                 log.info("Found the following trace id {}", traceIds);
                 then(traceIds).as("TraceId should have only one value").hasSize(1);
                 log.info("Checking if producer code was called");
@@ -66,7 +71,7 @@ class TracingAssertions {
         catch (Throwable er) {
             log.error("Something went wrong! Will print out the application logs\n\n");
             Arrays.stream(appIds)
-                    .forEach(id -> log.error("App with id [" + id + "]\n\n" + this.projectDeployer.getLog(id)));
+                .forEach(id -> log.error("App with id [" + id + "]\n\n" + this.projectDeployer.getLog(id)));
             throw er;
         }
     }
@@ -78,19 +83,22 @@ class TracingAssertions {
             Awaitility.await().pollInterval(1, TimeUnit.SECONDS).atMost(30, TimeUnit.SECONDS).untilAsserted(() -> {
                 AtomicInteger counter = new AtomicInteger();
                 List<String> traceIds = Arrays.stream(this.projectDeployer.getLog(appId).split(System.lineSeparator()))
-                        .map(s -> {
-                            Matcher matcher = pattern.matcher(s);
-                            if (matcher.matches()) {
-                                counter.incrementAndGet();
-                                return matcher.group(1);
-                            }
-                            return null;
-                        }).filter(Objects::nonNull).distinct().collect(Collectors.toList());
+                    .map(s -> {
+                        Matcher matcher = pattern.matcher(s);
+                        if (matcher.matches()) {
+                            counter.incrementAndGet();
+                            return matcher.group(1);
+                        }
+                        return null;
+                    })
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .collect(Collectors.toList());
                 log.info("Found the trace id {} [{}] times. Min required number [{}] ", traceIds, counter.get(),
                         minNumberOfOccurrences);
                 then(traceIds).as("TraceId should have only one value").hasSize(1);
                 then(counter).as("There should be at least X number of times")
-                        .hasValueGreaterThanOrEqualTo(minNumberOfOccurrences);
+                    .hasValueGreaterThanOrEqualTo(minNumberOfOccurrences);
             });
         }
         catch (Throwable er) {

@@ -68,8 +68,9 @@ class CircuitService {
                         this.tracer.currentSpan().context().traceId()));
                 return Mono.just("fallback");
             });
-        }).contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation))
-                .doFinally(signalType -> observation.stop());
+        })
+            .contextWrite(context -> context.put(ObservationThreadLocalAccessor.KEY, observation))
+            .doFinally(signalType -> observation.stop());
     }
 
     private void scoped(ContextView contextView, Runnable runnable) {

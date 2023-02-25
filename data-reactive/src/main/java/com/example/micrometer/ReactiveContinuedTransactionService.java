@@ -40,25 +40,26 @@ public class ReactiveContinuedTransactionService {
                 log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", tracer.currentSpan().context().traceId());
             }
             return repository.findById(1L);
-        }).transformDeferredContextual(
-                (reactiveCustomerMono, contextView) -> reactiveCustomerMono.doOnNext(customer -> {
-                    try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
-                            ObservationThreadLocalAccessor.KEY)) {
-                        // fetch an individual customer by ID
-                        log.info("Customer found with findById(1L):");
-                        log.info("--------------------------------");
-                        log.info(customer.toString());
-                        log.info("");
-                        // fetch customers by last name
-                        log.info("Customer found with findByLastName('Bauer'):");
-                        log.info("--------------------------------------------");
-                    }
-                }).flatMapMany(customer -> repository.findByLastName("Bauer")).doOnNext(reactiveCustomer -> {
-                    try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
-                            ObservationThreadLocalAccessor.KEY)) {
-                        log.info(reactiveCustomer.toString());
-                    }
-                }).then(this.reactiveNestedTransactionService.requiresNew()));
+        })
+            .transformDeferredContextual(
+                    (reactiveCustomerMono, contextView) -> reactiveCustomerMono.doOnNext(customer -> {
+                        try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+                                ObservationThreadLocalAccessor.KEY)) {
+                            // fetch an individual customer by ID
+                            log.info("Customer found with findById(1L):");
+                            log.info("--------------------------------");
+                            log.info(customer.toString());
+                            log.info("");
+                            // fetch customers by last name
+                            log.info("Customer found with findByLastName('Bauer'):");
+                            log.info("--------------------------------------------");
+                        }
+                    }).flatMapMany(customer -> repository.findByLastName("Bauer")).doOnNext(reactiveCustomer -> {
+                        try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+                                ObservationThreadLocalAccessor.KEY)) {
+                            log.info(reactiveCustomer.toString());
+                        }
+                    }).then(this.reactiveNestedTransactionService.requiresNew()));
     }
 
 }

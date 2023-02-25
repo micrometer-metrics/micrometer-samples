@@ -61,8 +61,8 @@ class ObservationRSocketConnectorConfigurer implements RSocketConnectorConfigure
     public void configure(RSocketConnector rSocketConnector) {
         rSocketConnector.interceptors(ir -> ir.forResponder(
                 (RSocketInterceptor) rSocket -> new ObservationResponderRSocketProxy(rSocket, this.observationRegistry))
-                .forRequester((RSocketInterceptor) rSocket -> new ObservationRequesterRSocketProxy(rSocket,
-                        this.observationRegistry)));
+            .forRequester((RSocketInterceptor) rSocket -> new ObservationRequesterRSocketProxy(rSocket,
+                    this.observationRegistry)));
     }
 
 }
@@ -79,8 +79,8 @@ class ObservationRSocketServerCustomizer implements RSocketServerCustomizer {
     public void customize(RSocketServer rSocketServer) {
         rSocketServer.interceptors(ir -> ir.forResponder(
                 (RSocketInterceptor) rSocket -> new ObservationResponderRSocketProxy(rSocket, this.observationRegistry))
-                .forRequester((RSocketInterceptor) rSocket -> new ObservationRequesterRSocketProxy(rSocket,
-                        this.observationRegistry)));
+            .forRequester((RSocketInterceptor) rSocket -> new ObservationRequesterRSocketProxy(rSocket,
+                    this.observationRegistry)));
     }
 
 }

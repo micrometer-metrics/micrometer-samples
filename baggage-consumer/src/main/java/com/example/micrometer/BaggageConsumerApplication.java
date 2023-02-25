@@ -82,8 +82,8 @@ class RemoteFieldsTestChecker {
         this.wireMockServer = new WireMockServer(WireMockConfiguration.options().dynamicPort());
         this.wireMockServer.start();
         this.wireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo("/foo"))
-                .withHeader("myremotefield", WireMock.equalTo("my-remote-field-value"))
-                .willReturn(WireMock.aResponse().withStatus(200).withBody("OK")));
+            .withHeader("myremotefield", WireMock.equalTo("my-remote-field-value"))
+            .willReturn(WireMock.aResponse().withStatus(200).withBody("OK")));
     }
 
     void assertThatFieldGotPropagated() {
@@ -93,8 +93,8 @@ class RemoteFieldsTestChecker {
             throw new IllegalStateException("WireMock failed to respond correctly");
         }
         // [myremotefield] was set in the baggage-producer
-        this.wireMockServer.verify(WireMock.getRequestedFor(WireMock.urlEqualTo("/foo")).withHeader("myremotefield",
-                WireMock.equalTo("my-remote-field-value")));
+        this.wireMockServer.verify(WireMock.getRequestedFor(WireMock.urlEqualTo("/foo"))
+            .withHeader("myremotefield", WireMock.equalTo("my-remote-field-value")));
         log.info("Successfully propagated the headers!");
     }
 

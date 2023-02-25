@@ -38,8 +38,9 @@ class WebFluxApplicationTests {
         String response = new RestTemplate().getForObject("http://localhost:" + port + "/", String.class);
 
         then(response).isNotBlank();
-        MeterRegistryAssert.then(meterRegistry).hasTimerWithNameAndTagKeys("http.server.requests", "error", "exception",
-                "method", "outcome", "status", "uri");
+        MeterRegistryAssert.then(meterRegistry)
+            .hasTimerWithNameAndTagKeys("http.server.requests", "error", "exception", "method", "outcome", "status",
+                    "uri");
     }
 
     @Test
@@ -74,8 +75,9 @@ class WebFluxApplicationTests {
     }
 
     private TraceContext spanContextFromObservation(Observation observation) {
-        TracingObservationHandler.TracingContext tracingContext = observation.getContextView().getOrDefault(
-                TracingObservationHandler.TracingContext.class, new TracingObservationHandler.TracingContext());
+        TracingObservationHandler.TracingContext tracingContext = observation.getContextView()
+            .getOrDefault(TracingObservationHandler.TracingContext.class,
+                    new TracingObservationHandler.TracingContext());
         return tracingContext.getSpan() != null ? tracingContext.getSpan().context() : null;
     }
 

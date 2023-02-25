@@ -44,12 +44,11 @@ public class SecurityConfiguration {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http, Tracer tracer) throws Exception {
         return http.authorizeHttpRequests(requests -> requests.anyRequest()
-                // This is needed for tests
-                .access((authentication, object) -> {
-                    log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer",
-                            tracer.currentSpan().context().traceId());
-                    return new AuthorizationDecision(true);
-                })).httpBasic(withDefaults()).formLogin(withDefaults()).build();
+            // This is needed for tests
+            .access((authentication, object) -> {
+                log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", tracer.currentSpan().context().traceId());
+                return new AuthorizationDecision(true);
+            })).httpBasic(withDefaults()).formLogin(withDefaults()).build();
     }
 
     @SuppressWarnings("deprecation")

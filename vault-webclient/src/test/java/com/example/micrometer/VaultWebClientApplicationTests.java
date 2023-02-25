@@ -35,7 +35,7 @@ class VaultWebClientApplicationTests {
     static void setup() {
         wireMockServer.start();
         wireMockServer
-                .stubFor(WireMock.get("/secret/foo").willReturn(WireMock.aResponse().withBody("{ }").withStatus(200)));
+            .stubFor(WireMock.get("/secret/foo").willReturn(WireMock.aResponse().withBody("{ }").withStatus(200)));
     }
 
     @AfterAll
@@ -50,8 +50,9 @@ class VaultWebClientApplicationTests {
 
     @Test
     void should_record_metrics() {
-        MeterRegistryAssert.then(meterRegistry).hasTimerWithNameAndTagKeys("http.client.requests", "error", "exception",
-                "method", "outcome", "status", "uri");
+        MeterRegistryAssert.then(meterRegistry)
+            .hasTimerWithNameAndTagKeys("http.client.requests", "error", "exception", "method", "outcome", "status",
+                    "uri");
     }
 
     @TestConfiguration(proxyBeanMethods = false) // otherwise the Vault autoconfig doesn't
