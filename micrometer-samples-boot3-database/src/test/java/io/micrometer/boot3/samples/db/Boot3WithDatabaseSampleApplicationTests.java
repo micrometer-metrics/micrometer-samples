@@ -74,121 +74,101 @@ class Boot3WithDatabaseSampleApplicationTests {
 
     @Test
     void verifyLogsMetricsTraces(CapturedOutput output) {
-        // @formatter:off
         await().atMost(Duration.ofSeconds(5)).untilAsserted(this::verifyIfZipkinIsUp);
         verifyIfGreetingApiWorks();
-        TraceInfo traceInfo = await()
-                .atMost(Duration.ofSeconds(5))
-                .until(() -> getTraceInfoFromLogs(output), Optional::isPresent)
-                .orElseThrow();
+        TraceInfo traceInfo = await().atMost(Duration.ofSeconds(5))
+            .until(() -> getTraceInfoFromLogs(output), Optional::isPresent)
+            .orElseThrow();
         verifyIfPrometheusEndpointWorks(traceInfo);
-        await()
-                .atMost(Duration.ofSeconds(10))
-                .pollDelay(Duration.ofMillis(100))
-                .pollInterval(Duration.ofMillis(500))
-                .untilAsserted(() -> verifyIfTraceIsInZipkin(traceInfo));
-        // @formatter:on
+        await().atMost(Duration.ofSeconds(10))
+            .pollDelay(Duration.ofMillis(100))
+            .pollInterval(Duration.ofMillis(500))
+            .untilAsserted(() -> verifyIfTraceIsInZipkin(traceInfo));
     }
 
     private void verifyIfGreetingApiWorks() {
-        // @formatter:off
-        given()
-                .port(port)
-                .accept(JSON)
-        .when()
-                .get("/greet/suzy")
-        .then()
-                .statusCode(200)
-                .body("greeted", equalTo("suzy"));
-        // @formatter:on
+        given().port(port)
+            .accept(JSON)
+            .when()
+            .get("/greet/suzy")
+            .then()
+            .statusCode(200)
+            .body("greeted", equalTo("suzy"));
     }
 
     private Optional<TraceInfo> getTraceInfoFromLogs(CharSequence output) {
-        // @formatter:off
-        return output.toString().lines()
-                .filter(line -> line.contains("<TEST_MARKER>"))
-                .map(TRACE_PATTERN::matcher)
-                .flatMap(Matcher::results)
-                .map(matchResult -> new TraceInfo(matchResult.group(2), matchResult.group(3)))
-                .findFirst();
-        // @formatter:on
+        return output.toString()
+            .lines()
+            .filter(line -> line.contains("<TEST_MARKER>"))
+            .map(TRACE_PATTERN::matcher)
+            .flatMap(Matcher::results)
+            .map(matchResult -> new TraceInfo(matchResult.group(2), matchResult.group(3)))
+            .findFirst();
     }
 
     private void verifyIfPrometheusEndpointWorks(TraceInfo traceInfo) {
-        // @formatter:off
-        given()
-                .port(port)
-                .accept(CONTENT_TYPE_OPENMETRICS_100)
-        .when()
-                .get("/actuator/prometheus")
-        .then()
-                .statusCode(200)
-                .body(
-                        containsString("greeting_greeted_total"), // counter
-                        containsString("greeting_seconds_count"), // summary
-                        containsString("greeting_seconds_bucket"), // histogram
-                        containsString("greeting_active_seconds_active_count"), // active summary
-                        containsString("greeting_active_seconds_bucket"), // active histogram
-                        containsString(String.format("{span_id=\"%s\",trace_id=\"%s\"}", traceInfo.spanId, traceInfo.traceId)) // exemplar
-                );
-        // @formatter:on
+        given().port(port)
+            .accept(CONTENT_TYPE_OPENMETRICS_100)
+            .when()
+            .get("/actuator/prometheus")
+            .then()
+            .statusCode(200)
+            .body(containsString("greeting_greeted_total"), // counter
+                    containsString("greeting_seconds_count"), // summary
+                    containsString("greeting_seconds_bucket"), // histogram
+                    containsString("greeting_active_seconds_active_count"), // active
+                                                                            // summary
+                    containsString("greeting_active_seconds_bucket"), // active histogram
+                    containsString(
+                            String.format("{span_id=\"%s\",trace_id=\"%s\"}", traceInfo.spanId, traceInfo.traceId)) // exemplar
+            );
     }
 
     private void verifyIfZipkinIsUp() {
-        // @formatter:off
-        given()
-                .port(zipkin.getFirstMappedPort())
-        .when()
-                .get("/zipkin")
-        .then()
-                .statusCode(200);
-        // @formatter:on
+        given().port(zipkin.getFirstMappedPort()).when().get("/zipkin").then().statusCode(200);
     }
 
     private void verifyIfTraceIsInZipkin(TraceInfo traceInfo) {
-        // @formatter:off
-        given()
-                .port(zipkin.getFirstMappedPort())
-                .accept(JSON)
-        .when()
-                .get("/zipkin/api/v2/trace/" + traceInfo.traceId)
-        .then()
-                .statusCode(200)
-                .contentType(JSON)
-                .body("size()", equalTo(5))
-                .body("findAll { it.name == 'greeting' }.size()", equalTo(1))
-                .body("findAll { it.name == 'query' }.size()", equalTo(1))
-                .body("findAll { it.name == 'http get /greet/{name}' }.size()", equalTo(1))
-                .rootPath("find { it.name == 'greeting' }")
-                    .body("traceId", equalTo(traceInfo.traceId))
-                    .body("id", equalTo(traceInfo.spanId))
-                    .body("parentId", not(nullValue()))
-                    .body("localEndpoint.serviceName", equalTo("boot3-db-sample"))
-                    .body("annotations[0].value", equalTo("greeted"))
-                    .body("tags['greeting.name']", equalTo("suzy"))
-                .detachRootPath("")
-                .rootPath("find { it.name == 'query' }")
-                    .body("traceId", equalTo(traceInfo.traceId))
-                    .body("id", not(equalTo(traceInfo.spanId)))
-                    .body("parentId", not(nullValue()))
-                    .body("kind", equalTo("CLIENT"))
-                // TODO: OTel does not add remoteEndpoint, it has a tag instead
-//                    .body("remoteEndpoint.serviceName", equalTo("testdb"))
-//                    .body("tags['peer.service']", equalTo("TESTDB"))
-                    .body("tags['jdbc.query[0]']", equalTo("SELECT count(name) FROM emp where name=?"))
-                .detachRootPath("")
-                .rootPath("find { it.name == 'http get /greet/{name}' }")
-                    .body("traceId", equalTo(traceInfo.traceId))
-                    .body("id", not(nullValue()))
-                    .body("parentId", is(nullValue()))
-                    .body("kind", equalTo("SERVER"))
-                    .body("localEndpoint.serviceName", equalTo("boot3-db-sample"))
-                    .body("tags['method']", equalTo("GET"))
-                    .body("tags['http.url']", equalTo("/greet/suzy"))
-                    .body("tags['outcome']", equalTo("SUCCESS"))
-                    .body("tags['status']", equalTo("200"))
-                    .body("tags['uri']", equalTo("/greet/{name}"));
-        // @formatter:on
+        given().port(zipkin.getFirstMappedPort())
+            .accept(JSON)
+            .when()
+            .get("/zipkin/api/v2/trace/" + traceInfo.traceId)
+            .then()
+            .statusCode(200)
+            .contentType(JSON)
+            .body("size()", equalTo(5))
+            .body("findAll { it.name == 'greeting' }.size()", equalTo(1))
+            .body("findAll { it.name == 'query' }.size()", equalTo(1))
+            .body("findAll { it.name == 'http get /greet/{name}' }.size()", equalTo(1))
+            .rootPath("find { it.name == 'greeting' }")
+            .body("traceId", equalTo(traceInfo.traceId))
+            .body("id", equalTo(traceInfo.spanId))
+            .body("parentId", not(nullValue()))
+            .body("localEndpoint.serviceName", equalTo("boot3-db-sample"))
+            .body("annotations[0].value", equalTo("greeted"))
+            .body("tags['greeting.name']", equalTo("suzy"))
+            .detachRootPath("")
+            .rootPath("find { it.name == 'query' }")
+            .body("traceId", equalTo(traceInfo.traceId))
+            .body("id", not(equalTo(traceInfo.spanId)))
+            .body("parentId", not(nullValue()))
+            .body("kind", equalTo("CLIENT"))
+            // TODO: OTel does not add remoteEndpoint, it has a tag instead
+            // .body("remoteEndpoint.serviceName", equalTo("testdb"))
+            // .body("tags['peer.service']", equalTo("TESTDB"))
+            .body("tags['jdbc.query[0]']", equalTo("SELECT count(name) FROM emp where name=?"))
+            .detachRootPath("")
+            .rootPath("find { it.name == 'http get /greet/{name}' }")
+            .body("traceId", equalTo(traceInfo.traceId))
+            .body("id", not(nullValue()))
+            .body("parentId", is(nullValue()))
+            .body("kind", equalTo("SERVER"))
+            .body("localEndpoint.serviceName", equalTo("boot3-db-sample"))
+            .body("tags['method']", equalTo("GET"))
+            .body("tags['http.url']", equalTo("/greet/suzy"))
+            .body("tags['outcome']", equalTo("SUCCESS"))
+            .body("tags['status']", equalTo("200"))
+            .body("tags['uri']", equalTo("/greet/{name}"));
     }
 
     private record TraceInfo(String traceId, String spanId) {

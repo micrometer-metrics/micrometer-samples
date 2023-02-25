@@ -114,18 +114,18 @@ public class SimpleNativeImageSample {
     private List<MeterBinder> createBinders() {
         // @formatter:off
         return List.of(
-                new ClassLoaderMetrics(),
-                new ExecutorServiceMetrics(executorService, "executor.sample", emptyList()),
-                new JvmCompilationMetrics(),
-                new JvmGcMetrics(),
-                new JvmHeapPressureMetrics(),
-                new JvmInfoMetrics(),
-                new JvmMemoryMetrics(),
-                new JvmThreadMetrics(),
-                new DiskSpaceMetrics(new File(".")),
-                new FileDescriptorMetrics(),
-                new ProcessorMetrics(),
-                new UptimeMetrics()
+            new ClassLoaderMetrics(),
+            new ExecutorServiceMetrics(executorService, "executor.sample", emptyList()),
+            new JvmCompilationMetrics(),
+            new JvmGcMetrics(),
+            new JvmHeapPressureMetrics(),
+            new JvmInfoMetrics(),
+            new JvmMemoryMetrics(),
+            new JvmThreadMetrics(),
+            new DiskSpaceMetrics(new File(".")),
+            new FileDescriptorMetrics(),
+            new ProcessorMetrics(),
+            new UptimeMetrics()
         );
         // @formatter:on
     }
