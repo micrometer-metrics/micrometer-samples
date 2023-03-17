@@ -139,7 +139,11 @@ class Boot3WithDatabaseSampleApplicationTests {
                     containsString("http_server_requests_active_seconds_active_count"),
                     containsString("http_server_requests_active_seconds_duration_sum"),
                     containsString("http_server_requests_active_seconds_max"),
-                    containsString("http_server_requests_active_seconds_bucket"));
+                    containsString("http_server_requests_active_seconds_bucket"),
+                    // Exemplar
+                    matchesRegex(
+                            "[\\s\\S]*http_server_requests_seconds_bucket\\{.*}.* 1.0 # \\{span_id=\".*\",trace_id=\"%s\"} [\\s\\S]*"
+                                .formatted(traceInfo.traceId)));
     }
 
     private void verifyIfZipkinIsUp() {
