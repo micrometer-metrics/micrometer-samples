@@ -15,7 +15,6 @@
  */
 package io.micrometer.boot3.samples.web;
 
-import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.observation.ObservationRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +37,6 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static io.micrometer.core.tck.MeterRegistryAssert.assertThat;
 import static io.prometheus.client.exporter.common.TextFormat.CONTENT_TYPE_OPENMETRICS_100;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -63,9 +61,6 @@ class Boot3WithWebSampleApplicationTests {
 
     @Autowired
     ObservationRegistry observationRegistry;
-
-    @Autowired
-    MeterRegistry meterRegistry;
 
     @LocalServerPort
     int port;
@@ -117,18 +112,33 @@ class Boot3WithWebSampleApplicationTests {
             .get("/actuator/prometheus")
             .then()
             .statusCode(200)
-            .body(containsString("greeting_greeted_total"), // counter
-                    containsString("greeting_seconds_count"), // summary
-                    containsString("greeting_seconds_bucket"), // histogram
-                    containsString("greeting_active_seconds_active_count"), // active
-                                                                            // summary
-                    containsString("greeting_active_seconds_bucket"), // active histogram
-                    containsString(
-                            String.format("{span_id=\"%s\",trace_id=\"%s\"}", traceInfo.spanId, traceInfo.traceId)) // exemplar
-            );
+            .body(
+                    // greeting observation
+                    // Counter, because of the event
+                    containsString("greeting_greeted_total"),
+                    // Timer
+                    containsString("greeting_seconds_count"), containsString("greeting_seconds_sum"),
+                    containsString("greeting_seconds_max"), containsString("greeting_seconds_bucket"),
+                    // LongTaskTimer
+                    containsString("greeting_active_seconds_active_count"),
+                    containsString("greeting_active_seconds_duration_sum"),
+                    containsString("greeting_active_seconds_max"), containsString("greeting_active_seconds_bucket"),
+                    // Exemplar
+                    matchesRegex(
+                            "[\\s\\S]*.*greeting_seconds_bucket\\{.*}.* 1.0 # \\{span_id=\"%s\",trace_id=\"%s\"} [\\s\\S]*"
+                                .formatted(traceInfo.spanId, traceInfo.traceId)),
 
-        assertThat(meterRegistry).hasTimerWithNameAndTagKeys("http.server.requests", "error", "exception", "method",
-                "outcome", "status", "uri");
+                    // HTTP observation
+                    // Timer
+                    containsString("http_server_requests_seconds_count"),
+                    containsString("http_server_requests_seconds_sum"),
+                    containsString("http_server_requests_seconds_max"),
+                    containsString("http_server_requests_seconds_bucket"),
+                    // LongTaskTimer
+                    containsString("http_server_requests_active_seconds_active_count"),
+                    containsString("http_server_requests_active_seconds_duration_sum"),
+                    containsString("http_server_requests_active_seconds_max"),
+                    containsString("http_server_requests_active_seconds_bucket"));
     }
 
     private void verifyIfZipkinIsUp() {

@@ -113,15 +113,33 @@ class Boot3WithDatabaseSampleApplicationTests {
             .get("/actuator/prometheus")
             .then()
             .statusCode(200)
-            .body(containsString("greeting_greeted_total"), // counter
-                    containsString("greeting_seconds_count"), // summary
-                    containsString("greeting_seconds_bucket"), // histogram
-                    containsString("greeting_active_seconds_active_count"), // active
-                                                                            // summary
-                    containsString("greeting_active_seconds_bucket"), // active histogram
-                    containsString(
-                            String.format("{span_id=\"%s\",trace_id=\"%s\"}", traceInfo.spanId, traceInfo.traceId)) // exemplar
-            );
+            .body(
+                    // greeting observation
+                    // Counter, because of the event
+                    containsString("greeting_greeted_total"),
+                    // Timer
+                    containsString("greeting_seconds_count"), containsString("greeting_seconds_sum"),
+                    containsString("greeting_seconds_max"), containsString("greeting_seconds_bucket"),
+                    // LongTaskTimer
+                    containsString("greeting_active_seconds_active_count"),
+                    containsString("greeting_active_seconds_duration_sum"),
+                    containsString("greeting_active_seconds_max"), containsString("greeting_active_seconds_bucket"),
+                    // Exemplar
+                    matchesRegex(
+                            "[\\s\\S]*.*greeting_seconds_bucket\\{.*}.* 1.0 # \\{span_id=\"%s\",trace_id=\"%s\"} [\\s\\S]*"
+                                .formatted(traceInfo.spanId, traceInfo.traceId)),
+
+                    // HTTP observation
+                    // Timer
+                    containsString("http_server_requests_seconds_count"),
+                    containsString("http_server_requests_seconds_sum"),
+                    containsString("http_server_requests_seconds_max"),
+                    containsString("http_server_requests_seconds_bucket"),
+                    // LongTaskTimer
+                    containsString("http_server_requests_active_seconds_active_count"),
+                    containsString("http_server_requests_active_seconds_duration_sum"),
+                    containsString("http_server_requests_active_seconds_max"),
+                    containsString("http_server_requests_active_seconds_bucket"));
     }
 
     private void verifyIfZipkinIsUp() {
