@@ -12,17 +12,13 @@ buildscript {
 
 apply plugin: 'org.springframework.boot'
 
-repositories {
-	maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-}
-
 dependencies {
 	implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
 
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-rsocket'
-	implementation 'io.rsocket:rsocket-micrometer:1.+' // TODO: Remove me
+	implementation 'io.rsocket:rsocket-micrometer:1.+'
 	implementation 'io.micrometer:micrometer-registry-prometheus'
 
 	// Default is Brave + Zipkin, you can opt in via "-Pwavefront" to Wavefront and "-Potel" for OTel
