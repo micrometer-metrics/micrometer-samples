@@ -34,6 +34,8 @@ dependencies {
 		implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
 	}
 
+	runtimeOnly 'com.h2database:h2'
+
 	testImplementation project(':test-common')
 	testImplementation 'io.micrometer:micrometer-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
