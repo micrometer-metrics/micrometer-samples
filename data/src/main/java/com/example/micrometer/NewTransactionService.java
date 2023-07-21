@@ -26,11 +26,8 @@ public class NewTransactionService {
 
     @Transactional
     public void newTransaction() {
-        log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", tracer.currentSpan().context().traceId()); // TODO:
-                                                                                                                // TX
-                                                                                                                // is
-                                                                                                                // not
-                                                                                                                // working
+        // TODO: TX is not working
+        log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", tracer.currentSpan().context().traceId());
 
         // save a few customers
         repository.save(new Customer("Jack", "Bauer"));
