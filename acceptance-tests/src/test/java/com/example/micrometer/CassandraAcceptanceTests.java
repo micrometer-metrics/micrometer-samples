@@ -22,7 +22,7 @@ import java.util.Map;
 class CassandraAcceptanceTests extends AcceptanceTestsBase {
 
     @Container
-    static CassandraContainer cassandra = new CassandraContainer("cassandra:3.11.2");
+    static CassandraContainer cassandra = new CassandraContainer("cassandra:3.11.10");
 
     @BeforeAll
     static void setup() {

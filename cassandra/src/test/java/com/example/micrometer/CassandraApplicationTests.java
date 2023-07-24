@@ -1,39 +1,52 @@
 package com.example.micrometer;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.Session;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.testcontainers.containers.CassandraContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import java.time.Duration;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 @SpringBootTest
 @Testcontainers
-@Disabled
+@AutoConfigureObservability
+@ExtendWith(OutputCaptureExtension.class)
 class CassandraApplicationTests {
 
-    @Container
-    static CassandraContainer cassandra = new CassandraContainer("cassandra:3.11.2");
+    private static final Pattern TRACE_PATTERN = Pattern
+        .compile("^.+INFO \\[(.+),(\\p{XDigit}+),(\\p{XDigit}+)\\] .+ <ACCEPTANCE_TEST>.+$");
 
-    @DynamicPropertySource
-    static void setup(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.cassandra.contact-points",
-                () -> cassandra.getContainerIpAddress() + ":" + cassandra.getFirstMappedPort());
-        Cluster cluster = cassandra.getCluster();
-        try (Session session = cluster.connect()) {
-            session.execute("CREATE KEYSPACE IF NOT EXISTS example WITH replication = \n"
-                    + "{'class':'SimpleStrategy','replication_factor':'1'};");
-        }
-    }
+    @Container
+    @ServiceConnection
+    static CassandraContainer<?> cassandra = new CassandraContainer<>("cassandra:3.11.10");
 
     @Test
-    void should_work() {
-
+    void logsShouldContainTraceId(CapturedOutput output) {
+        String traceId = await().atMost(Duration.ofSeconds(5))
+            .until(() -> getTraceIdFromLogs(output), Optional::isPresent)
+            .orElseThrow();
+        assertThat(traceId).hasSize(32);
     }
 
+    private Optional<String> getTraceIdFromLogs(CharSequence output) {
+        return output.toString()
+            .lines()
+            .filter(line -> line.contains("<ACCEPTANCE_TEST>"))
+            .map(TRACE_PATTERN::matcher)
+            .flatMap(Matcher::results)
+            .map(matchResult -> matchResult.group(2))
+            .findFirst();
+    }
 }
