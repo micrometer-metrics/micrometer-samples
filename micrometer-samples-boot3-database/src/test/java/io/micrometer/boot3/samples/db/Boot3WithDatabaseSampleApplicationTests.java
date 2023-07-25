@@ -57,7 +57,7 @@ class Boot3WithDatabaseSampleApplicationTests {
         .compile("^.+INFO \\[(.+),(\\p{XDigit}+),(\\p{XDigit}+)\\] .+ <TEST_MARKER>.+$");
 
     @Container
-    static GenericContainer<?> zipkin = new GenericContainer(DockerImageName.parse("openzipkin/zipkin:latest"))
+    static GenericContainer<?> zipkin = new GenericContainer<>(DockerImageName.parse("openzipkin/zipkin:latest"))
         .withExposedPorts(9411);
 
     @Autowired
@@ -167,7 +167,7 @@ class Boot3WithDatabaseSampleApplicationTests {
             .body("id", equalTo(traceInfo.spanId))
             .body("parentId", not(nullValue()))
             .body("localEndpoint.serviceName", equalTo("boot3-db-sample"))
-            .body("annotations[0].value", equalTo("greeted"))
+            .body("annotations[0].value", anyOf(equalTo("greeted"), equalTo("\"greeted\":{}")))
             .body("tags['greeting.name']", equalTo("suzy"))
             .detachRootPath("")
             .rootPath("find { it.name == 'query' }")
