@@ -49,4 +49,5 @@ class CassandraApplicationTests {
             .map(matchResult -> matchResult.group(2))
             .findFirst();
     }
+
 }
