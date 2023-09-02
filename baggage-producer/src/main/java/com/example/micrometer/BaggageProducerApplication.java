@@ -78,7 +78,7 @@ class BaggageRestTemplateService {
     String call(String url) {
         Span span = this.tracer.nextSpan();
         try (Tracer.SpanInScope ws = this.tracer.withSpan(span.start())) {
-            try (BaggageInScope baggage = this.tracer.createBaggage("mybaggage", "my-baggage-value").makeCurrent()) {
+            try (BaggageInScope baggage = this.tracer.createBaggageInScope("mybaggage", "my-baggage-value")) {
                 LOGGER.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer",
                         this.tracer.currentSpan().context().traceId());
                 LOGGER.info("<BAGGAGE VALUE: {}> Baggage is set", baggage.get());
