@@ -48,12 +48,10 @@ class RetrofitApplicationTests {
     @Test
     void should_record_metrics() {
         MeterRegistryAssert.then(meterRegistry)
-            .hasMeterWithNameAndTagKeys("okhttp", "error", "host", "method", "outcome", "status", "target.host",
-                    "target.port", "target.scheme", "uri");
+            .hasMeterWithNameAndTagKeys("okhttp", "error", "host", "method", "outcome", "status", "uri");
 
         MeterRegistryAssert.then(meterRegistry)
-            .hasMeterWithNameAndTagKeys("okhttp.active", "host", "method", "outcome", "status", "target.host",
-                    "target.port", "target.scheme", "uri");
+            .hasMeterWithNameAndTagKeys("okhttp.active", "host", "method", "outcome", "status", "uri");
     }
 
 }
