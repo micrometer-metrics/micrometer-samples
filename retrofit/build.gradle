@@ -34,9 +34,11 @@ dependencies {
 		implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
 	}
 
-	testImplementation project(':test-common')
-	testImplementation 'io.micrometer:micrometer-test'
+	testImplementation platform('org.testcontainers:testcontainers-bom:1.+')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'com.github.tomakehurst:wiremock-jre8-standalone:latest.release'
-
+	testImplementation 'io.micrometer:micrometer-test'
+	testImplementation 'io.rest-assured:rest-assured'
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testImplementation 'org.awaitility:awaitility'
 }
