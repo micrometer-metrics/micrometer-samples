@@ -18,14 +18,13 @@ public class RetrofitApplication {
     }
 
     @Bean
-    GreetingClient greetingClient(
-        ObservationRegistry observationRegistry,
-        @Value("${greeting.endpoint}") String greetingEndpoint) {
+    GreetingClient greetingClient(ObservationRegistry observationRegistry,
+            @Value("${greeting.endpoint}") String greetingEndpoint) {
         return new Retrofit.Builder().baseUrl(greetingEndpoint)
             .client(new OkHttpClient.Builder()
-                .addInterceptor(OkHttpObservationInterceptor.builder(observationRegistry, "http.client.requests").build())
-                .build()
-            )
+                .addInterceptor(
+                        OkHttpObservationInterceptor.builder(observationRegistry, "http.client.requests").build())
+                .build())
             .addConverterFactory(ScalarsConverterFactory.create())
             .build()
             .create(GreetingClient.class);

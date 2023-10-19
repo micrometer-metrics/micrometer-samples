@@ -27,6 +27,7 @@ import java.util.Map;
 
 @RestController
 public class SampleController {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SampleController.class);
 
     private final GreetingClient client;
@@ -45,4 +46,5 @@ public class SampleController {
     String greeting(@PathVariable String name) {
         return "Hi %s!".formatted(name);
     }
+
 }

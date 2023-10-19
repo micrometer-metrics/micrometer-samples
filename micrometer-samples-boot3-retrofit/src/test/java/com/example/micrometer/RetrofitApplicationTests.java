@@ -41,6 +41,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @ExtendWith(OutputCaptureExtension.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class RetrofitApplicationTests {
+
     private static final Pattern TRACE_PATTERN = Pattern
         .compile("^.+INFO \\[(.+),(\\p{XDigit}+),(\\p{XDigit}+)\\] .+ <TEST_MARKER>.+$");
 
@@ -59,19 +60,14 @@ class RetrofitApplicationTests {
     @DynamicPropertySource
     static void zipkinProperties(DynamicPropertyRegistry registry) {
         registry.add("management.zipkin.tracing.endpoint",
-            () -> String.format("http://localhost:%d/api/v2/spans", zipkin.getFirstMappedPort()));
+                () -> String.format("http://localhost:%d/api/v2/spans", zipkin.getFirstMappedPort()));
     }
 
     @BeforeAll
     static void setup() {
         WIREMOCK.start();
         WIREMOCK.stubFor(
-            WireMock.get("/greeting/Suzy").willReturn(
-                WireMock.aResponse()
-                    .withBody("Hi Suzy!")
-                    .withStatus(200)
-            )
-        );
+                WireMock.get("/greeting/Suzy").willReturn(WireMock.aResponse().withBody("Hi Suzy!").withStatus(200)));
     }
 
     @AfterAll
@@ -100,9 +96,9 @@ class RetrofitApplicationTests {
     private void verifyIfGreetApiWorks() {
         given().port(port)
             .accept(JSON)
-        .when()
+            .when()
             .get("/greet/Suzy")
-        .then()
+            .then()
             .statusCode(200)
             .body("greeting", equalTo("Hi Suzy!"));
     }
@@ -123,81 +119,80 @@ class RetrofitApplicationTests {
     private void verifyIfPrometheusEndpointWorks(TraceInfo traceInfo) {
         given().port(port)
             .accept(CONTENT_TYPE_OPENMETRICS_100)
-        .when()
+            .when()
             .get("/actuator/prometheus")
-        .then()
+            .then()
             .statusCode(200)
             .body(
-                // HTTP Server Observation
-                // Timer
-                containsString("http_server_requests_seconds_count"),
-                containsString("http_server_requests_seconds_sum"),
-                containsString("http_server_requests_seconds_max"),
-                containsString("http_server_requests_seconds_bucket"),
-                // LongTaskTimer
-                containsString("http_server_requests_active_seconds_active_count"),
-                containsString("http_server_requests_active_seconds_duration_sum"),
-                containsString("http_server_requests_active_seconds_max"),
-                containsString("http_server_requests_active_seconds_bucket"),
-                // Exemplar
-                matchesRegex(
-                    "[\\s\\S]*http_server_requests_seconds_bucket\\{.*}.* 1.0 # \\{span_id=\".*\",trace_id=\"%s\"} [\\s\\S]*"
-                        .formatted(traceInfo.traceId)),
+                    // HTTP Server Observation
+                    // Timer
+                    containsString("http_server_requests_seconds_count"),
+                    containsString("http_server_requests_seconds_sum"),
+                    containsString("http_server_requests_seconds_max"),
+                    containsString("http_server_requests_seconds_bucket"),
+                    // LongTaskTimer
+                    containsString("http_server_requests_active_seconds_active_count"),
+                    containsString("http_server_requests_active_seconds_duration_sum"),
+                    containsString("http_server_requests_active_seconds_max"),
+                    containsString("http_server_requests_active_seconds_bucket"),
+                    // Exemplar
+                    matchesRegex(
+                            "[\\s\\S]*http_server_requests_seconds_bucket\\{.*}.* 1.0 # \\{span_id=\".*\",trace_id=\"%s\"} [\\s\\S]*"
+                                .formatted(traceInfo.traceId)),
 
-                // HTTP Client Observation
-                // Timer
-                containsString("http_client_requests_seconds_count"),
-                containsString("http_client_requests_seconds_sum"),
-                containsString("http_client_requests_seconds_max"),
-                containsString("http_client_requests_seconds_bucket"),
-                // LongTaskTimer
-                containsString("http_client_requests_active_seconds_duration_sum"),
-                containsString("http_client_requests_active_seconds_active_count"),
-                containsString("http_client_requests_active_seconds_max"),
-                containsString("http_client_requests_active_seconds_bucket"),
-                // Exemplar
-                matchesRegex(
-                    "[\\s\\S]*http_client_requests_seconds_bucket\\{.*}.* 1.0 # \\{span_id=\".*\",trace_id=\"%s\"} [\\s\\S]*"
-                        .formatted(traceInfo.traceId))
-            );
+                    // HTTP Client Observation
+                    // Timer
+                    containsString("http_client_requests_seconds_count"),
+                    containsString("http_client_requests_seconds_sum"),
+                    containsString("http_client_requests_seconds_max"),
+                    containsString("http_client_requests_seconds_bucket"),
+                    // LongTaskTimer
+                    containsString("http_client_requests_active_seconds_duration_sum"),
+                    containsString("http_client_requests_active_seconds_active_count"),
+                    containsString("http_client_requests_active_seconds_max"),
+                    containsString("http_client_requests_active_seconds_bucket"),
+                    // Exemplar
+                    matchesRegex(
+                            "[\\s\\S]*http_client_requests_seconds_bucket\\{.*}.* 1.0 # \\{span_id=\".*\",trace_id=\"%s\"} [\\s\\S]*"
+                                .formatted(traceInfo.traceId)));
     }
 
     private void verifyIfTraceIsInZipkin(TraceInfo traceInfo) {
         given().port(zipkin.getFirstMappedPort())
             .accept(JSON)
-        .when()
+            .when()
             .get("/zipkin/api/v2/trace/" + traceInfo.traceId)
-        .then()
+            .then()
             .statusCode(200)
             .contentType(JSON)
             .body("size()", equalTo(2))
             .body("findAll { it.name == 'http get /greet/{name}' }.size()", equalTo(1))
             .body("findAll { it.name == 'get' }.size()", equalTo(1))
             .rootPath("find { it.name == 'http get /greet/{name}' }")
-                .body("traceId", equalTo(traceInfo.traceId))
-                .body("id", equalTo(traceInfo.spanId))
-                .body("parentId", is(nullValue()))
-                .body("kind", equalTo("SERVER"))
-                .body("localEndpoint.serviceName", equalTo("boot3-retrofit-sample"))
-                .body("tags['method']", equalTo("GET"))
-                .body("tags['http.url']", equalTo("/greet/Suzy"))
-                .body("tags['outcome']", equalTo("SUCCESS"))
-                .body("tags['status']", equalTo("200"))
-                .body("tags['uri']", equalTo("/greet/{name}"))
+            .body("traceId", equalTo(traceInfo.traceId))
+            .body("id", equalTo(traceInfo.spanId))
+            .body("parentId", is(nullValue()))
+            .body("kind", equalTo("SERVER"))
+            .body("localEndpoint.serviceName", equalTo("boot3-retrofit-sample"))
+            .body("tags['method']", equalTo("GET"))
+            .body("tags['http.url']", equalTo("/greet/Suzy"))
+            .body("tags['outcome']", equalTo("SUCCESS"))
+            .body("tags['status']", equalTo("200"))
+            .body("tags['uri']", equalTo("/greet/{name}"))
             .detachRootPath("")
             .rootPath("find { it.name == 'get' }")
-                .body("traceId", equalTo(traceInfo.traceId))
-                .body("id", not(nullValue()))
-                .body("parentId", not(nullValue()))
-                .body("kind", equalTo("CLIENT"))
-                .body("localEndpoint.serviceName", equalTo("boot3-retrofit-sample"))
-                .body("tags['host']", equalTo("localhost"))
-                .body("tags['method']", equalTo("GET"))
-                .body("tags['outcome']", equalTo("SUCCESS"))
-                .body("tags['status']", equalTo("200"))
-                .body("tags['target.host']", equalTo("localhost"))
-                .body("tags['target.port']", equalTo("7100"))
-                .body("tags['target.scheme']", equalTo("http"));
+            .body("traceId", equalTo(traceInfo.traceId))
+            .body("id", not(nullValue()))
+            .body("parentId", not(nullValue()))
+            .body("kind", equalTo("CLIENT"))
+            .body("localEndpoint.serviceName", equalTo("boot3-retrofit-sample"))
+            .body("tags['host']", equalTo("localhost"))
+            .body("tags['method']", equalTo("GET"))
+            .body("tags['outcome']", equalTo("SUCCESS"))
+            .body("tags['status']", equalTo("200"))
+            .body("tags['target.host']", equalTo("localhost"))
+            .body("tags['target.port']", equalTo("7100"))
+            .body("tags['target.scheme']", equalTo("http"));
     }
 
 }
