@@ -80,7 +80,7 @@ workflows:
             branches:
               only:
                 - main
-                - latest-snapshots
+#                - latest-snapshots
     jobs:
       - nightly-brave-build
       - nightly-otel-build
