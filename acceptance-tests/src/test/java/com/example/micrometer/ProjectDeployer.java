@@ -107,7 +107,7 @@ class ProjectDeployer {
     private AppDeploymentRequest appRequest(String appName, Map<String, String> props) {
         Map<String, String> map = new HashMap<>(props);
         attachWavefrontConfigurationIfPresent(map);
-        makeCloud2022WorkWithBoot3_1(map);
+        makeCloud2022WorkWithBoot3_2(map);
         AppDefinition appDefinition = new AppDefinition(appName, map);
         return deploymentRequest(appName, appDefinition);
     }
@@ -121,8 +121,8 @@ class ProjectDeployer {
         }
     }
 
-    private void makeCloud2022WorkWithBoot3_1(Map<String, String> map) {
-        map.put("spring.cloud.compatibility-verifier.compatible-boot-versions", "3.0.x,3.1.x");
+    private void makeCloud2022WorkWithBoot3_2(Map<String, String> map) {
+        map.put("spring.cloud.compatibility-verifier.compatible-boot-versions", "3.0.x,3.1.x,3.2.x");
     }
 
     private AppDeploymentRequest deploymentRequest(String appName, AppDefinition appDefinition) {

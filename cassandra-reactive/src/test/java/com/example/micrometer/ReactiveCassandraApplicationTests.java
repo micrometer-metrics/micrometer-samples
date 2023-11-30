@@ -26,7 +26,7 @@ import static org.awaitility.Awaitility.await;
 class ReactiveCassandraApplicationTests {
 
     private static final Pattern TRACE_PATTERN = Pattern
-        .compile("^.+INFO \\[(.+),(\\p{XDigit}+),(\\p{XDigit}+)\\] .+ <ACCEPTANCE_TEST>.+$");
+        .compile("^.+ --- \\[(.+)] \\[.+] \\[(\\p{XDigit}+)-(\\p{XDigit}+)] .+ <ACCEPTANCE_TEST>.+$");
 
     @Container
     @ServiceConnection

@@ -11,9 +11,6 @@
 #
 #spring.cloud.function.definition: tracingFunction
 ## spring.cloud.function.definition: tracingFunction;supplier;stringSupplier
-#
-## For tests
-#logging.pattern.level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
 
 #spring:
 #  application:
@@ -30,7 +27,6 @@
 #    sampling:
 #      probability: 1.0
 #
-#logging.pattern.level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
 
 spring:
   application:
@@ -47,8 +43,3 @@ spring:
     function:
       definition: tracingFunction
 # spring.cloud.function.definition: tracingFunction;supplier;stringSupplier
-
-# For tests
-logging:
-  pattern:
-    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

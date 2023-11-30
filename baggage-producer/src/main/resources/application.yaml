@@ -10,5 +10,3 @@ management:
       remote-fields:
         - mybaggage
         - myremotefield
-
-logging.pattern.level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

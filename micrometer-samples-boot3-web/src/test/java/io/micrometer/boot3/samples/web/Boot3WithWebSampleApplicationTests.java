@@ -53,7 +53,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 class Boot3WithWebSampleApplicationTests {
 
     private static final Pattern TRACE_PATTERN = Pattern
-        .compile("^.+INFO \\[(.+),(\\p{XDigit}+),(\\p{XDigit}+)\\] .+ <TEST_MARKER>.+$");
+        .compile("^.+ --- \\[(.+)] \\[.+] \\[(\\p{XDigit}+)-(\\p{XDigit}+)] .+ <TEST_MARKER>.+$");
 
     @Container
     static GenericContainer<?> zipkin = new GenericContainer<>(DockerImageName.parse("openzipkin/zipkin:latest"))

@@ -78,7 +78,8 @@ class TracingAssertions {
 
     void assertThatLogsContainPropagatedIdAtLeastXNumberOfTimes(String appId, String springApplicationName,
             int minNumberOfOccurrences) {
-        Pattern pattern = Pattern.compile("^.*\\[" + springApplicationName + ",([a-z|0-9]+?),([a-z|0-9]+?)].*$");
+        Pattern pattern = Pattern
+            .compile("^.+ --- \\[" + springApplicationName + "] \\[.+] \\[(\\p{XDigit}+)-(\\p{XDigit}+)] .+$");
         try {
             Awaitility.await().pollInterval(1, TimeUnit.SECONDS).atMost(30, TimeUnit.SECONDS).untilAsserted(() -> {
                 AtomicInteger counter = new AtomicInteger();

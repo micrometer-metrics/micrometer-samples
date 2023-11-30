@@ -5,6 +5,3 @@ spring:
     stream:
       bindings:
         channel-in-0.destination: channelreactivedestination
-
-# For tests
-logging.pattern.level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
