@@ -1,6 +1,7 @@
 package com.example.micrometer;
 
 import io.micrometer.context.ContextSnapshot;
+import io.micrometer.context.ContextSnapshotFactory;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
@@ -47,6 +48,8 @@ class CircuitService {
 
     private final ObservationRegistry observationRegistry;
 
+    private final ContextSnapshotFactory contextSnapshotFactory = ContextSnapshotFactory.builder().build();
+
     CircuitService(ReactiveCircuitBreakerFactory factory, Tracer tracer, ObservationRegistry observationRegistry) {
         this.factory = factory;
         this.tracer = tracer;
@@ -74,7 +77,7 @@ class CircuitService {
     }
 
     private void scoped(ContextView contextView, Runnable runnable) {
-        try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+        try (ContextSnapshot.Scope scope = this.contextSnapshotFactory.setThreadLocalsFrom(contextView,
                 ObservationThreadLocalAccessor.KEY)) {
             runnable.run();
         }

@@ -1,6 +1,7 @@
 package com.example.micrometer;
 
 import io.micrometer.context.ContextSnapshot;
+import io.micrometer.context.ContextSnapshotFactory;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
@@ -37,6 +38,8 @@ class Config {
 
     private static final Logger log = LoggerFactory.getLogger(Config.class);
 
+    private final ContextSnapshotFactory contextSnapshotFactory = ContextSnapshotFactory.builder().build();
+
     @Bean
     CommandLineRunner myCommandLineRunner(WebClientService webClientService) {
         return args -> {
@@ -54,7 +57,7 @@ class Config {
     @Bean
     WebClientCustomizer testWebClientCustomizer(Tracer tracer, ObservationRegistry observationRegistry) {
         return webClientBuilder -> webClientBuilder.filter((request, next) -> Mono.deferContextual(contextView -> {
-            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+            try (ContextSnapshot.Scope scope = this.contextSnapshotFactory.setThreadLocalsFrom(contextView,
                     ObservationThreadLocalAccessor.KEY)) {
                 log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", tracer.currentSpan().context().traceId());
             }

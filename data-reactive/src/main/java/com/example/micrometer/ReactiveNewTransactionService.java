@@ -1,6 +1,7 @@
 package com.example.micrometer;
 
 import io.micrometer.context.ContextSnapshot;
+import io.micrometer.context.ContextSnapshotFactory;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
 import io.micrometer.tracing.Tracer;
@@ -24,6 +25,8 @@ public class ReactiveNewTransactionService {
 
     private final ObservationRegistry observationRegistry;
 
+    private final ContextSnapshotFactory contextSnapshotFactory = ContextSnapshotFactory.builder().build();
+
     public ReactiveNewTransactionService(ReactiveCustomerRepository repository,
             ReactiveContinuedTransactionService reactiveContinuedTransactionService, Tracer tracer,
             ObservationRegistry observationRegistry) {
@@ -36,7 +39,7 @@ public class ReactiveNewTransactionService {
     @Transactional
     public Mono<Void> newTransaction() {
         return Mono.deferContextual(contextView -> {
-            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+            try (ContextSnapshot.Scope scope = this.contextSnapshotFactory.setThreadLocalsFrom(contextView,
                     ObservationThreadLocalAccessor.KEY)) {
                 log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", tracer.currentSpan().context().traceId());
                 log.info("Customers found with findAll():");
@@ -52,7 +55,7 @@ public class ReactiveNewTransactionService {
             .flatMapMany(reactiveCustomer -> repository.findAll())
             .transformDeferredContextual(
                     (reactiveCustomerFlux, contextView) -> reactiveCustomerFlux.doOnNext(reactiveCustomer -> {
-                        try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+                        try (ContextSnapshot.Scope scope = this.contextSnapshotFactory.setThreadLocalsFrom(contextView,
                                 ObservationThreadLocalAccessor.KEY)) {
                             log.info(reactiveCustomer.toString());
                         }

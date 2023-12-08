@@ -1,6 +1,7 @@
 package com.example.micrometer;
 
 import io.micrometer.context.ContextSnapshot;
+import io.micrometer.context.ContextSnapshotFactory;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
@@ -64,6 +65,8 @@ class RsocketService {
 
     private final ObservationRegistry observationRegistry;
 
+    private final ContextSnapshotFactory contextSnapshotFactory = ContextSnapshotFactory.builder().build();
+
     RsocketService(RSocketRequester rSocketRequester, Tracer tracer, ObservationRegistry observationRegistry) {
         this.rSocketRequester = rSocketRequester;
         this.tracer = tracer;
@@ -76,7 +79,7 @@ class RsocketService {
             // You could use the client Obseravtion directy, but we're trying to show how
             // you would interact with
             // setting thread locals from Reactor Context
-            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+            try (ContextSnapshot.Scope scope = this.contextSnapshotFactory.setThreadLocalsFrom(contextView,
                     ObservationThreadLocalAccessor.KEY)) {
                 log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer",
                         this.tracer.currentSpan().context().traceId());

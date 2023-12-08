@@ -1,6 +1,7 @@
 package com.example.micrometer;
 
 import io.micrometer.context.ContextSnapshot;
+import io.micrometer.context.ContextSnapshotFactory;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
 import io.micrometer.tracing.Tracer;
@@ -23,6 +24,8 @@ public class ReactiveContinuedTransactionService {
 
     private final ReactiveNestedTransactionService reactiveNestedTransactionService;
 
+    private final ContextSnapshotFactory contextSnapshotFactory = ContextSnapshotFactory.builder().build();
+
     public ReactiveContinuedTransactionService(ReactiveCustomerRepository repository, Tracer tracer,
             ObservationRegistry observationRegistry,
             ReactiveNestedTransactionService reactiveNestedTransactionService) {
@@ -35,7 +38,7 @@ public class ReactiveContinuedTransactionService {
     @Transactional
     public Mono<Void> continuedTransaction() {
         return Mono.deferContextual(contextView -> {
-            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+            try (ContextSnapshot.Scope scope = this.contextSnapshotFactory.setThreadLocalsFrom(contextView,
                     ObservationThreadLocalAccessor.KEY)) {
                 log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer", tracer.currentSpan().context().traceId());
             }
@@ -43,7 +46,7 @@ public class ReactiveContinuedTransactionService {
         })
             .transformDeferredContextual(
                     (reactiveCustomerMono, contextView) -> reactiveCustomerMono.doOnNext(customer -> {
-                        try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+                        try (ContextSnapshot.Scope scope = this.contextSnapshotFactory.setThreadLocalsFrom(contextView,
                                 ObservationThreadLocalAccessor.KEY)) {
                             // fetch an individual customer by ID
                             log.info("Customer found with findById(1L):");
@@ -55,7 +58,7 @@ public class ReactiveContinuedTransactionService {
                             log.info("--------------------------------------------");
                         }
                     }).flatMapMany(customer -> repository.findByLastName("Bauer")).doOnNext(reactiveCustomer -> {
-                        try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+                        try (ContextSnapshot.Scope scope = this.contextSnapshotFactory.setThreadLocalsFrom(contextView,
                                 ObservationThreadLocalAccessor.KEY)) {
                             log.info(reactiveCustomer.toString());
                         }
