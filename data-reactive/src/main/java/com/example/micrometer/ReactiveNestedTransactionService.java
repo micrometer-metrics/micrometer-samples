@@ -1,6 +1,7 @@
 package com.example.micrometer;
 
 import io.micrometer.context.ContextSnapshot;
+import io.micrometer.context.ContextSnapshotFactory;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
 import io.micrometer.tracing.Tracer;
@@ -23,6 +24,8 @@ public class ReactiveNestedTransactionService {
 
     private final ReactiveCustomerRepository repository;
 
+    private final ContextSnapshotFactory contextSnapshotFactory = ContextSnapshotFactory.builder().build();
+
     public ReactiveNestedTransactionService(Tracer tracer, ObservationRegistry observationRegistry,
             ReactiveCustomerRepository repository) {
         this.tracer = tracer;
@@ -33,7 +36,7 @@ public class ReactiveNestedTransactionService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Mono<Void> requiresNew() {
         return Mono.deferContextual(contextView -> {
-            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+            try (ContextSnapshot.Scope scope = this.contextSnapshotFactory.setThreadLocalsFrom(contextView,
                     ObservationThreadLocalAccessor.KEY)) {
                 log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from consumer requires new",
                         tracer.currentSpan().context().traceId());

@@ -1,6 +1,7 @@
 package com.example.micrometer;
 
 import io.micrometer.context.ContextSnapshot;
+import io.micrometer.context.ContextSnapshotFactory;
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
 import io.micrometer.tracing.Tracer;
 import org.slf4j.Logger;
@@ -27,6 +28,8 @@ class WebFluxController {
 
     private final Tracer tracer;
 
+    private final ContextSnapshotFactory contextSnapshotFactory = ContextSnapshotFactory.builder().build();
+
     WebFluxController(Tracer tracer) {
         this.tracer = tracer;
     }
@@ -34,7 +37,7 @@ class WebFluxController {
     @RequestMapping("/")
     public Mono<String> span() {
         return Mono.deferContextual(contextView -> {
-            try (ContextSnapshot.Scope scope = ContextSnapshot.setThreadLocalsFrom(contextView,
+            try (ContextSnapshot.Scope scope = this.contextSnapshotFactory.setThreadLocalsFrom(contextView,
                     ObservationThreadLocalAccessor.KEY)) {
                 String traceId = this.tracer.currentSpan().context().traceId();
                 log.info("<ACCEPTANCE_TEST> <TRACE:{}> Hello from producer", traceId);
