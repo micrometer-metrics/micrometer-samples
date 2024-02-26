@@ -6,7 +6,7 @@ executors:
     environment:
       GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
     machine:
-      image: ubuntu-2204:2022.07.1
+      image: ubuntu-2204:2024.01.1
 
 commands:
   gradlew-build:
