@@ -20,7 +20,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'net.ttddyy.observation:datasource-micrometer-spring-boot:1.+'
+    implementation "net.ttddyy.observation:datasource-micrometer-spring-boot:${datasourceMicrometerSpringBootVersion}"
     implementation 'io.micrometer:micrometer-registry-prometheus'
 
     // Default is Brave + Zipkin, you can opt in via "-Pwavefront" to Wavefront and "-Potel" for OTel
