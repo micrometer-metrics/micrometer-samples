@@ -112,7 +112,7 @@ subprojects {
 
         useJUnitPlatform()
 
-        retry {
+        develocity.testRetry {
             maxFailures = 5
             maxRetries = 3
         }
