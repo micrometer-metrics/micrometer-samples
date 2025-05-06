@@ -20,7 +20,7 @@ import java.util.Map;
 class KafkaAcceptanceTests extends AcceptanceTestsBase {
 
     @Container
-    static KafkaContainer broker = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka").withTag("5.4.3"));
+    static KafkaContainer broker = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka").withTag("7.9.0"));
 
     @Test
     void should_pass_tracing_context_from_kafka_producer_to_consumer(TestInfo testInfo) throws Exception {
